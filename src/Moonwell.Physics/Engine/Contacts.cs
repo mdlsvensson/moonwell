@@ -56,8 +56,14 @@ namespace Moonwell.Engine
         /// <summary>The bit of OnStruck in a class's mask.</summary>
         private const int StruckBit = 1;
 
-        /// <summary>How many rounds Held takes the velocity and the pull down the walls a ball touched: each round leaves of what goes into a corner a share as small as the cosine between the walls' feet.</summary>
-        private const int Rounds = 4;
+        /// <summary>How near the ground, under its lowest point, a ball that bounces off a wall counts as on it.</summary>
+        private const float OnGround = 0.5f;
+
+        /// <summary>The most walls Held takes a ball to be at.</summary>
+        private const int Most = 4;
+
+        /// <summary>How far, as a share of its length, a part along one wall's foot may go into another wall for Room to take it as free: a float's last bits.</summary>
+        private const float Lean = 0.001f;
 
         /// <summary>A length shorter than this gives no direction, for a normal.</summary>
         private const float Tiny = 0.0001f;
@@ -94,6 +100,21 @@ namespace Moonwell.Engine
 
         /// <summary>Whether the walk down the walls running now put a ball on the ground along a wall's foot, so it may rest against the walls when the walk ends.</summary>
         private static bool footed;
+
+        /// <summary>The ball's velocity as its step left it, before the walk down the walls running now: x.</summary>
+        private static float walkVX;
+
+        /// <summary>The velocity before the walk: y.</summary>
+        private static float walkVY;
+
+        /// <summary>The velocity before the walk: z.</summary>
+        private static float walkVZ;
+
+        /// <summary>The level normals of the walls Held finds a ball at, x: made on first use, Most long, so no table is made a step.</summary>
+        private static List<float>? heldX;
+
+        /// <summary>The level normals of the walls Held finds a ball at, y.</summary>
+        private static List<float>? heldY;
 
         /// <summary>The reactions each class writes, keyed by the class (never by an actor); made on first use.</summary>
         private static Dictionary<object, int>? masks;
@@ -776,6 +797,11 @@ namespace Moonwell.Engine
                 if (Ended(missile))
                 {
                     return Go;
+                }
+
+                if (wall != null && nz == 0.0f && !missile.fell)
+                {
+                    Grounded(missile, hitX, hitY, hitZ);
                 }
 
                 Quicker(missile, before);
@@ -1661,6 +1687,9 @@ namespace Moonwell.Engine
 
             wallRound++;
             footed = false;
+            walkVX = missile.vx;
+            walkVY = missile.vy;
+            walkVZ = missile.vz;
             var round = wallRound;
             var count = list.Count;
             for (var turn = 0; turn < count && !Ended(missile) && missile.wallContact != Contact.None; turn++)
@@ -1922,6 +1951,36 @@ namespace Moonwell.Engine
         }
 
         /// <summary>
+        /// A ball on the ground this step that bounced off a wall's side at (x, y, z), its middle there: what of its new
+        /// velocity goes into the ground is taken away, as the ground holds it. A bounce off a wall turns only the velocity
+        /// across the wall, so on a slope the part down the slope it kept went into the ground, and a Bounce met the ground
+        /// at once after every wall it met while going along the ground.
+        /// </summary>
+        private static void Grounded(Missile missile, float x, float y, float z)
+        {
+            var bottom = z - missile.radius;
+            if (bottom - Ground.Height(x, y, z) > OnGround)
+            {
+                return;
+            }
+
+            float gx;
+            float gy;
+            float gz;
+            Ground.Slope(x, y, z, out gx, out gy, out gz);
+            var vx = missile.vx;
+            var vy = missile.vy;
+            var vz = missile.vz;
+            var into = vx * gx + vy * gy + vz * gz;
+            if (gz > 0.0f && into < 0.0f)
+            {
+                missile.vx = vx - into * gx;
+                missile.vy = vy - into * gy;
+                missile.vz = vz - into * gz;
+            }
+        }
+
+        /// <summary>
         /// Keeps of a velocity only its part along the line where a wall meets the ground: the wall's level normal (nx, ny)
         /// crossed with the ground's (gx, gy, gz), so it goes neither into the wall nor into the ground.
         /// </summary>
@@ -1944,12 +2003,14 @@ namespace Moonwell.Engine
 
         /// <summary>
         /// After a walk that put a ball on the ground along a wall's foot: it rests (OnRest), as a ball stopped on ground its
-        /// friction holds does, when the walls it is at (touched in the last Recent steps, and its radius and the Skin from
-        /// it or less: in a corner it meets the two walls a step about) take what is left of its velocity and of the
-        /// slope's pull. Its velocity and the pull along the ground (by Physics.Gravity, as Roll's) each keep, wall by wall and
-        /// over a few rounds, only the part along a wall's foot where they go into the wall; at rest the velocity is under
-        /// its Friction for a step, and the pull no more than its Friction. A ball pulled into two walls closing a corner
-        /// rests there; one pulled along a single wall down a slope does not.
+        /// friction holds does, when the walls it is at take its velocity and the slope's pull. The walls it is at: those it
+        /// keeps a touch of (met, and not left farther than its radius and the Skin), its radius and the Skin from it or
+        /// less now, at most Most of them; touched or not this step, as in a corner it meets the two walls a step about, and
+        /// in a shallow one it may slide along one for a while before it comes back to the other. Its velocity as its step left it, before the walk, and the pull along the ground
+        /// (by Physics.Gravity, as Roll's), are each kept as the walls let them go (Room); at rest what is left of the
+        /// velocity is under its Friction for a step, and of the pull no more than its Friction. A ball pulled into two
+        /// walls closing a corner rests there, whatever the corner's angle; one pulled along a single wall down a slope does
+        /// not.
         /// </summary>
         private static void Held(Missile missile)
         {
@@ -1972,59 +2033,67 @@ namespace Moonwell.Engine
                 return;
             }
 
+            if (heldX == null)
+            {
+                heldX = new List<float>();
+                heldY = new List<float>();
+                for (var i = 0; i < Most; i++)
+                {
+                    heldX.Add(0.0f);
+                    heldY!.Add(0.0f);
+                }
+            }
+
+            var normalsX = heldX;
+            var normalsY = heldY!;
             var radius = missile.radius;
+            var count = touches.Count;
+            var walls = 0;
+            for (var i = 0; i < count && walls < Most; i++)
+            {
+                var wall = Raw.At(touches, i).wall!;
+                if (wall.ending)
+                {
+                    continue;
+                }
+
+                // The level normal out of the wall toward the ball.
+                float x1;
+                float y1;
+                float x2;
+                float y2;
+                Ends(wall, out x1, out y1, out x2, out y2);
+                float qx;
+                float qy;
+                Nearest(x, y, x1, y1, x2 - x1, y2 - y1, out qx, out qy);
+                var ox = x - qx;
+                var oy = y - qy;
+                var off = Trig.Sqrt(ox * ox + oy * oy);
+                if (!(off > Tiny) || off > radius + Skin)
+                {
+                    // Not at the wall now.
+                    continue;
+                }
+
+                Raw.Put(normalsX, walls, ox / off);
+                Raw.Put(normalsY, walls, oy / off);
+                walls++;
+            }
+
+            if (walls == 0)
+            {
+                return;
+            }
+
             var gravity = Physics.Current().Gravity;
             var px = gravity * gz * gx;
             var py = gravity * gz * gy;
             var pz = gravity * (gz * gz - 1.0f);
-            var vx = missile.vx;
-            var vy = missile.vy;
-            var vz = missile.vz;
-            var now = Tracking.StepNow;
-            var count = touches.Count;
-            for (var pass = 0; pass < Rounds; pass++)
-            {
-                for (var i = 0; i < count; i++)
-                {
-                    var touch = Raw.At(touches, i);
-                    var wall = touch.wall!;
-                    if (now - touch.lastTouch > Recent || wall.ending)
-                    {
-                        continue;
-                    }
-
-                    // The level normal out of the wall toward the ball.
-                    float x1;
-                    float y1;
-                    float x2;
-                    float y2;
-                    Ends(wall, out x1, out y1, out x2, out y2);
-                    float qx;
-                    float qy;
-                    Nearest(x, y, x1, y1, x2 - x1, y2 - y1, out qx, out qy);
-                    var ox = x - qx;
-                    var oy = y - qy;
-                    var off = Trig.Sqrt(ox * ox + oy * oy);
-                    if (!(off > Tiny) || off > radius + Skin)
-                    {
-                        // Not at the wall now.
-                        continue;
-                    }
-
-                    var nx = ox / off;
-                    var ny = oy / off;
-                    if (px * nx + py * ny < 0.0f)
-                    {
-                        Foot(nx, ny, gx, gy, gz, ref px, ref py, ref pz);
-                    }
-
-                    if (vx * nx + vy * ny < 0.0f)
-                    {
-                        Foot(nx, ny, gx, gy, gz, ref vx, ref vy, ref vz);
-                    }
-                }
-            }
-
+            Room(normalsX, normalsY, walls, gx, gy, gz, ref px, ref py, ref pz);
+            var vx = walkVX;
+            var vy = walkVY;
+            var vz = walkVZ;
+            Room(normalsX, normalsY, walls, gx, gy, gz, ref vx, ref vy, ref vz);
             var friction = missile.friction;
             var lost = friction * Interactions.Current().Step;
             if (vx * vx + vy * vy + vz * vz <= lost * lost && px * px + py * py + pz * pz <= friction * friction)
@@ -2032,6 +2101,69 @@ namespace Moonwell.Engine
                 missile.rolling = missile.groundContact == Contact.Slide;
                 Flight.Rest(missile);
             }
+        }
+
+        /// <summary>
+        /// Keeps of a vector along the ground what the walls Held found let it go, all at once: unchanged when it goes into
+        /// none of them; else the longest of its parts along the foot of a wall it goes into that goes into no other of
+        /// them (within Lean of its length); else nothing, as walls closing a corner take it whole.
+        /// </summary>
+        private static void Room(List<float> normalsX, List<float> normalsY, int walls, float gx, float gy, float gz, ref float vx, ref float vy, ref float vz)
+        {
+            var into = false;
+            for (var i = 0; i < walls; i++)
+            {
+                if (vx * Raw.At(normalsX, i) + vy * Raw.At(normalsY, i) < 0.0f)
+                {
+                    into = true;
+                }
+            }
+
+            if (!into)
+            {
+                return;
+            }
+
+            var bestX = 0.0f;
+            var bestY = 0.0f;
+            var bestZ = 0.0f;
+            var best = 0.0f;
+            for (var i = 0; i < walls; i++)
+            {
+                var nx = Raw.At(normalsX, i);
+                var ny = Raw.At(normalsY, i);
+                if (vx * nx + vy * ny >= 0.0f)
+                {
+                    continue;
+                }
+
+                var fx = vx;
+                var fy = vy;
+                var fz = vz;
+                Foot(nx, ny, gx, gy, gz, ref fx, ref fy, ref fz);
+                var square = fx * fx + fy * fy + fz * fz;
+                var lean = -Lean * Trig.Sqrt(square);
+                var free = true;
+                for (var j = 0; j < walls; j++)
+                {
+                    if (j != i && fx * Raw.At(normalsX, j) + fy * Raw.At(normalsY, j) < lean)
+                    {
+                        free = false;
+                    }
+                }
+
+                if (free && square > best)
+                {
+                    best = square;
+                    bestX = fx;
+                    bestY = fy;
+                    bestZ = fz;
+                }
+            }
+
+            vx = bestX;
+            vy = bestY;
+            vz = bestZ;
         }
 
         /// <summary>A wall's two ends where it is now: as made, moved by how far its place has moved since.</summary>

@@ -373,6 +373,88 @@ namespace Moonwell.Testing
         }
 
         /// <summary>
+        /// Corners wider than a right angle on the slope of 1 in 2: two walls 500 long meet at (800, 800), opening uphill,
+        /// 135 and 160 degrees apart. A ball with Friction 20 laid inside, in the middle or off to one side, rolling or a
+        /// Bounce, comes down into the corner and rests there: OnRest once, no impact after 8 s, still for the last second
+        /// of 16. The rest test took the velocity the walk left and took it and the pull along one wall's foot after
+        /// another, which leaves a share moving along the second wall in any corner but a right angle: such a ball never
+        /// rested, and a Bounce met the walls and the ground 5 to 25 times a second.
+        /// </summary>
+        public static void WideCorners(FakeWorld world)
+        {
+            var halves = new float[] { 67.5f, 80.0f };
+            var contacts = new Contact[] { Contact.Slide, Contact.Bounce };
+            for (var h = 0; h < halves.Length; h++)
+            {
+                for (var c = 0; c < contacts.Length; c++)
+                {
+                    for (var o = 0; o < 2; o++)
+                    {
+                        var what = "V" + (2.0f * halves[h]) + " " + contacts[c] + (o == 0 ? " in the middle: " : " to one side: ");
+                        SlopeOnly();
+                        var a = halves[h] * 0.0174532925f;
+                        var ca = MathF.Cos(a);
+                        var sa = MathF.Sin(a);
+                        Wall.Create(800.0f, 800.0f, 800.0f + 500.0f * ca, 800.0f + 500.0f * sa);
+                        Wall.Create(800.0f, 800.0f, 800.0f + 500.0f * ca, 800.0f - 500.0f * sa);
+                        var x = 800.0f + 150.0f * ca;
+                        var y = 800.0f + (o == 0 ? 0.0f : 150.0f * sa - 25.0f / ca);
+                        var ball = new Ball();
+                        ball.GroundContact = contacts[c];
+                        ball.WallContact = contacts[c];
+                        ball.Gravity = 800.0f;
+                        ball.Friction = 20.0f;
+                        Missile.Create(ball, x, y, Physics.GroundHeight(x, y) + 16.0f);
+                        var settled = 0;
+                        var lastX = 0.0f;
+                        var lastY = 0.0f;
+                        for (var i = 0; i < 512; i++)
+                        {
+                            if (i == 256)
+                            {
+                                settled = ball.Impacts;
+                            }
+
+                            if (i == 480)
+                            {
+                                lastX = ball.X;
+                                lastY = ball.Y;
+                            }
+
+                            Steps(world, 1);
+                        }
+
+                        Expect.Equal(1, ball.Rested, what + "it rests in the corner, OnRest once");
+                        Expect.Equal(settled, ball.Impacts, what + "no impact after 8 s");
+                        Within(lastX, ball.X, 0.0f, what + "still for the last second: x");
+                        Within(lastY, ball.Y, 0.0f, what + "y");
+                        Within(Physics.GroundHeight(ball.X, ball.Y) + 16.0f, ball.Z, 1.0f, what + "on the ground");
+                    }
+                }
+            }
+        }
+
+        /// <summary>Installs the packages on fakes with the slope of SlopeWithWall, rising 64 a tile of 128 along x, and no wall.</summary>
+        private static void SlopeOnly()
+        {
+            Interactions.Install(new FakeInteractionWorld());
+            Physics.Install(new FakePhysicsWorld());
+            var row = "";
+            for (var i = 0; i < 16; i++)
+            {
+                row = row + GridText.Corner(i * 64.0f, 2);
+            }
+
+            var text = "";
+            for (var i = 0; i < 16; i++)
+            {
+                text = text + row;
+            }
+
+            Terrain.Install(new FakeTerrainWorld(), 16, 16, 0.0f, 0.0f, text);
+        }
+
+        /// <summary>
         /// A ball of radius 0, rolling or a Bounce, laid 1 off the slope's wall on the side the ground falls toward it from,
         /// is pulled into the wall at every step and goes on down along it for 3 seconds on its own side: put back out at
         /// the wall's side whenever its middle is on or past the wall's line, whatever its radius, and left just off the
