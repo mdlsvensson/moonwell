@@ -522,7 +522,7 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
 - **Ownership**: a missile belongs to the game unless `Fire` or `Create` is given an `owner`, so one fired in a spell
   outlives the cast. `OnImpact` runs with the missile's owner.
 - **Knockback** keeps the unit's order. It stops at trees, buildings, cliffs, walls (`Wall.Create`) and a bridge's
-  rail, which keeps its body on the deck. A stopped push stops short of the edge, by up to a step's move and the unit's
+  rail, which keeps its body on the deck (a unit wider than the deck rides with it over both sides). A stopped push stops short of the edge, by up to a step's move and the unit's
   collision size (about 37 and its collision size at 1,200 a second). `IPushTarget` has `OnPushed`, `OnSlammed` and
   `OnGrounded`; an `OnPushed` that pushes its own unit calls itself again, without end.
 - **Bridges**: placed bridges are ground, for missiles landing (from above: one below a deck flies under it) and units

@@ -31,6 +31,9 @@ namespace Moonwell.Engine
         /// <summary>The least share of a unit's edge point's direction a move goes toward it for the point to be checked against a deck's rail: the cosine of about 89.4 degrees.</summary>
         private const float Toward = 0.01f;
 
+        /// <summary>How far in a unit's two sides square to its move are taken, for the rail: a unit exactly as wide as a deck is not over it.</summary>
+        private const float Inset = 0.5f;
+
         /// <summary>The cosine of an eighth of a turn, for the points of a unit's edge between the axes.</summary>
         private const float Slant = 0.70710678f;
 
@@ -569,42 +572,65 @@ namespace Moonwell.Engine
 
         /// <summary>
         /// Whether a unit on a deck at (fromX, fromY), the deck <paramref name="here"/> high under its middle, keeps its body
-        /// inside the deck's rail when it moves to (centreX, centreY), where the deck is <paramref name="there"/> high: each
-        /// point of its edge, its collision size out every eighth of a turn, that it moves toward (by more than Toward of the
-        /// move), is on a deck or over ground within DeckStep of the deck where it moves to, or was off both already where
-        /// it is, against the deck's height there (a body over the rail already does not hold it, so it can be pushed back
-        /// or along). Each against its own middle's height, so a unit that comes onto a ramp with its body over the side
-        /// meets the rail where the rail begins, not after.
+        /// inside the deck's rail when it moves to (centreX, centreY), where the deck is <paramref name="there"/> high: its
+        /// edge, its collision size out every eighth of a turn, taken as four opposite pairs (Pair). A point holds the body
+        /// when it is on a deck or over ground within DeckStep of the deck, against the deck's height where the middle is:
+        /// so a unit that comes onto a ramp with its body over the side meets the rail where the rail begins, not after.
         /// </summary>
         private static bool Inside(float size, float fromX, float fromY, float centreX, float centreY, float here, float there)
         {
             var moveX = centreX - fromX;
             var moveY = centreY - fromY;
-            // A point is checked when the move goes toward it by more than Toward of its length: a unit pushed along the
-            // deck, whose sides may be at its edge or over it, is not stopped by a float's last bit of sideways move.
+            // Scaled so that the move goes toward a point of the edge by more than Toward of its length where its dot
+            // with the point's offset is more than 1.
             var least = Toward * size * Trig.Sqrt(moveX * moveX + moveY * moveY);
             moveX /= least > 0.0f ? least : 1.0f;
             moveY /= least > 0.0f ? least : 1.0f;
             var slant = size * Slant;
-            return Rim(moveX, moveY, size, 0.0f, fromX, fromY, centreX, centreY, here, there)
-                && Rim(moveX, moveY, -size, 0.0f, fromX, fromY, centreX, centreY, here, there)
-                && Rim(moveX, moveY, 0.0f, size, fromX, fromY, centreX, centreY, here, there)
-                && Rim(moveX, moveY, 0.0f, -size, fromX, fromY, centreX, centreY, here, there)
-                && Rim(moveX, moveY, slant, slant, fromX, fromY, centreX, centreY, here, there)
-                && Rim(moveX, moveY, slant, -slant, fromX, fromY, centreX, centreY, here, there)
-                && Rim(moveX, moveY, -slant, slant, fromX, fromY, centreX, centreY, here, there)
-                && Rim(moveX, moveY, -slant, -slant, fromX, fromY, centreX, centreY, here, there);
+            var inset = size > Inset ? (size - Inset) / size : 0.0f;
+            return Pair(moveX, moveY, size, 0.0f, inset, fromX, fromY, centreX, centreY, here, there)
+                && Pair(moveX, moveY, 0.0f, size, inset, fromX, fromY, centreX, centreY, here, there)
+                && Pair(moveX, moveY, slant, slant, inset, fromX, fromY, centreX, centreY, here, there)
+                && Pair(moveX, moveY, slant, -slant, inset, fromX, fromY, centreX, centreY, here, there);
         }
 
-        /// <summary>Whether one point of a unit's edge, (offsetX, offsetY) from its middle, does not take it over a deck's rail: on a side it does not move toward (the move, scaled by Inside, goes toward it by no more than 1), held where it moves to (against the deck's height there), or not held where it is already (against the height here).</summary>
-        private static bool Rim(float moveX, float moveY, float offsetX, float offsetY, float fromX, float fromY, float centreX, float centreY, float here, float there)
+        /// <summary>
+        /// Whether two opposite points of a unit's edge, (offsetX, offsetY) from its middle and back, keep it off a deck's
+        /// rail. The one the move goes toward (by more than Toward of the move: a dot with the scaled move above 1) must be
+        /// held where it moves to, or be over the edge already where it is, by more than Inset (Kept); the one it goes away
+        /// from is not asked.
+        /// Square to the move, as a unit sliding along the deck's side is, the two are taken a little in (by Inset, so a
+        /// unit exactly as wide as the deck is not over it by a float's last bit), and the move is refused when one goes
+        /// over the rail where the other is held: the unit would fit, so it may not ride with its body over the side. A
+        /// unit wider than the deck, over both sides, rides on.
+        /// </summary>
+        private static bool Pair(float moveX, float moveY, float offsetX, float offsetY, float inset, float fromX, float fromY, float centreX, float centreY, float here, float there)
         {
-            if (moveX * offsetX + moveY * offsetY <= 1.0f)
+            var toward = moveX * offsetX + moveY * offsetY;
+            if (toward > 1.0f)
             {
-                return true;
+                return Kept(offsetX, offsetY, inset, fromX, fromY, centreX, centreY, here, there);
             }
 
-            return Holds(centreX + offsetX, centreY + offsetY, there) || !Holds(fromX + offsetX, fromY + offsetY, here);
+            if (toward < -1.0f)
+            {
+                return Kept(-offsetX, -offsetY, inset, fromX, fromY, centreX, centreY, here, there);
+            }
+
+            var sideX = offsetX * inset;
+            var sideY = offsetY * inset;
+            if (!Kept(sideX, sideY, 1.0f, fromX, fromY, centreX, centreY, here, there) && Holds(centreX - sideX, centreY - sideY, there))
+            {
+                return false;
+            }
+
+            return Kept(-sideX, -sideY, 1.0f, fromX, fromY, centreX, centreY, here, there) || !Holds(centreX + sideX, centreY + sideY, there);
+        }
+
+        /// <summary>Whether a point of a unit's edge, (offsetX, offsetY) from its middle, does not take it over a deck's rail: held where it moves to (against the deck's height there), or over the edge already where it is (against the height here), taken in by inset there so a point on the edge, or a float's last bit past it, is not over it already.</summary>
+        private static bool Kept(float offsetX, float offsetY, float inset, float fromX, float fromY, float centreX, float centreY, float here, float there)
+        {
+            return Holds(centreX + offsetX, centreY + offsetY, there) || !Holds(fromX + offsetX * inset, fromY + offsetY * inset, here);
         }
 
         /// <summary>Whether a point holds the body of a unit on a deck of a height: a deck is there (its height is not read: the middle's checks see the heights), or the ground there is within DeckStep of that height.</summary>

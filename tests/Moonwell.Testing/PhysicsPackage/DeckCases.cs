@@ -449,9 +449,10 @@ namespace Moonwell.Testing
         /// <summary>
         /// A unit that comes onto a deck at its ramp with its body over the deck's side meets the rail where the rail
         /// begins: a footman of collision size 16 at (556, 320) on the bank, its body 12 over the east side, pushed north,
-        /// stops at the rail's start with OnSlammed, its middle short of y 450. It rode the whole deck to the far bank with
-        /// its body over the rail, as the body's points over the side were held by the low ground at the ramp and then
-        /// counted as over the edge already. Units of collision size 16 to 64 pushed straight along the deck's middle still
+        /// stops at the rail's start with OnSlammed, its middle short of y 450, and so does one at (548, 360) pushed at 60
+        /// degrees, which slides north along the side once the slant is refused. They rode the whole deck to the far bank
+        /// with the body over the rail: the first as the body's points over the side were held by the low ground at the ramp
+        /// and then counted as over the edge already, the second as its side, square to its slide, was not checked. Units of collision size 16 to 64 pushed straight along the deck's middle still
         /// go on at one ramp and off at the other, both ways, with no slam; one of 64 pushed at a slant stops at the ramp's
         /// side, and pushed back it leaves.
         /// </summary>
@@ -485,6 +486,24 @@ namespace Moonwell.Testing
             Expect.True(north < 450.0f, "its body over the side, it stops where the rail begins; it went to y " + north);
             Expect.True(side.Slams.Count >= 1, "OnSlammed ran");
             side.Kill();
+
+            // At a slant onto the ramp, its body 4 over the side: the slant is refused at once, and the slide north it
+            // goes on with, square to the side, meets the rail too.
+            var slant = PusheeAt(world, 548.0f, 360.0f);
+            slant.Knockback(60.0f, 300.0f, 1.0f);
+            var slantNorth = 0.0f;
+            for (var i = 0; i < 48; i++)
+            {
+                Steps(world, 1);
+                if (slant.Y > slantNorth)
+                {
+                    slantNorth = slant.Y;
+                }
+            }
+
+            Expect.True(slantNorth < 450.0f, "at a slant, sliding along the side, it stops where the rail begins; it went to y " + slantNorth);
+            Expect.True(slant.Slams.Count >= 1, "OnSlammed ran");
+            slant.Kill();
 
             var sizes = new float[] { 16.0f, 32.0f, 48.0f, 64.0f };
             for (var k = 0; k < sizes.Length; k++)
