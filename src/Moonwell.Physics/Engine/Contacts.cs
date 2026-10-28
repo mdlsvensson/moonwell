@@ -1929,7 +1929,23 @@ namespace Moonwell.Engine
                 return Met;
             }
 
-            if (off > Tiny)
+            if (length > Tiny && Straight(cx, cy, x1, y1, ex, ey))
+            {
+                // On the wall's straight part: the wall's own normal, out of the side where the ball began its move. The way
+                // from the wall's nearest point is the radius there, and for a thin ball, met with its middle on the line,
+                // only a float's last bits, which turned it any way: in the game's own Lua at 1,000 from the origin, and in
+                // .NET at 12,000, a thin ball sliding along a wall was sent through it.
+                var sx = -ey / length;
+                var sy = ex / length;
+                var side = sx * (ax - x1) + sy * (ay - y1);
+                if (side > Tiny || side < -Tiny)
+                {
+                    nx = side > 0.0f ? sx : -sx;
+                    ny = side > 0.0f ? sy : -sy;
+                    return Met;
+                }
+            }
+            else if (off > Tiny)
             {
                 nx = ox / off;
                 ny = oy / off;
@@ -2247,8 +2263,8 @@ namespace Moonwell.Engine
         /// <summary>
         /// Puts a ball's middle at (x, y) back out at a wall's side, its radius from the wall and at least Clear (so a ball of
         /// radius 0 is off the line, which a float's last bit would leave it on): when it is nearer on its own side (the
-        /// side of the normal (nx, ny)), away from the nearest point of the wall; and whenever it is on the wall's line or
-        /// past it, along the normal.
+        /// side of the normal (nx, ny)) round an end, away from the end; on the straight part, and whenever it is on the
+        /// wall's line or past it, along the normal.
         /// </summary>
         private static void Beside(Wall wall, float radius, float nx, float ny, ref float x, ref float y)
         {
@@ -2273,8 +2289,9 @@ namespace Moonwell.Engine
                 return;
             }
 
-            if (own && off > Tiny)
+            if (own && off > Tiny && !Straight(x, y, x1, y1, ex, ey))
             {
+                // Round an end: away from it, as the normal there is.
                 x = qx + ox / off * back;
                 y = qy + oy / off * back;
                 return;
@@ -2282,6 +2299,19 @@ namespace Moonwell.Engine
 
             x = qx + nx * back;
             y = qy + ny * back;
+        }
+
+        /// <summary>Whether the nearest point of a wall from (x1, y1) along (ex, ey) to a point is on its straight part, between its ends.</summary>
+        private static bool Straight(float x, float y, float x1, float y1, float ex, float ey)
+        {
+            var square = ex * ex + ey * ey;
+            if (!(square > Tiny * Tiny))
+            {
+                return false;
+            }
+
+            var along = ((x - x1) * ex + (y - y1) * ey) / square;
+            return along > 0.0f && along < 1.0f;
         }
 
         /// <summary>The nearest point of a wall from (x1, y1) along (ex, ey) to a point. It divides by the wall's length squared as it is, not by a square root squared: the game's square root, off by up to 2 parts in 100,000, put the point off along the wall by as much, which tilted a bounce's normal.</summary>
