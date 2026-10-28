@@ -544,7 +544,9 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
   - A `Bounce` with low `Friction` (about 20) in a very shallow corner (about 160 degrees) on a steep hill (1 in 1) can
     bounce between the walls for more than 16 seconds before it rests.
   - Walls do not push missiles: a wall moved into a resting missile goes into it, and lowering a wall's `Height` does
-    not wake what rests against it.
+    not wake what rests against it or on its top.
+  - A wall moved slowly away from a ball resting against it on a hill (under about 0.2 a step) wakes it each time it
+    rests again, so `OnRest` runs once for every short roll after the wall.
   - On a bridge turned off the axes, a unit standing with its body slightly over the side (a footman, about 1 or 2.5
     over) may be stopped when pushed along the deck.
   - A unit as wide as a bridge's deck crosses it only when pushed straight along it; pushed slightly sideways, it stops
