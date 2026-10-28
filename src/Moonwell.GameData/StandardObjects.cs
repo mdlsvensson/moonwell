@@ -31,7 +31,8 @@ namespace Moonwell.GameData;
 /// </param>
 /// <param name="EditorSuffix">
 /// The editor suffix World Editor shows after the name (<c>(Cairne)</c>): the value of the kind's <c>EditorSuffix</c>
-/// field (an upgrade's at level 1), trimmed, a <c>WESTRING_</c> key replaced as for <paramref name="Name"/>; the empty
+/// field (an upgrade's at level 1), trimmed, with a bracket the list's comma cut closed as World Editor does
+/// (<c>(ruined, two story)</c> is <c>(ruined)</c>), a <c>WESTRING_</c> key replaced as for <paramref name="Name"/>; the empty
 /// string for none, and for a doodad, which has no such field.
 /// </param>
 /// <param name="Building">
@@ -487,6 +488,7 @@ public static class StandardObjects
         private readonly int _element;
         private readonly bool _list;
         private readonly bool _appended;
+        private readonly bool _suffix;
 
         // The last level whose column the tables hold, for an ability field held in a column of each level; 0 otherwise.
         private int _lastLevel;
@@ -509,6 +511,7 @@ public static class StandardObjects
 
             _perLevelColumn = _column.Contains("{level}", StringComparison.Ordinal);
             _list = field.PerLevel && !_perLevelColumn;
+            _suffix = _column == SuffixColumn;
             if (_element >= 0 && field.PerLevel)
             {
                 throw new InvalidOperationException($"{field.Kind} field {field.Id}: a per-level field that is one element of a list is not supported");
@@ -598,6 +601,12 @@ public static class StandardObjects
 
         private void Add(Dictionary<string, string> values, int level, string? value)
         {
+            // World Editor closes a suffix that the list's comma cut inside its brackets: (ruined, two story) is (ruined).
+            if (_suffix && value != null && value.StartsWith('(') && !value.Contains(')', StringComparison.Ordinal))
+            {
+                value += ")";
+            }
+
             if (value != null)
             {
                 values[level == 0 ? Field.Id : Field.Id + ":" + level.ToString(CultureInfo.InvariantCulture)] = value;
