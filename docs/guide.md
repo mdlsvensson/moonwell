@@ -518,7 +518,8 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
   along it for the rest of its step with no impact, as the loop in Maths does after a hit; it does not stand still.
   Going along the ground, both lose their `Friction` (200) a second, and rest (`OnRest`) where a slope's pull, by
   `Physics.Gravity` whatever their own `Gravity`, cannot move them against it, or where walls take that pull (a corner
-  on a hill: one resting against a wall wakes when the wall ends or moves); with `Friction = 0` they never slow.
+  on a hill: one resting against a wall wakes when the wall ends or moves away from it); with `Friction = 0` they never
+  slow.
 - **Ownership**: a missile belongs to the game unless `Fire` or `Create` is given an `owner`, so one fired in a spell
   outlives the cast. `OnImpact` runs with the missile's owner.
 - **Knockback** keeps the unit's order. It stops at trees, buildings, cliffs, walls (`Wall.Create`) and a bridge's

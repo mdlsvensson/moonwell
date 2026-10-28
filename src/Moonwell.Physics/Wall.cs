@@ -153,13 +153,14 @@ namespace Moonwell
         {
             base.Finish();
             Walls.Dropped();
-            Pass.WallGone(this);
+            Pass.WallGone(this, 0.0f, 0.0f, true);
         }
 
-        /// <summary>Wakes what rests against it before it moves: what it held, it holds no more.</summary>
-        internal override void Moving()
+        /// <summary>Wakes what rests against it before it moves to (x, y), where it moves away from it: what it held, it holds no more. What it moves into it passes through.</summary>
+        internal override void Moving(float x, float y)
         {
-            Pass.WallGone(this);
+            var place = entry!;
+            Pass.WallGone(this, x - place.X, y - place.Y, false);
         }
     }
 }

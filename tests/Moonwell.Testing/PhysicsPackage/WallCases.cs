@@ -473,6 +473,58 @@ namespace Moonwell.Testing
             }
         }
 
+        /// <summary>
+        /// A ball resting against a wall across the slope of 1 in 2 is woken once by the wall moving away from it, not at
+        /// every set of the wall's place: the wall's X set to itself every step for 8 s leaves it resting (OnRest once);
+        /// then moved 400 down the slope, it goes on down to the wall and rests against it again (OnRest twice), and the
+        /// wall's X set to itself every step for 4 s more leaves it so. A wall moved 10 into a resting ball does not wake
+        /// it: the wall goes into it, as walls do not push missiles. So rolling and as a Bounce. It got OnRest at every set, 16 or 32 a second, for ever.
+        /// </summary>
+        public static void WallSet(FakeWorld world)
+        {
+            var contacts = new Contact[] { Contact.Slide, Contact.Bounce };
+            for (var c = 0; c < contacts.Length; c++)
+            {
+                var what = contacts[c] + ": ";
+                SlopeOnly();
+                var wall = Wall.Create(600.0f, 0.0f, 600.0f, 2000.0f);
+                var ball = Resting(world, contacts[c], 200.0f);
+                Expect.Equal(1, ball.Rested, what + "it rests against the wall");
+                for (var i = 0; i < 256; i++)
+                {
+                    wall.X = wall.X;
+                    Steps(world, 1);
+                }
+
+                Expect.Equal(1, ball.Rested, what + "the wall's X set to itself every step for 8 s: OnRest still once");
+                wall.X = wall.X - 400.0f;
+                for (var i = 0; i < 320 && ball.Rested < 2; i++)
+                {
+                    Steps(world, 1);
+                }
+
+                Expect.Equal(2, ball.Rested, what + "the wall moved away, it goes on down to it and rests again");
+                Within(216.0f, ball.X, 1.0f, what + "against the wall where it is now, its radius off");
+                for (var i = 0; i < 128; i++)
+                {
+                    wall.X = wall.X;
+                    Steps(world, 1);
+                }
+
+                Expect.Equal(2, ball.Rested, what + "and set to itself for 4 s more: OnRest still twice");
+
+                var restX = ball.X;
+                for (var i = 0; i < 20; i++)
+                {
+                    wall.X = wall.X + 0.5f;
+                    Steps(world, 1);
+                }
+
+                Expect.Equal(2, ball.Rested, what + "a wall moved 10 into it does not wake it");
+                Within(restX, ball.X, 0.0f, what + "it lies still, the wall in it");
+            }
+        }
+
         /// <summary>Lays a ball with a contact and a Friction at (640, 1000) on the slope, above the wall at x 600, and steps until it rests against it, at most 3 s.</summary>
         private static Ball Resting(FakeWorld world, Contact contact, float friction)
         {

@@ -147,8 +147,8 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the gizmo's place is set by its X, Y or Position, before it moves there; nothing for a plain gizmo. A package's kind of gizmo answers its own part here, as a wall wakes what rests against it.</summary>
-        internal virtual void Moving()
+        /// <summary>Runs when the gizmo's place is set by its X, Y or Position to another place, (x, y), before it moves there; not when it is set to where it is. Nothing for a plain gizmo. A package's kind of gizmo answers its own part here, as a wall wakes what rests against it.</summary>
+        internal virtual void Moving(float x, float y)
         {
         }
 
@@ -238,7 +238,11 @@ namespace Moonwell
                 Dev.Check(false, Names.NameOf(this) + ": the gizmo has not been created");
             }
 
-            Moving();
+            if (x != entry!.X || y != entry.Y)
+            {
+                Moving(x, y);
+            }
+
             Interactions.Grid.Move(entry!, x, y);
         }
 

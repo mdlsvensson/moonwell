@@ -2324,6 +2324,21 @@ namespace Moonwell.Engine
             return ox * ox + oy * oy > near * near;
         }
 
+        /// <summary>Whether a wall moving by (moveX, moveY) moves away from a missile's ball: against the level normal out of the wall toward the ball.</summary>
+        internal static bool Away(Missile missile, Wall wall, float moveX, float moveY)
+        {
+            float x1;
+            float y1;
+            float x2;
+            float y2;
+            Ends(wall, out x1, out y1, out x2, out y2);
+            var entry = missile.entry!;
+            float qx;
+            float qy;
+            Nearest(entry.X, entry.Y, x1, y1, x2 - x1, y2 - y1, out qx, out qy);
+            return (entry.X - qx) * moveX + (entry.Y - qy) * moveY < 0.0f;
+        }
+
         /// <summary>Whether a missile keeps a touch of a wall: its ball was at it when it last met the walls.</summary>
         internal static bool Touches(Missile missile, Wall wall)
         {
@@ -2353,7 +2368,7 @@ namespace Moonwell.Engine
         }
 
         /// <summary>Forgets a wall a missile's ball has left, keeping the order of the rest: a Pass or a refusal may meet it again when it next comes to it.</summary>
-        private static void Forget(Missile missile, Wall wall)
+        internal static void Forget(Missile missile, Wall wall)
         {
             var touch = TouchOf(missile, wall);
             if (touch != null)
