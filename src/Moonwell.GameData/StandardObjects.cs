@@ -34,10 +34,13 @@ namespace Moonwell.GameData;
 /// field (an upgrade's at level 1), trimmed, a <c>WESTRING_</c> key replaced as for <paramref name="Name"/>; the empty
 /// string for none, and for a doodad, which has no such field.
 /// </param>
-/// <param name="Building">True for a unit whose <c>isbldg</c> column is 1; false for every other kind.</param>
+/// <param name="Building">
+/// True for a unit whose <c>isbldg</c> column is 1 (<c>hbar</c>, the Human Barracks); false for every other kind and
+/// for a unit that is not a building (<c>hfoo</c>).
+/// </param>
 /// <param name="Own">
-/// For an ability, the ids of the fields specific to it (<see cref="Fields.SpecificOf"/>), in the fields' order; empty
-/// for every other kind. Never null once made.
+/// For an ability, the ids of the fields specific to it (<see cref="Fields.SpecificOf"/>), in the fields' order
+/// (<c>AHhb</c>, Holy Light, has <c>Hhb1</c>); empty for every other kind. Never null once made.
 /// </param>
 /// <param name="Modes">
 /// The keys of <paramref name="Values"/> whose value differs between the graphics modes (<see cref="StandardObjects.Modes"/>:
@@ -65,7 +68,7 @@ public sealed record StandardObject(
     private static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> EmptyModes =
         new Dictionary<string, IReadOnlyDictionary<string, string>>();
 
-    /// <summary>The ids of the fields specific to an ability (<see cref="Fields.SpecificOf"/>); empty for every other kind. Never null.</summary>
+    /// <summary>The ids of the fields specific to an ability, as the <c>Own</c> parameter above says (<c>Hhb1</c> for <c>AHhb</c>); empty for every other kind. Never null.</summary>
     public IReadOnlyList<string> Own { get; init; } = Own ?? Array.Empty<string>();
 
     /// <summary>The keys whose value differs between the graphics modes, with the value in each mode (<c>sd</c>, <c>hd</c>, <c>de</c>); empty for none. Never null.</summary>
@@ -220,7 +223,7 @@ public static class StandardObjects
         var modes = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal);
         if (row.HasModes)
         {
-            var byMode = new[] { evaluator.Values(id, row.In("sd")), evaluator.Values(id, row.In("hd")), values };
+            var byMode = Modes.Select(mode => mode == DefinitiveMode ? values : evaluator.Values(id, row.In(mode))).ToArray();
             foreach (var key in byMode.SelectMany(read => read.Keys).Distinct(StringComparer.Ordinal))
             {
                 var perMode = new Dictionary<string, string>(StringComparer.Ordinal);

@@ -182,6 +182,7 @@ public class StandardObjectsTests
     {
         var footman = Find(Of(Kind.Unit), "hfoo");
 
+        Assert.Contains("uhpm", footman.Values.Keys);
         Assert.NotEmpty(footman.Modes);
         Assert.All(footman.Modes.Values, byMode => Assert.True(byMode.Values.Distinct().Count() > 1));
         Assert.False(footman.Modes.ContainsKey("uhpm"));
@@ -490,6 +491,58 @@ public class StandardObjectsTests
         Assert.True(Find(units, "hfoo").Building);
         Assert.False(Find(units, "Hpal").Building);
         Assert.False(Find(Of(Kind.Unit), "hfoo").Building);
+    }
+
+    [Fact]
+    public void Applies_follows_the_abilitys_own_fields()
+    {
+        var tables = GameTables.OpenExport(MiniExportFolder());
+        var fields = Fields.Of(tables, Kind.Ability);
+        var holyLight = Find(StandardObjects.Of(tables, Kind.Ability, fields), "AHhb");
+
+        var specific = fields.Where(field => field.Specific.Count > 0).ToList();
+        Assert.Contains(specific, field => holyLight.Own.Contains(field.Id));
+        Assert.Contains(specific, field => !holyLight.Own.Contains(field.Id));
+        Assert.All(specific, field => Assert.Equal(holyLight.Own.Contains(field.Id), StandardObjects.Applies(field, holyLight)));
+
+        // A common field applies to every ability but those its notSpecific lists by code: acas lists Arpb.
+        var cast = fields.Single(field => field.Id == "acas");
+        Assert.Contains("Arpb", cast.NotSpecific);
+        Assert.True(StandardObjects.Applies(cast, holyLight));
+
+        using var copy = new Copy();
+        copy.Replace("units/abilitydata.slk", "C;X1;Y3;K\"AHhb\"", "C;X2;K\"AHhb\"", "C;X2;K\"Arpb\"");
+        var tablesCopy = copy.Tables();
+        var listed = Find(StandardObjects.Of(tablesCopy, Kind.Ability, Fields.Of(tablesCopy, Kind.Ability)), "AHhb");
+        Assert.Equal("Arpb", listed.Code);
+        Assert.False(StandardObjects.Applies(cast, listed));
+    }
+
+    [Fact]
+    public void Applies_follows_a_buildings_own_use_flags()
+    {
+        // utra (Trains) is for buildings only, ubui (Builds) for units and heroes only.
+        using var copy = new Copy();
+        copy.Replace("units/unitbalance.slk", "C;X1;Y3;K\"hfoo\"", "C;X53;K0", "C;X53;K1");
+        var tables = copy.Tables();
+        var fields = Fields.Of(tables, Kind.Unit);
+        var trains = fields.Single(field => field.Id == "utra");
+        var builds = fields.Single(field => field.Id == "ubui");
+        Assert.True(trains.ForBuilding && !trains.ForUnit);
+        Assert.True(builds.ForUnit && !builds.ForBuilding);
+
+        var footman = Find(StandardObjects.Of(tables, Kind.Unit, fields), "hfoo");
+
+        Assert.True(footman.Building);
+        Assert.True(StandardObjects.Applies(trains, footman));
+        Assert.False(StandardObjects.Applies(builds, footman));
+
+        // The same footman, not a building: the flags swap.
+        var plainTables = GameTables.OpenExport(MiniExportFolder());
+        var plain = Find(StandardObjects.Of(plainTables, Kind.Unit, fields), "hfoo");
+        Assert.False(plain.Building);
+        Assert.False(StandardObjects.Applies(trains, plain));
+        Assert.True(StandardObjects.Applies(builds, plain));
     }
 
     [Fact]

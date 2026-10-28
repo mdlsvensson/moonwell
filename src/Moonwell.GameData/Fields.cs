@@ -87,9 +87,15 @@ public sealed record FieldRules(
 /// <param name="Store">How an object file stores the field's value: <c>int</c>, <c>real</c>, <c>unreal</c> or <c>string</c>.</param>
 /// <param name="Rules">What World Editor allows the field to hold; <see cref="FieldRules.None"/> when not given.</param>
 /// <param name="Choice">For a <see cref="FieldType.Choice"/> field, the enum it holds; null for any other type.</param>
-/// <param name="ForUnit">True when the metadata's <c>useUnit</c> is 1: a unit that is neither a hero nor a building has the field.</param>
+/// <param name="ForUnit">
+/// True when the metadata's <c>useUnit</c> is 1: a unit that is neither a hero nor a building has the field
+/// (<c>uhpm</c>, the maximum hit points, has it; <c>ustr</c>, the strength, does not).
+/// </param>
 /// <param name="ForHero">True when <c>useHero</c> is 1: a hero has the field (<c>ustr</c>, the strength, is for heroes only).</param>
-/// <param name="ForBuilding">True when <c>useBuilding</c> is 1: a building has the field.</param>
+/// <param name="ForBuilding">
+/// True when <c>useBuilding</c> is 1: a building, a unit whose <c>isbldg</c> column is 1, has the field (<c>uhpm</c>
+/// has it; <c>ustr</c> does not).
+/// </param>
 /// <param name="NotSpecific">
 /// For a common ability field, the codes of the abilities that do not have it, from <c>notSpecific</c> (<c>Arpb</c>,
 /// <c>Arpl</c>); empty for none. Never null.
@@ -234,6 +240,9 @@ public static class Fields
             }
 
             name = BesideEnums(row.Id, name!, listed, choice, repeat > 0, enums);
+            var forUnit = Value(row, "useUnit") == "1";
+            var forHero = Value(row, "useHero") == "1";
+            var forBuilding = Value(row, "useBuilding") == "1";
 
             fields.Add(new Field(
                 kind,
@@ -246,13 +255,13 @@ public static class Fields
                 Value(row, "netsafe") == "1",
                 specific,
                 ColumnOf(row, repeat, pointer, perField),
-                kind == Kind.Unit && Value(row, "useHero") == "1" && Value(row, "useUnit") != "1" && Value(row, "useBuilding") != "1",
+                kind == Kind.Unit && forHero && !forUnit && !forBuilding,
                 StoreOf(Value(row, "type")),
                 RulesOf(row, LabelOf(tables, row)),
                 choice,
-                Value(row, "useUnit") == "1",
-                Value(row, "useHero") == "1",
-                Value(row, "useBuilding") == "1",
+                forUnit,
+                forHero,
+                forBuilding,
                 Split(Value(row, "notSpecific"))));
             var column = ColumnOf(row, repeat, pointer, perField);
             candidates.Add(new NameCandidate(row.Id, name!, listed, GroupsOf(kind, row, specific, mentioned, aliases, column, listedColumns), member != null));

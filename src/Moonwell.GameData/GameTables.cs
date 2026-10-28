@@ -241,8 +241,8 @@ public sealed class GameTables : IDisposable
 
     /// <summary>
     /// The rows of any SLK table by its path in the tables (<c>units/unitui.slk</c>), read as the other tables are: the
-    /// first column is the id and the cells are the file's text, empty ones left out. Null when the tables have no such
-    /// file.
+    /// first column is the id and the cells are the file's text. A cell the file does not have is left out; a cell
+    /// that is there and empty (<c>K""</c>) is kept as the empty string. Null when the tables have no such file.
     /// </summary>
     public IReadOnlyList<MetaRow>? Table(string relative)
     {
@@ -650,7 +650,8 @@ public sealed class GameTables : IDisposable
 
     /// <summary>
     /// An SLK table: the first row names the columns and the first column is the id. Cells are the text of the file,
-    /// quoted text unquoted and numbers and booleans as written; empty cells are left out.
+    /// quoted text unquoted and numbers and booleans as written; a cell the file does not have is left out, and one
+    /// that is there and empty (<c>K""</c>) is kept as the empty string.
     /// </summary>
     private List<TableRow> ReadTable(string key, string display)
     {
