@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using System.Text;
 using War3Net.Build.Extensions;
 using War3Net.Build.Object;
@@ -10,13 +11,40 @@ namespace Moonwell.Build.Tests
         private static readonly string[] Kinds = { "unit", "item", "destructable", "doodad", "ability", "buff", "upgrade" };
         private static readonly string[] Extensions = { "w3u", "w3t", "w3b", "w3d", "w3a", "w3h", "w3q" };
 
+        // The SHA-256 of each object file the build stages, so a change to what they hold shows as the file that changed.
+        private static readonly Dictionary<string, string> FixtureHashes = new Dictionary<string, string>
+        {
+            ["war3map.w3a"] = "01d118c77f1748a336a4ca4ce9e1d4f55f3dcc0136264bb69c1b5d9023a1e4bd",
+            ["war3map.w3b"] = "7b570b0c76efb1716e4c6f4e1206eae42ab73eab6ab1b59e74854e659b4a8e68",
+            ["war3map.w3d"] = "55fb9284c404f90d28d6db807d87ee09a0f15859a33efbe22acdfb8a312a9cc0",
+            ["war3map.w3h"] = "e5e03195a88dd495e0718d6502efbce27bb8ca0bf36ce284f84ae0a487d5c4ed",
+            ["war3map.w3q"] = "ede92a5ca93bd260130c56a5eef7f5aa44cb3a6136995d3e16c94c743e11cd01",
+            ["war3map.w3t"] = "ff4f21ae379ca8b3adcc435fac2181f1f88f58ba9c0ec8c6fed06d790f827a8d",
+            ["war3map.w3u"] = "37888b0591f7ff94fbe9002ddc7256fbe14e9910f4feff3d224f05e41e92f4ec",
+            ["war3mapSkin.w3a"] = "7d025a1db02802493db311d5e918b7a499ef2a69eac8a5fdd8a78fceb670f15c",
+            ["war3mapSkin.w3b"] = "1e09f66800e468e9b145b642423f38fdd0d9fff5b9575b97251e5d7fc88368dc",
+            ["war3mapSkin.w3d"] = "ac5105e2d58b3f1a6cecb9eb2922decc953d1d375e027fac90d70ad23e586e42",
+            ["war3mapSkin.w3h"] = "584cf5532514eb169d2454c5fdc075a1a7a2a0f4c50486dfc732ad7a62322b50",
+            ["war3mapSkin.w3q"] = "bc02849111201fe2a6568c101e053350f209265773d8acc056433a7e7f1d1f1f",
+            ["war3mapSkin.w3t"] = "d583802691f06fdbf6a5c51e31bc6aa85eec4f487e6a422f60d17b426258b127",
+            ["war3mapSkin.w3u"] = "f149bc5e3667a1d1bd8eedaf0bb365817d46c1f3ac59fae49a4319639cd4538e",
+        };
+
+        private static readonly Dictionary<string, string> SampleHashes = new Dictionary<string, string>
+        {
+            ["war3map.w3u"] = "68984469e63f0a6931eba09864c39ba3a135b1725226c5e32cdf5b81117b0267",
+            ["war3mapSkin.w3u"] = "7414faa20e12cce812bf8c08242428306ccc9bb5d876eaf4ad5a38c4bbe5fcbe",
+        };
+
         private readonly DeclarationsTests.BuiltObjects built;
+        private readonly SampleBuilds samples;
         private readonly string folder = Path.Combine(Path.GetTempPath(), "moonwell-objectfiles-" + Guid.NewGuid().ToString("N"));
         private readonly StringWriter log = new StringWriter { NewLine = "\n" };
 
-        public ObjectFilesTests(DeclarationsTests.BuiltObjects built)
+        public ObjectFilesTests(DeclarationsTests.BuiltObjects built, SampleBuilds samples)
         {
             this.built = built;
+            this.samples = samples;
             Directory.CreateDirectory(Path.Combine(folder, "map"));
             File.WriteAllBytes(Path.Combine(folder, "map", "war3map.w3i"), Array.Empty<byte>());
             File.WriteAllText(Path.Combine(folder, "Sample.csproj"), "<Project />");
@@ -46,6 +74,21 @@ namespace Moonwell.Build.Tests
                     Assert.Equal(File.ReadAllBytes(Path.Combine(fixture, name)), File.ReadAllBytes(Path.Combine(staged, name)));
                 }
             }
+        }
+
+        [Fact]
+        public void Staged_object_files_keep_their_bytes()
+        {
+            var staged = StageFixtureObjects(out _, out _);
+
+            AssertHashes(FixtureHashes, staged);
+        }
+
+        [Fact]
+        public void The_samples_staged_object_files_keep_their_bytes()
+        {
+            AssertHashes(SampleHashes, Path.Combine(samples.Development.BuildFolder, "Sample"));
+            AssertHashes(SampleHashes, Path.Combine(samples.Release.BuildFolder, "Sample"));
         }
 
         [Fact]
@@ -594,6 +637,31 @@ namespace Moonwell.Build.Tests
             }
 
             return files;
+        }
+
+        private void AssertHashes(IReadOnlyDictionary<string, string> expected, string stagedFolder)
+        {
+            var actual = new SortedDictionary<string, string>(StringComparer.Ordinal);
+            foreach (var pair in ObjectFileBytes(stagedFolder))
+            {
+                actual[pair.Key] = Convert.ToHexString(SHA256.HashData(pair.Value)).ToLowerInvariant();
+            }
+
+            var problems = new List<string>();
+            foreach (var pair in actual)
+            {
+                if (!expected.TryGetValue(pair.Key, out var hash))
+                {
+                    problems.Add($"{pair.Key} appeared ({pair.Value})");
+                }
+                else if (hash != pair.Value)
+                {
+                    problems.Add($"{pair.Key} changed (was {hash}, is {pair.Value})");
+                }
+            }
+
+            problems.AddRange(expected.Keys.Where(name => !actual.ContainsKey(name)).Select(name => $"{name} disappeared"));
+            Assert.True(problems.Count == 0, stagedFolder + "\n" + string.Join("\n", problems));
         }
 
         private void WriteSource(string name, UnitObjectData data)
