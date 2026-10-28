@@ -306,6 +306,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "ground.bounce-under-gravity", Run = GroundCases.BounceUnderGravity });
             list.Add(new Case { Name = "ground.bounce-friction", Run = GroundCases.BounceFriction });
             list.Add(new Case { Name = "ground.bounce-own-gravity", Run = GroundCases.BounceOwnGravity });
+            list.Add(new Case { Name = "ground.bounce-no-gravity", Run = GroundCases.BounceNoGravity });
             list.Add(new Case { Name = "ground.cast-out-of-the-map", Run = GroundCases.CastOutOfTheMap });
             list.Add(new Case { Name = "homing.turn-rate", Run = ComponentCases.TurnRate });
             list.Add(new Case { Name = "homing.circle", Run = ComponentCases.Circle });

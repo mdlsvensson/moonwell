@@ -320,6 +320,63 @@ namespace Moonwell.Testing
             Expect.True(bounce.X >= slide.X - 1.0f, "no further than the Slide: at " + bounce.X + " against " + slide.X);
         }
 
+        /// <summary>
+        /// A Bounce with no Gravity of its own (a missile's default) going along the ground is pulled and slowed at every
+        /// step, as a Slide is: laid on the slope of 1 in 2 it goes down as far as a Slide in 2 s, within 3 parts in 100;
+        /// thrown at 300 down a slope of 10 degrees, whose pull its Friction holds, it rests where a Slide thrown the same
+        /// way rests, within 3 parts in 100 of the way. Its move ended a float's last bit above the ground or below it, and
+        /// above, the ground was not met that step: it went 58 down the steep slope where the Slide went 278, and down the
+        /// gentle one it went on past 1,400 and did not rest.
+        /// </summary>
+        public static void BounceNoGravity(FakeWorld world)
+        {
+            var steep = new float[16];
+            for (var i = 0; i < steep.Length; i++)
+            {
+                steep[i] = i * 64.0f;
+            }
+
+            Along(steep);
+            var bounce = Laid(Contact.Bounce, 0.0f, 1000.0f, 64.0f);
+            var slide = Laid(Contact.Slide, 0.0f, 1000.0f, 192.0f);
+            Steps(world, 64);
+            var bounceWay = 1000.0f - bounce.X;
+            var slideWay = 1000.0f - slide.X;
+            Expect.True(slideWay > 200.0f, "the Slide goes down the slope of 1 in 2; " + slideWay);
+            Expect.True(Math.Abs(bounceWay - slideWay) <= 0.03f * slideWay, "the Bounce as far as the Slide: " + bounceWay + " against " + slideWay);
+
+            var heights = new float[16];
+            for (var i = 0; i < heights.Length; i++)
+            {
+                heights[i] = i * SlopeRise;
+            }
+
+            Along(heights);
+            var thrown = Thrown(Contact.Bounce, 0.0f, 64.0f);
+            var rolled = Thrown(Contact.Slide, 800.0f, 192.0f);
+            for (var i = 0; i < 320 && (thrown.Rested == 0 || rolled.Rested == 0); i++)
+            {
+                Steps(world, 1);
+            }
+
+            Expect.Equal(1, rolled.Rested, "the Slide thrown down the slope of 10 degrees rests");
+            Expect.Equal(1, thrown.Rested, "and so does the Bounce");
+            var thrownWay = 1800.0f - thrown.X;
+            var rolledWay = 1800.0f - rolled.X;
+            Expect.True(Math.Abs(thrownWay - rolledWay) <= 0.03f * rolledWay, "where the Slide does: " + thrownWay + " against " + rolledWay);
+        }
+
+        /// <summary>Lays a ball with a GroundContact and a Gravity on the ground at (1800, y), thrown at 300 down the slope along x.</summary>
+        private static Ball Thrown(Contact contact, float gravity, float y)
+        {
+            var ball = Laid(contact, gravity, 1800.0f, y);
+            var cos = 0.98480775f;
+            var sin = 0.17364818f;
+            ball.VX = -300.0f * cos;
+            ball.VZ = -300.0f * sin;
+            return ball;
+        }
+
         /// <summary>Lays a ball with a GroundContact and a Gravity on the ground at a place, with no velocity.</summary>
         private static Ball Laid(Contact contact, float gravity, float x, float y)
         {

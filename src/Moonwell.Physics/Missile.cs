@@ -267,6 +267,9 @@ namespace Moonwell
         /// <summary>Whether its move this step was a free fall, gravity taken for the whole step: a contact later in the step gives back the part after it. False once it met the ground or rolled along it this step, whose velocity is the ground's.</summary>
         internal bool fell;
 
+        /// <summary>Whether, a Bounce, it went along the ground at its last step: at this one it meets the ground where it is a float's last bit above it, so it is pulled and slowed at every step it stays on it, whatever its own Gravity.</summary>
+        internal bool alongGround;
+
         /// <summary>Whether it lies still on the ground; it moves again when something gives it a velocity.</summary>
         internal bool resting;
 

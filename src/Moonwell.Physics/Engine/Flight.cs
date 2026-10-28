@@ -101,6 +101,8 @@ namespace Moonwell.Engine
             }
 
             missile.fell = true;
+            var along = missile.alongGround;
+            missile.alongGround = false;
             var vx = missile.vx;
             var vy = missile.vy;
             var vz = missile.vz;
@@ -164,7 +166,7 @@ namespace Moonwell.Engine
             }
 
             var contact = missile.groundContact;
-            if (contact != Contact.None && contact != Contact.Pass && Land(missile, step, grid, world, entry, fromX, fromY, fromZ, x, y, z, rise))
+            if (contact != Contact.None && contact != Contact.Pass && Land(missile, step, grid, world, entry, fromX, fromY, fromZ, x, y, z, rise, along))
             {
                 return;
             }
@@ -216,7 +218,7 @@ namespace Moonwell.Engine
         /// it): it could only find the ground below, which changes nothing but what is kept of the read, and the next
         /// step's check is made from the span's bounds while they decide it, as they do for whatever the read finds.
         /// </summary>
-        private static bool Land(Missile missile, float step, Grid grid, IPhysicsWorld world, Entry entry, float fromX, float fromY, float fromZ, float x, float y, float z, float rise)
+        private static bool Land(Missile missile, float step, Grid grid, IPhysicsWorld world, Entry entry, float fromX, float fromY, float fromZ, float x, float y, float z, float rise, bool along)
         {
             var radius = missile.radius;
             var bottom = z - radius;
@@ -265,7 +267,7 @@ namespace Moonwell.Engine
                     }
                 }
 
-                if (x >= missile.spanMinX && x <= missile.spanMaxX && y >= missile.spanMinY && y <= missile.spanMaxY && bottom > missile.spanHigh && Decks.count == 0 && missile.spanGrid == Terrain.Grid)
+                if (!along && x >= missile.spanMinX && x <= missile.spanMaxX && y >= missile.spanMinY && y <= missile.spanMaxY && bottom > missile.spanHigh && Decks.count == 0 && missile.spanGrid == Terrain.Grid)
                 {
                     // Above the highest ground of its span: the read could only find the ground below. It is put off.
                     Ground.reads++;
@@ -285,7 +287,7 @@ namespace Moonwell.Engine
                 missile.groundY = y;
                 missile.groundZ = ground;
                 missile.groundSince = 0.0f;
-                if (bottom > ground)
+                if (bottom > ground && !(along && bottom - ground <= OnGround && !Leaving(missile, x, y, fromZ)))
                 {
                     missile.throughGround = false;
                     if (Decks.count == 0 && (x < missile.spanMinX || x > missile.spanMaxX || y < missile.spanMinY || y > missile.spanMaxY || missile.spanGrid != Terrain.Grid))
@@ -299,28 +301,40 @@ namespace Moonwell.Engine
                     return false;
                 }
 
-                if (missile.throughGround)
+                if (bottom > ground)
                 {
-                    return false;
-                }
-
-                float startGap;
-                if (!Ground.Cast(fromX, fromY, fromZ - radius, x, y, bottom, out hitX, out hitY, out hitZ, out fraction, out startGap))
-                {
+                    // Along the ground at its last step and a float's last bit above it now, not moving out of it: it met
+                    // the ground at its step's start, so it is pulled and slowed this step too, whatever its own Gravity.
                     hitX = x;
                     hitY = y;
                     hitZ = ground;
-                    fraction = 1.0f;
-                }
-                else if (startGap <= OnGround)
-                {
-                    // It began the step on the ground, near enough.
                     fraction = 0.0f;
                 }
                 else
                 {
-                    // The cast takes the decks not above the ball's lowest point at the start.
-                    limit = fromZ - radius;
+                    if (missile.throughGround)
+                    {
+                        return false;
+                    }
+
+                    float startGap;
+                    if (!Ground.Cast(fromX, fromY, fromZ - radius, x, y, bottom, out hitX, out hitY, out hitZ, out fraction, out startGap))
+                    {
+                        hitX = x;
+                        hitY = y;
+                        hitZ = ground;
+                        fraction = 1.0f;
+                    }
+                    else if (startGap <= OnGround)
+                    {
+                        // It began the step on the ground, near enough.
+                        fraction = 0.0f;
+                    }
+                    else
+                    {
+                        // The cast takes the decks not above the ball's lowest point at the start.
+                        limit = fromZ - radius;
+                    }
                 }
             }
 
@@ -385,6 +399,16 @@ namespace Moonwell.Engine
             return true;
         }
 
+        /// <summary>Whether a missile at a point moves out of the ground there faster than SlideSpeed, as a ball leaving it after a bounce does.</summary>
+        private static bool Leaving(Missile missile, float x, float y, float z)
+        {
+            float nx;
+            float ny;
+            float nz;
+            Ground.Slope(x, y, z, out nx, out ny, out nz);
+            return missile.vx * nx + missile.vy * ny + missile.vz * nz > SlideSpeed;
+        }
+
         /// <summary>Whether a missile this high above the ground, so many seconds after its last read, cannot have reached it yet: the slack check of Land. True for no less a height once true.</summary>
         private static bool Far(Missile missile, float high, float since)
         {
@@ -439,7 +463,9 @@ namespace Moonwell.Engine
                 }
                 else if (along && nz > 0.0f && setting == Contact.Bounce)
                 {
-                    // A Bounce going along the ground loses its Friction, as Roll does a Slide.
+                    // A Bounce going along the ground loses its Friction, as Roll does a Slide, and meets the ground at its
+                    // next step even a float's last bit above it.
+                    missile.alongGround = true;
                     var friction = missile.friction;
                     var speed = Trig.Sqrt(vx * vx + vy * vy + vz * vz);
                     var lost = friction * step;
@@ -710,6 +736,7 @@ namespace Moonwell.Engine
         internal static void Rest(Missile missile)
         {
             missile.resting = true;
+            missile.alongGround = false;
             missile.vx = 0.0f;
             missile.vy = 0.0f;
             missile.vz = 0.0f;
