@@ -16,6 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Moonwell.MapFiles.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Moonwell.GameData\Moonwell.GameData.csproj" />
   </ItemGroup>
 
