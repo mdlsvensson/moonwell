@@ -34,6 +34,11 @@ namespace Moonwell.GameData;
 /// field (an upgrade's at level 1), trimmed, a <c>WESTRING_</c> key replaced as for <paramref name="Name"/>; the empty
 /// string for none, and for a doodad, which has no such field.
 /// </param>
+/// <param name="Building">True for a unit whose <c>isbldg</c> column is 1; false for every other kind.</param>
+/// <param name="Own">
+/// For an ability, the ids of the fields specific to it (<see cref="Fields.SpecificOf"/>), in the fields' order; empty
+/// for every other kind. Never null once made.
+/// </param>
 public sealed record StandardObject(
     Kind Kind,
     string Id,
@@ -45,7 +50,13 @@ public sealed record StandardObject(
     IReadOnlyDictionary<string, string> Values,
     IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Sets,
     IReadOnlyList<string> MissingFrom,
-    string EditorSuffix = "");
+    string EditorSuffix = "",
+    bool Building = false,
+    IReadOnlyList<string>? Own = null)
+{
+    /// <summary>The ids of the fields specific to an ability (<see cref="Fields.SpecificOf"/>); empty for every other kind. Never null.</summary>
+    public IReadOnlyList<string> Own { get; init; } = Own ?? Array.Empty<string>();
+}
 
 /// <summary>The game's standard objects of a kind, with the value of each field that applies to them.</summary>
 /// <remarks>
@@ -198,7 +209,32 @@ public static class StandardObjects
             values,
             sets,
             missing,
-            Resolved(tables, evaluator.SuffixOf(values)).Trim());
+            Resolved(tables, evaluator.SuffixOf(values)).Trim(),
+            evaluator.BuildingOf(row),
+            evaluator.OwnOf(id, kind == Kind.Ability ? Clean(row.Get("code")) : null));
+    }
+
+    /// <summary>Whether a field applies to an object: by use flags for a unit, by its specific and <c>notSpecific</c> codes for an ability, always for any other kind.</summary>
+    /// <param name="field">A field of the object's kind.</param>
+    /// <param name="obj">The object, as <see cref="Of"/> built it.</param>
+    /// <returns>True when the object has a value for the field to hold, e.g. <c>ustr</c> (Strength) applies to a hero but not to a footman.</returns>
+    public static bool Applies(Field field, StandardObject obj)
+    {
+        return Applies(field, obj.Kind, obj.Code, obj.IsHero, obj.Building, obj.Own);
+    }
+
+    /// <summary>The rule of <see cref="Applies(Field, StandardObject)"/>, written once for it and for the generator's reading of the tables.</summary>
+    private static bool Applies(Field field, Kind kind, string? code, bool hero, bool building, IEnumerable<string>? own)
+    {
+        switch (kind)
+        {
+            case Kind.Unit:
+                return building ? field.ForBuilding : hero ? field.ForHero : field.ForUnit;
+            case Kind.Ability:
+                return field.Specific.Count > 0 ? own != null && own.Contains(field.Id) : !field.NotSpecific.Contains(code ?? "");
+            default:
+                return true;
+        }
     }
 
     /// <summary>The label of a <c>WESTRING_</c> key; the empty string for a key the tables have no label for; any other name as it is.</summary>
@@ -369,11 +405,6 @@ public static class StandardObjects
         private readonly int _element;
         private readonly bool _list;
         private readonly bool _appended;
-        private readonly HashSet<string> _specific;
-        private readonly HashSet<string> _notSpecific;
-        private readonly bool _hero;
-        private readonly bool _unit;
-        private readonly bool _building;
 
         // The last level whose column the tables hold, for an ability field held in a column of each level; 0 otherwise.
         private int _lastLevel;
@@ -384,11 +415,6 @@ public static class StandardObjects
         public FieldPlan(Field field, MetaRow meta)
         {
             Field = field;
-            _specific = new HashSet<string>(field.Specific, StringComparer.Ordinal);
-            _notSpecific = new HashSet<string>(field.NotSpecific, StringComparer.Ordinal);
-            _hero = field.ForHero;
-            _unit = field.ForUnit;
-            _building = field.ForBuilding;
             _appended = Cell(meta, "appendIndex") == "1";
             _element = -1;
             _column = field.Column;
@@ -431,15 +457,7 @@ public static class StandardObjects
         /// <param name="own">For an ability, the ids of the fields specific to it (<see cref="Fields.SpecificOf"/>).</param>
         public bool Applies(Kind kind, string? code, bool hero, bool building, IReadOnlySet<string>? own)
         {
-            switch (kind)
-            {
-                case Kind.Unit:
-                    return building ? _building : hero ? _hero : _unit;
-                case Kind.Ability:
-                    return _specific.Count > 0 ? own != null && own.Contains(Field.Id) : !_notSpecific.Contains(code ?? "");
-                default:
-                    return true;
-            }
+            return StandardObjects.Applies(Field, kind, code, hero, building, own);
         }
 
         /// <summary>Adds the field's values: one, or one for each level up to <paramref name="levels"/> (null: no level count).</summary>
@@ -564,11 +582,9 @@ public static class StandardObjects
         {
             var code = _kind == Kind.Ability ? Clean(row.Get("code")) : null;
             var hero = IsHero(_kind, id);
-            var building = _kind == Kind.Unit && Clean(row.Get("isbldg")) == "1";
+            var building = BuildingOf(row);
             var levels = LevelCount(row);
-            var own = _kind == Kind.Ability
-                ? new HashSet<string>(Fields.SpecificOf(_fields, id, code).Select(field => field.Id), StringComparer.Ordinal)
-                : null;
+            var own = _kind == Kind.Ability ? new HashSet<string>(OwnOf(id, code), StringComparer.Ordinal) : null;
             var values = new Dictionary<string, string>(StringComparer.Ordinal);
             foreach (var plan in _plans)
             {
@@ -579,6 +595,18 @@ public static class StandardObjects
             }
 
             return values;
+        }
+
+        /// <summary>Whether the object is a unit whose <c>isbldg</c> is 1.</summary>
+        public bool BuildingOf(Row row)
+        {
+            return _kind == Kind.Unit && Clean(row.Get("isbldg")) == "1";
+        }
+
+        /// <summary>The ids of the ability's own fields (<see cref="Fields.SpecificOf"/>); empty for any other kind.</summary>
+        public List<string> OwnOf(string id, string? code)
+        {
+            return _kind == Kind.Ability ? Fields.SpecificOf(_fields, id, code).Select(field => field.Id).ToList() : new List<string>();
         }
 
         /// <summary>The name in <paramref name="values"/>: the <c>Name</c> field's (an upgrade's at level 1; a buff's tooltip first).</summary>

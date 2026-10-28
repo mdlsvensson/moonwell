@@ -417,6 +417,44 @@ public class StandardObjectsTests
     }
 
     [Fact]
+    public void A_building_is_marked()
+    {
+        using var copy = new Copy();
+        copy.Replace("units/unitbalance.slk", "C;X1;Y3;K\"hfoo\"", "C;X53;K0", "C;X53;K1");
+
+        var units = Of(copy.Tables(), Kind.Unit);
+
+        Assert.True(Find(units, "hfoo").Building);
+        Assert.False(Find(units, "Hpal").Building);
+        Assert.False(Find(Of(Kind.Unit), "hfoo").Building);
+    }
+
+    [Fact]
+    public void An_ability_knows_its_own_fields()
+    {
+        var tables = GameTables.OpenExport(MiniExportFolder());
+        var fields = Fields.Of(tables, Kind.Ability);
+        var objects = StandardObjects.Of(tables, Kind.Ability, fields);
+
+        var holyLight = Find(objects, "AHhb");
+        Assert.NotEmpty(holyLight.Own);
+        Assert.Equal(Fields.SpecificOf(fields, "AHhb", holyLight.Code).Select(f => f.Id), holyLight.Own);
+        Assert.Empty(Find(Of(Kind.Unit), "hfoo").Own);
+    }
+
+    [Fact]
+    public void Applies_follows_the_use_flags()
+    {
+        var tables = GameTables.OpenExport(MiniExportFolder());
+        var fields = Fields.Of(tables, Kind.Unit);
+        var units = StandardObjects.Of(tables, Kind.Unit, fields);
+        var strength = fields.Single(f => f.Id == "ustr");
+
+        Assert.True(StandardObjects.Applies(strength, Find(units, "Hpal")));
+        Assert.False(StandardObjects.Applies(strength, Find(units, "hfoo")));
+    }
+
+    [Fact]
     public void an_item_has_the_item_fields()
     {
         var item = Find(Of(Kind.Item), "ratf");
