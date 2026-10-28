@@ -168,6 +168,69 @@ public class StandardObjectsTests
     }
 
     [Fact]
+    public void A_value_the_modes_differ_on_has_each_mode()
+    {
+        var paladin = Find(Of(Kind.Unit), "Hpal");
+
+        Assert.Equal(new[] { "sd", "hd", "de" }, StandardObjects.Modes);
+        Assert.Equal(new Dictionary<string, string> { ["sd"] = "1", ["hd"] = "1.2", ["de"] = "0.935" }, paladin.Modes["usca"]);
+        Assert.Equal("0.935", paladin.Values["usca"]);
+    }
+
+    [Fact]
+    public void A_value_the_modes_agree_on_has_no_modes()
+    {
+        var footman = Find(Of(Kind.Unit), "hfoo");
+
+        Assert.NotEmpty(footman.Modes);
+        Assert.All(footman.Modes.Values, byMode => Assert.True(byMode.Values.Distinct().Count() > 1));
+        Assert.False(footman.Modes.ContainsKey("uhpm"));
+    }
+
+    [Fact]
+    public void A_value_held_only_for_hd_is_empty_in_classic()
+    {
+        using var copy = new Copy();
+        copy.SetFootmanScales("modelScale:hd=2");
+
+        var footman = Find(Of(copy.Tables(), Kind.Unit), "hfoo");
+
+        Assert.Equal(new Dictionary<string, string> { ["sd"] = "", ["hd"] = "2", ["de"] = "2" }, footman.Modes["usca"]);
+        Assert.Equal("2", footman.Values["usca"]);
+    }
+
+    [Fact]
+    public void A_bare_value_is_the_classic_one_beside_a_reforged_one()
+    {
+        using var copy = new Copy();
+        copy.SetFootmanScales("modelScale=1", "modelScale:hd=0.9");
+
+        Assert.Equal(new Dictionary<string, string> { ["sd"] = "1", ["hd"] = "0.9", ["de"] = "0.9" }, Find(Of(copy.Tables(), Kind.Unit), "hfoo").Modes["usca"]);
+    }
+
+    [Fact]
+    public void A_blank_definitive_edition_value_is_empty_in_definitive_edition_only()
+    {
+        // As Values reads it: the key has no value in de, not the :hd or the plain key's.
+        using var copy = new Copy();
+        copy.SetFootmanScales("modelScale=1", "modelScale:de=", "modelScale:hd=0.9");
+
+        var footman = Find(Of(copy.Tables(), Kind.Unit), "hfoo");
+
+        Assert.Equal(new Dictionary<string, string> { ["sd"] = "1", ["hd"] = "0.9", ["de"] = "" }, footman.Modes["usca"]);
+        Assert.False(footman.Values.ContainsKey("usca"));
+    }
+
+    [Fact]
+    public void An_object_with_no_mode_keys_has_no_modes()
+    {
+        using var copy = new Copy();
+        copy.SetFootmanScales("modelScale=1");
+
+        Assert.Empty(Find(Of(copy.Tables(), Kind.Unit), "hfoo").Modes);
+    }
+
+    [Fact]
     public void objects_are_ordered_by_id()
     {
         var ids = Of(Kind.Unit).Select(o => o.Id).ToList();

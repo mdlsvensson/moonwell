@@ -39,6 +39,13 @@ namespace Moonwell.GameData;
 /// For an ability, the ids of the fields specific to it (<see cref="Fields.SpecificOf"/>), in the fields' order; empty
 /// for every other kind. Never null once made.
 /// </param>
+/// <param name="Modes">
+/// The keys of <paramref name="Values"/> whose value differs between the graphics modes (<see cref="StandardObjects.Modes"/>:
+/// <c>sd</c> Classic, <c>hd</c> Reforged, <c>de</c> Definitive Edition), read from the same rows as
+/// <paramref name="Values"/>, which is the <c>de</c> reading. For each such key, the value in each mode; the empty
+/// string stands for a mode the key has no value in (<c>usca</c> of a unit with only <c>modelScale:hd</c> is empty in
+/// <c>sd</c>). Never null once made.
+/// </param>
 public sealed record StandardObject(
     Kind Kind,
     string Id,
@@ -52,10 +59,17 @@ public sealed record StandardObject(
     IReadOnlyList<string> MissingFrom,
     string EditorSuffix = "",
     bool Building = false,
-    IReadOnlyList<string>? Own = null)
+    IReadOnlyList<string>? Own = null,
+    IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>>? Modes = null)
 {
+    private static readonly IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> EmptyModes =
+        new Dictionary<string, IReadOnlyDictionary<string, string>>();
+
     /// <summary>The ids of the fields specific to an ability (<see cref="Fields.SpecificOf"/>); empty for every other kind. Never null.</summary>
     public IReadOnlyList<string> Own { get; init; } = Own ?? Array.Empty<string>();
+
+    /// <summary>The keys whose value differs between the graphics modes, with the value in each mode (<c>sd</c>, <c>hd</c>, <c>de</c>); empty for none. Never null.</summary>
+    public IReadOnlyDictionary<string, IReadOnlyDictionary<string, string>> Modes { get; init; } = Modes ?? EmptyModes;
 }
 
 /// <summary>The game's standard objects of a kind, with the value of each field that applies to them.</summary>
@@ -95,6 +109,10 @@ public static class StandardObjects
     private const string TooltipName = "Tooltip";
     private const string SuffixColumn = "EditorSuffix";
     private const string KeyPrefix = "WESTRING_";
+    private const string DefinitiveMode = "de";
+
+    /// <summary>The graphics modes, by the names <see cref="StandardObject.Modes"/> uses: <c>sd</c> Classic, <c>hd</c> Reforged, <c>de</c> Definitive Edition. <see cref="StandardObject.Values"/> is the <c>de</c> reading.</summary>
+    public static readonly IReadOnlyList<string> Modes = ["sd", "hd", "de"];
 
     /// <summary>The standard objects of <paramref name="kind"/> ordered by id (ordinal), with the values of <paramref name="fields"/>.</summary>
     public static IReadOnlyList<StandardObject> Of(GameTables tables, Kind kind, IReadOnlyList<Field> fields)
@@ -190,12 +208,32 @@ public static class StandardObjects
             missing.Insert(0, BaseTables);
         }
 
-        var row = new Row(primary);
+        var row = new Row(primary, DefinitiveMode);
         var values = evaluator.Values(id, row);
         var sets = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal);
         foreach (var set in existing)
         {
-            sets[set] = Diff(values, evaluator.Values(id, new Row(setRows[set][id])));
+            sets[set] = Diff(values, evaluator.Values(id, new Row(setRows[set][id], DefinitiveMode)));
+        }
+
+        // Only the skin files key values by mode, so most objects need no second reading.
+        var modes = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.Ordinal);
+        if (row.HasModes)
+        {
+            var byMode = new[] { evaluator.Values(id, row.In("sd")), evaluator.Values(id, row.In("hd")), values };
+            foreach (var key in byMode.SelectMany(read => read.Keys).Distinct(StringComparer.Ordinal))
+            {
+                var perMode = new Dictionary<string, string>(StringComparer.Ordinal);
+                for (var i = 0; i < Modes.Count; i++)
+                {
+                    perMode[Modes[i]] = byMode[i].GetValueOrDefault(key, "");
+                }
+
+                if (perMode.Values.Distinct(StringComparer.Ordinal).Count() > 1)
+                {
+                    modes[key] = perMode;
+                }
+            }
         }
 
         return new StandardObject(
@@ -211,7 +249,8 @@ public static class StandardObjects
             missing,
             Resolved(tables, evaluator.SuffixOf(values)).Trim(),
             evaluator.BuildingOf(row),
-            evaluator.OwnOf(id, kind == Kind.Ability ? Clean(row.Get("code")) : null));
+            evaluator.OwnOf(id, kind == Kind.Ability ? Clean(row.Get("code")) : null),
+            modes);
     }
 
     /// <summary>Whether a field applies to an object: by use flags for a unit, by its specific and <c>notSpecific</c> codes for an ability, always for any other kind.</summary>
@@ -326,7 +365,8 @@ public static class StandardObjects
     /// is what the game read in graphics mode 2 on 3.0.1 (game-facts, seen 2026-10-22): the key's <c>:de</c> value, else its
     /// <c>:hd</c> value, else the key itself, and never its <c>:sd</c> value (a footman's scale 0.8 with <c>:hd</c> 0.95, a
     /// peasant's 0.85 beside its <c>modelScale=1</c>, an assassin's 1.2 with <c>:hd</c> 1.2 and <c>:sd</c> 1.3). In the
-    /// other modes the game reads that mode's values.
+    /// other modes the game reads that mode's values: Classic the key's <c>:sd</c> value, else the key itself; Reforged
+    /// its <c>:hd</c> value, else the key itself (<see cref="In"/>).
     /// </summary>
     private sealed class Row
     {
@@ -335,13 +375,34 @@ public static class StandardObjects
         // the same way.
         private const string GameMode = ":de";
         private const string FallbackMode = ":hd";
+        private const string ClassicMode = ":sd";
 
         private readonly ObjectRows _rows;
+        private readonly string _mode;
         private Dictionary<string, string?>? _folded;
+        private bool? _hasModes;
 
-        public Row(ObjectRows rows)
+        /// <summary>The rows as read in a graphics mode (<see cref="StandardObjects.Modes"/>).</summary>
+        public Row(ObjectRows rows, string mode)
         {
             _rows = rows;
+            _mode = mode;
+        }
+
+        private Row(Row from, string mode)
+        {
+            _rows = from._rows;
+            _mode = mode;
+            _folded = from.Folded();
+        }
+
+        /// <summary>Whether the rows hold a key with a mode suffix (<c>modelScale:hd</c>), so that the modes may read different values.</summary>
+        public bool HasModes => _hasModes ??= _rows.Values.Keys.Any(HasModeSuffix);
+
+        /// <summary>The same rows read in another mode.</summary>
+        public Row In(string mode)
+        {
+            return new Row(this, mode);
         }
 
         /// <summary>The value of the key, or null when no key matches or several keys match without regard to case.</summary>
@@ -374,7 +435,19 @@ public static class StandardObjects
 
         private string? Spelling(string key)
         {
-            return Spelled(key + GameMode) ?? Spelled(key + FallbackMode) ?? Spelled(key);
+            return _mode switch
+            {
+                "sd" => Spelled(key + ClassicMode) ?? Spelled(key),
+                "hd" => Spelled(key + FallbackMode) ?? Spelled(key),
+                _ => Spelled(key + GameMode) ?? Spelled(key + FallbackMode) ?? Spelled(key),
+            };
+        }
+
+        private static bool HasModeSuffix(string key)
+        {
+            return key.EndsWith(GameMode, StringComparison.OrdinalIgnoreCase)
+                || key.EndsWith(FallbackMode, StringComparison.OrdinalIgnoreCase)
+                || key.EndsWith(ClassicMode, StringComparison.OrdinalIgnoreCase);
         }
 
         private string? Spelled(string key)
@@ -384,6 +457,12 @@ public static class StandardObjects
                 return key;
             }
 
+            return Folded().GetValueOrDefault(key);
+        }
+
+        /// <summary>The keys without regard to case, each to its spelling, or to null when several keys match.</summary>
+        private Dictionary<string, string?> Folded()
+        {
             if (_folded == null)
             {
                 _folded = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
@@ -393,7 +472,7 @@ public static class StandardObjects
                 }
             }
 
-            return _folded.GetValueOrDefault(key);
+            return _folded;
         }
     }
 
