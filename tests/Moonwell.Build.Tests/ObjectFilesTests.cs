@@ -30,6 +30,22 @@ namespace Moonwell.Build.Tests
             ["war3mapSkin.w3u"] = "f149bc5e3667a1d1bd8eedaf0bb365817d46c1f3ac59fae49a4319639cd4538e",
         };
 
+        private static readonly Dictionary<string, string> MergedHashes = new Dictionary<string, string>
+        {
+            ["war3map.w3a"] = "77abcb0fda4d7f85d6ec3fd12350d2e4566359789759cc5b512c50cc7399a9d1",
+            ["war3map.w3b"] = "26291b0f51897f7e13899fcf91a2e6b71d32dbbb132814e934ea580f30726707",
+            ["war3map.w3d"] = "a645cdb1fe9016f921bd5e35b9f2d951d3b7ac2035c8330c343279056a2bb489",
+            ["war3map.w3h"] = "b3b1b3b9208f6e8f766f79ca6805aa0de3c50cc048455f24661756407726cca1",
+            ["war3map.w3t"] = "54ceddff3165f0517c377cafb29921d8105a798269e906a8b70217fbf67c6c99",
+            ["war3map.w3u"] = "8f9056ea3000f885404d930a5a18537a4a0e1bfeb60a9ad77bc11de61e30aa0b",
+            ["war3mapSkin.w3a"] = "75fbe3d8c56c4a85210a06ff6607d62e00ba63c3dbef2b50b6332fb620ec8dd0",
+            ["war3mapSkin.w3b"] = "e555e3082c6e69aeda19090f33954a648182265949988b4ae5c2d371e51d5371",
+            ["war3mapSkin.w3d"] = "a09315902285e7a3c589d037694222e9b0745326cbf6d35adebb2fcb4c9cc92a",
+            ["war3mapSkin.w3h"] = "458f0f21b8d8e53bb702f7b61682a04d3b75093e2d3fec50750e242facadbe2a",
+            ["war3mapSkin.w3t"] = "5766e06673a1c782ae8d64fda96bdb31d23ff8ed05bdc9e67f9109846cfbbeb5",
+            ["war3mapSkin.w3u"] = "e25c6e276dfc83a388d5248cee942945694d7a49158879a6fa64790e2b1f8368",
+        };
+
         private static readonly Dictionary<string, string> SampleHashes = new Dictionary<string, string>
         {
             ["war3map.w3u"] = "68984469e63f0a6931eba09864c39ba3a135b1725226c5e32cdf5b81117b0267",
@@ -85,8 +101,30 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void Objects_staged_into_a_maps_own_files_keep_their_bytes()
+        {
+            // World Editor's own files are the map's source files, except the upgrades' (a kind with no source file and no declared object, so no file is written);
+            // the declared objects take the place of the entries with their ids, and the rest of the entries stay.
+            var fixture = TestFolders.Fixture("WorldEditorObjects");
+            foreach (var extension in Extensions.Where(one => one != "w3q"))
+            {
+                File.Copy(Path.Combine(fixture, "war3map." + extension), Path.Combine(folder, "map", "war3map." + extension));
+                File.Copy(Path.Combine(fixture, "war3mapSkin." + extension), Path.Combine(folder, "map", "war3mapSkin." + extension));
+            }
+
+            var set = built.Read(null);
+            var objects = set.Objects.Where(one => one.Kind != "upgrade").ToList();
+            var ids = ObjectIds.Assign(objects, AllStandardIds(), new HashSet<string>());
+            var staged = WriteObjects(objects, ids, set.StandardClassIds, built.Standard);
+
+            AssertHashes(MergedHashes, staged);
+        }
+
+        [Fact]
         public void The_samples_staged_object_files_keep_their_bytes()
         {
+            Assert.True(samples.Development.ExitCode == 0, samples.Development.Output + samples.Development.Error);
+            Assert.True(samples.Release.ExitCode == 0, samples.Release.Output + samples.Release.Error);
             AssertHashes(SampleHashes, Path.Combine(samples.Development.BuildFolder, "Sample"));
             AssertHashes(SampleHashes, Path.Combine(samples.Release.BuildFolder, "Sample"));
         }
