@@ -523,9 +523,10 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
 - **Ownership**: a missile belongs to the game unless `Fire` or `Create` is given an `owner`, so one fired in a spell
   outlives the cast. `OnImpact` runs with the missile's owner.
 - **Knockback** keeps the unit's order. It stops at trees, buildings, cliffs, walls (`Wall.Create`) and a bridge's
-  rail, which keeps its body on the deck (a unit wider than the deck rides with it over both sides). A stopped push stops short of the edge, by up to a step's move and the unit's
-  collision size (about 37 and its collision size at 1,200 a second). `IPushTarget` has `OnPushed`, `OnSlammed` and
-  `OnGrounded`; an `OnPushed` that pushes its own unit calls itself again, without end.
+  rail, which keeps its body on the deck (a unit wider than the deck rides with it over both sides). A stopped push
+  stops short of the edge, by up to a step's move and the unit's collision size (about 37 and its collision size at
+  1,200 a second). `IPushTarget` has `OnPushed`, `OnSlammed` and `OnGrounded`; an `OnPushed` that pushes its own unit
+  calls itself again, without end.
 - **Bridges**: placed bridges are ground, for missiles landing (from above: one below a deck flies under it) and units
   standing, until the bridge dies (brought back to life, it is not ground again); missiles do not meet it as a
   destructable. A deck stands on the ground beneath any water at its bridge's place, as in the game; the build writes
@@ -537,6 +538,18 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
 - Everything runs on every machine. Reads are safe in `Local.For`; firing, pushing and every set are not.
 - In the debug mode, a selected missile's panel shows its speed, velocity and radius, and a pushed unit's its push;
   `-stats` counts the missiles (and how many rest) and the pushed units.
+- **Known limits**:
+  - A ball rolling along a wall into a square or sharper corner on a hill comes to rest the moment it meets the second
+    wall, without bouncing back.
+  - A `Bounce` with low `Friction` (about 20) in a very shallow corner (about 160 degrees) on a steep hill (1 in 1) can
+    bounce between the walls for more than 16 seconds before it rests.
+  - Walls do not push missiles: a wall moved into a resting missile goes into it, and lowering a wall's `Height` does
+    not wake what rests against it.
+  - On a bridge turned off the axes, a unit standing with its body slightly over the side (a footman, about 1 or 2.5
+    over) may be stopped when pushed along the deck.
+  - A unit as wide as a bridge's deck crosses it only when pushed straight along it; pushed slightly sideways, it stops
+    where the rail begins.
+  - A unit pushed on a bridge's deck costs about half again as much a step as one pushed on the ground.
 
 ## Areas
 
