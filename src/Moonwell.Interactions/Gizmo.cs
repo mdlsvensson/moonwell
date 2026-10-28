@@ -147,6 +147,11 @@ namespace Moonwell
         {
         }
 
+        /// <summary>Runs when the gizmo's place is set by its X, Y or Position, before it moves there; nothing for a plain gizmo. A package's kind of gizmo answers its own part here, as a wall wakes what rests against it.</summary>
+        internal virtual void Moving()
+        {
+        }
+
         /// <summary>Runs on its own at every Tick, in the cycle's first pass, before the interactions check what is near.</summary>
         public virtual void OnTick()
         {
@@ -233,6 +238,7 @@ namespace Moonwell
                 Dev.Check(false, Names.NameOf(this) + ": the gizmo has not been created");
             }
 
+            Moving();
             Interactions.Grid.Move(entry!, x, y);
         }
 

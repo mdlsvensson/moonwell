@@ -170,6 +170,26 @@ namespace Moonwell.Engine
             }
         }
 
+        /// <summary>Wakes each resting missile that keeps a touch of a wall, as the wall has ended or is moving: what rested against it falls or rolls on from its next step, as when the deck under it goes.</summary>
+        public static void WallGone(Wall wall)
+        {
+            var list = missiles;
+            if (list == null)
+            {
+                return;
+            }
+
+            var count = list.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var missile = Raw.At(list, i);
+                if (missile.resting && !missile.ending && Contacts.Touches(missile, wall))
+                {
+                    missile.groundGone = true;
+                }
+            }
+        }
+
         /// <summary>Takes the ended missiles out of the list, keeping the order of the rest.</summary>
         private static void Pack(List<Missile> list)
         {

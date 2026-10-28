@@ -2324,6 +2324,12 @@ namespace Moonwell.Engine
             return ox * ox + oy * oy > near * near;
         }
 
+        /// <summary>Whether a missile keeps a touch of a wall: its ball was at it when it last met the walls.</summary>
+        internal static bool Touches(Missile missile, Wall wall)
+        {
+            return TouchOf(missile, wall) != null;
+        }
+
         /// <summary>What a missile keeps of a wall its ball is at; null for none.</summary>
         private static Touch? TouchOf(Missile missile, Wall wall)
         {

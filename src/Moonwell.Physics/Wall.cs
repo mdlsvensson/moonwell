@@ -148,11 +148,18 @@ namespace Moonwell
             Walls.Add(this);
         }
 
-        /// <summary>Tells the package's walls it is gone.</summary>
+        /// <summary>Tells the package's walls it is gone, and wakes what rests against it.</summary>
         internal override void Finish()
         {
             base.Finish();
             Walls.Dropped();
+            Pass.WallGone(this);
+        }
+
+        /// <summary>Wakes what rests against it before it moves: what it held, it holds no more.</summary>
+        internal override void Moving()
+        {
+            Pass.WallGone(this);
         }
     }
 }

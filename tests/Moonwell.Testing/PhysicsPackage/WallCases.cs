@@ -434,6 +434,62 @@ namespace Moonwell.Testing
             }
         }
 
+        /// <summary>
+        /// A ball resting against a wall across the slope of 1 in 2, which its Friction (20 or 200) cannot hold on its own,
+        /// wakes when the wall goes: ended, it goes on down the slope; moved 300 down the slope, it goes on down to the wall
+        /// where it is now and rests against it again. So rolling and as a Bounce. It lay still where the wall had been.
+        /// </summary>
+        public static void WallGoes(FakeWorld world)
+        {
+            var contacts = new Contact[] { Contact.Slide, Contact.Bounce };
+            var frictions = new float[] { 20.0f, 200.0f };
+            for (var c = 0; c < contacts.Length; c++)
+            {
+                for (var f = 0; f < frictions.Length; f++)
+                {
+                    var what = contacts[c] + " with Friction " + frictions[f] + ": ";
+                    SlopeOnly();
+                    var wall = Wall.Create(600.0f, 0.0f, 600.0f, 2000.0f);
+                    var ball = Resting(world, contacts[c], frictions[f]);
+                    Expect.Equal(1, ball.Rested, what + "it rests against the wall");
+                    var restX = ball.X;
+                    wall.End();
+                    Steps(world, 64);
+                    Expect.True(ball.X < restX - 100.0f, what + "the wall ended, it goes on down the slope; at " + ball.X + " from " + restX);
+
+                    SlopeOnly();
+                    var moved = Wall.Create(600.0f, 0.0f, 600.0f, 2000.0f);
+                    var other = Resting(world, contacts[c], frictions[f]);
+                    Expect.Equal(1, other.Rested, what + "the other rests against the wall");
+                    moved.X = moved.X - 300.0f;
+                    for (var i = 0; i < 320 && other.Rested < 2; i++)
+                    {
+                        Steps(world, 1);
+                    }
+
+                    Expect.Equal(2, other.Rested, what + "the wall moved, it goes on down to it and rests again");
+                    Within(316.0f, other.X, 1.0f, what + "against the wall where it is now, its radius off");
+                }
+            }
+        }
+
+        /// <summary>Lays a ball with a contact and a Friction at (640, 1000) on the slope, above the wall at x 600, and steps until it rests against it, at most 3 s.</summary>
+        private static Ball Resting(FakeWorld world, Contact contact, float friction)
+        {
+            var ball = new Ball();
+            ball.GroundContact = contact;
+            ball.WallContact = contact;
+            ball.Gravity = 800.0f;
+            ball.Friction = friction;
+            Missile.Create(ball, 640.0f, 1000.0f, Physics.GroundHeight(640.0f, 1000.0f) + 16.0f);
+            for (var i = 0; i < 96 && ball.Rested == 0; i++)
+            {
+                Steps(world, 1);
+            }
+
+            return ball;
+        }
+
         /// <summary>Installs the packages on fakes with the slope of SlopeWithWall, rising 64 a tile of 128 along x, and no wall.</summary>
         private static void SlopeOnly()
         {
