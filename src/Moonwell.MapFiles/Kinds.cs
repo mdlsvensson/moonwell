@@ -6,7 +6,7 @@ namespace Moonwell.MapFiles;
 public static class Kinds
 {
     /// <summary>The seven kinds, in the order of the <see cref="Kind"/> enum.</summary>
-    public static IReadOnlyList<Kind> All { get; } = Enum.GetValues<Kind>();
+    public static IReadOnlyList<Kind> All { get; } = Array.AsReadOnly(Enum.GetValues<Kind>());
 
     /// <summary>The kind's file extension without the dot: <c>w3u</c> for units.</summary>
     public static string Extension(Kind kind) => kind switch

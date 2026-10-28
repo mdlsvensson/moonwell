@@ -14,6 +14,16 @@ public class RawcodesTests
     }
 
     [Fact]
+    public void Every_one_byte_character_keeps_its_place()
+    {
+        Assert.Equal(0x6FE96668, Rawcodes.From("hféo", "id"));
+        Assert.Equal("hféo", Rawcodes.TextOf(Rawcodes.IdOf("hféo")));
+        Assert.Equal(Rawcodes.From("hféo", "id"), Rawcodes.IdOf("hféo"));
+        Assert.Equal("ab", Rawcodes.TextOf(Rawcodes.IdOf("ab")));
+        Assert.Equal(Rawcodes.IdOf("hfoo"), Rawcodes.IdOf("hfoo and more"));
+    }
+
+    [Fact]
     public void From_refuses_an_id_that_is_not_four_bytes()
     {
         Assert.Equal(Rawcodes.IdOf("hfoo"), Rawcodes.From("hfoo", "id"));

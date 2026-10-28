@@ -19,6 +19,7 @@ public class KindsTests
         };
 
         Assert.Equal(expected.Select(one => one.Item1), Kinds.All);
+        Assert.False(Kinds.All is Kind[], "The list must not be an array anyone can write to.");
         foreach (var (kind, extension, key) in expected)
         {
             Assert.Equal(extension, Kinds.Extension(kind));
