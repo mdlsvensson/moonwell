@@ -11,6 +11,7 @@
     <Project Path="src/Moonwell.GameData/Moonwell.GameData.csproj" />
     <Project Path="src/Moonwell.Input/Moonwell.Input.csproj" />
     <Project Path="src/Moonwell.Interactions/Moonwell.Interactions.csproj" />
+    <Project Path="src/Moonwell.MapFiles/Moonwell.MapFiles.csproj" />
     <Project Path="src/Moonwell.Maths/Moonwell.Maths.csproj" />
     <Project Path="src/Moonwell.Natives/Moonwell.Natives.csproj" />
     <Project Path="src/Moonwell.Objects/Moonwell.Objects.csproj" />
@@ -26,6 +27,7 @@
     <Project Path="tests/Moonwell.Build.Tests/Moonwell.Build.Tests.csproj" />
     <Project Path="tests/Moonwell.Generator.Tests/Moonwell.Generator.Tests.csproj" />
     <Project Path="tests/Moonwell.Lua.Tests/Moonwell.Lua.Tests.csproj" />
+    <Project Path="tests/Moonwell.MapFiles.Tests/Moonwell.MapFiles.Tests.csproj" />
     <Project Path="tests/Moonwell.Objects.Tests/Moonwell.Objects.Tests.csproj" />
     <Project Path="tests/Moonwell.Testing/Moonwell.Testing.csproj" />
     <Project Path="tests/Moonwell.Tests/Moonwell.Tests.csproj" />
