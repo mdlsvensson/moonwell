@@ -6,6 +6,8 @@ namespace Moonwell.Analyzers.Tests;
 /// </summary>
 public class SyntaxTests
 {
+    private const string Two = "struct Two { public int A, B; public void Deconstruct(out int a, out int b) { a = A; b = B; } }";
+
     private const string Types = """
             enum Color { Red, Green = 5, Blue }
             [Flags] enum Mode { None = 0, A = 1, B = 2 }
@@ -20,15 +22,18 @@ public class SyntaxTests
     [InlineData("MW0017", "object o = 1; var s = o switch { int => \"a\", _ => \"c\" };", "int")]
     [InlineData("MW0017", "int x = 1; var s = x switch { var n when n > 3 => \"a\", _ => \"c\" };", "var n")]
     [InlineData("MW0017", "int x = 1; var s = x switch { not 1 => \"a\", _ => \"c\" };", "not 1")]
-    [InlineData("MW0017", "int x = 1; var b = x is not (1 or 2);", "(1 or 2)")]
-    [InlineData("MW0017", "int x = 1; var b = x is (> 1 and < 9);", "(> 1 and < 9)")]
     [InlineData("MW0017", "var bx = new Box(); var b = bx is { X: var y };", "var y")]
     [InlineData("MW0017", "var bx = new Box(); var b = bx is { X: int y };", "int y")]
-    [InlineData("MW0017", "var bx = new Box(); var b = bx is { Inner: not null };", "not null")]
     [InlineData("MW0017", "int[] a = { 1, 2 }; var b = a is [var first, .. var rest];", ".. var rest")]
+    [InlineData("MW0017", "int x = 1; var s = x switch { (1 or 2) => \"a\", _ => \"c\" };", "(1 or 2)")]
+    [InlineData("MW0017", "var bx = new Box(); var b = bx is { Inner.X: var y };", "var y")]
     // MW0018: patterns that give the wrong answer
-    [InlineData("MW0018", "var bx = new Box(); var b = bx is { Inner.X: 9 };", "Inner.X: 9")]
-    [InlineData("MW0018", "(int, int) t = (1, 2); var b = t is (1, _);", "(1, _)")]
+    [InlineData("MW0018", "var rc = new Rec(1, 2); var b = rc is (1, 2);", "(1, 2)", "record Rec(int X, int Y);")]
+    [InlineData("MW0018", "Two? n = null; var b = n is (1, 2);", "(1, 2)", Two)]
+    [InlineData("MW0018", "object o = 1; var b = o is Two(1, _);", "Two(1, _)", Two)]
+    [InlineData("MW0018", "var t = ((1, 2), 3); var b = t is ((1, _), 3);", "(1, _)")]
+    [InlineData("MW0018", "var hd = new Holder(); var b = hd is { T: (1, _) };", "(1, _)", "class Holder { public (int, int) T; }")]
+    [InlineData("MW0018", "var t = (A: 1, B: 2); var b = t is (A: 1, B: 2);", "(A: 1, B: 2)")]
     // MW0020: a struct changed through a copy of an element
     [InlineData("MW0020", "var arr = new Pt[1]; var c = arr[0]; c.X = 6;", "arr[0]")]
     [InlineData("MW0020", "var l = new List<Pt> { new Pt() }; var c = l[0]; c.X++;", "l[0]")]
@@ -146,6 +151,25 @@ public class SyntaxTests
             (int q, int r) = (1, 2);
             var (first, second) = Pair();
             """, Types + "\n" + "static (int, int) Pair() => (1, 2);"));
+    }
+
+    [Fact]
+    public void the_patterns_the_fork_writes_right_are_accepted()
+    {
+        // Decision 80: each of these runs right in the game's Lua (the cases in PatternCases).
+        Assert.Empty(MapCode.Check("""
+            int x = 5;
+            var a = x is (1 or 5) && x is not (1 or 2) && x is (> 0 and (< 3 or > 4));
+            var bx = new Box { X = 3 };
+            var b = bx is { X: (1 or 3) } && bx is { Inner: not null } && bx is { X: not 3 } && bx is { Inner: not { X: 1 } };
+            var c = bx is { Inner.X: 9 } && bx is { Inner.Inner.X: > 2 };
+            var d = bx switch { { Inner.X: 9 } => "nine", { Inner: not null } => "inner", { X: (1 or 3) } => "odd", _ => "other" };
+            (int, int) t = (1, 2);
+            var e = t is (1, _) && t is (> 0, >= 2) && t is (not 3, _) && (t is (2, _) or (1, _)) && t is not (3, _);
+            var f = t is (var m, var n) ? m + n : 0;
+            var two = new Two { A = 1, B = 2 };
+            var g = two is (1, 2) && two is Two(1, var h) && (bx, 1) is ({ X: 3 }, 1);
+            """, Types + "\n" + Two));
     }
 
     [Fact]

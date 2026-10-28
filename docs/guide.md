@@ -201,7 +201,8 @@ public sealed class KillCounter : UnitComponent
   game, and `unit.Remove<KillCounter>()` removes it (`End()` ends a component from inside). `HasEnded` is false inside
   `OnRemoved`, `OnLeave` and `OnEnd`, and true once the removal or `End()` returns. A component object is on one
   actor only: adding it to a second, applying a buff that is on a unit already, or removing a component from an actor
-  it is not on is reported and refused, in a release build too.
+  it is not on is reported and refused, in a release build too. A component's `Actor` is set from `OnAdded` on: read in
+  its constructor, a development build reports it.
 - Reactions to the whole map (`OnGameStart`, `OnUnitCreated`, `OnUnitDied`, `OnUnitCast`, `OnLeave`) go on a game or
   player component. `OnUnitCreated` runs once for each unit, when it comes into the game (one that came in before
   anything wanted it runs none); a unit's own is `OnCreated`.
@@ -374,7 +375,7 @@ Add the `Moonwell.Terrain` package (the template's `.csproj` has the line, comme
 pathing and rays. A map that does not reference it carries none of its code and no grid.
 
 ```csharp
-var z = Terrain.Height(target.X, target.Y);
+var z = Terrain.Height(target.X, target.Y);     // or Terrain.Height(target.Position())
 if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at hit.Point */ }
 ```
 
@@ -393,6 +394,8 @@ if (Terrain.Raycast(from, to, out var hit)) { /* the missile meets the ground at
   (not measured in the game).
 - On a bridge, `Height` reads the water or ground beneath, and `IsWalkable` and `CanStand` read false.
 - `Terrain.Raycast(from, to, out hit)` is for a missile against the ground; a ridge narrower than 32 can be stepped over.
+- Each query of a point takes `(x, y)` or a `Vector2`. A vector is a table in the game's Lua, so code that runs every
+  tick on many points passes the floats.
   As with the maths raycasts, a missile goes on when its step moves on after a hit for the rest of its time. Only the
   part of a ray over the map is cast: past the map's edge it meets nothing, and a long ray reads the ground at most
   about 2,700 times (across the largest map, about 25 ms).
@@ -583,8 +586,8 @@ compared, and from later checks of the compiler Moonwell builds with.
 | Rule | Rejects | Write instead |
 |---|---|---|
 | MW0005 | `decimal` (`long`, `ulong`, `uint` and `double` are under Multiplayer) | `int` or `float` |
-| MW0017 | in a `switch` expression: `> 10 =>`, `int =>`, `var n`, `not 1`; in any pattern: `(...)`, a name inside `{ X: int y }`, `not null` inside `{ }`, `.. var rest` | a `when` on a named variable (`int n when n > 10`), or an `if` |
-| MW0018 | `x is (1, _)`, `p is Pt(var a, var b)`, `p is { Inner.X: 9 }` | `{ X: 1 }`, a `switch`, `{ Inner: { X: 9 } }` |
+| MW0017 | at the top of a `switch` expression arm: `> 10 =>`, `int =>`, `var n`, `not 1`, `(1 or 2) =>`; in any pattern: a name inside `{ X: int y }` or `{ X: var y }`, `.. var rest` | a `when` on a named variable (`int n when n > 10`), or an `if` |
+| MW0018 | outside a `switch` expression arm, a positional pattern on a class, a record, a nullable struct or `object` (`p is (1, 2)`), inside another pattern (`{ T: (1, _) }`) or with names (`(A: 1, B: 2)`) | `{ X: 1 }`; on a tuple or a struct, `t is (1, _)` works |
 | MW0020 | `var c = arr[0];` on a struct, then `c.X = 6`, `c.Inner.X = 6`, `c.Move()` or `Bump(ref c)` (it changes `arr[0]`) | make a new struct, or write `c` back with `arr[0] = c` |
 | MW0022 | `var (a, b) = (1, 2)`, `(x[0], x[1]) = (x[1], x[0])`, a tuple turned into text | `(int a, int b) = (1, 2)`, a temporary, its items |
 | MW0023 | a user-defined `++`, `--`, `operator true/false`; `static abstract`; a record deriving from a record; one class implementing `IG<int>` and `IG<string>`; `with` on an anonymous type | a method; an ordinary class |
@@ -616,11 +619,12 @@ The analyzer does not see these, so they build and then go wrong in the game:
 | `byte` and `short` arithmetic | does not wrap | `int`, wrapped yourself |
 
 What works is most of the language: classes, structs, records, primary constructors, interfaces and default methods,
-generics with constraints, enums, delegates, events, `switch` statements, `is` patterns with constants, types and
-properties, `??`, `?.`, collection expressions, `foreach` over every collection, `yield`, lambdas and closures,
-`ref`/`out`/`in` parameters, `lock`, string interpolation, `List`, `Dictionary`, `HashSet`, `Queue`, `Stack`, arrays and
-most of LINQ. `float` and `int` arithmetic is the game's, see MW0005; its floats have no NaN or infinity (MW0042), and
-its square roots and sines are off by up to about 2 parts in 100,000 (Maths).
+generics with constraints, enums, delegates, events, `switch` statements, `is` patterns with constants, types,
+properties (`{ Inner.X: 9 }` too) and positions on a tuple or a struct, `??`, `?.`, collection expressions, `foreach`
+over every collection, `yield`, lambdas and closures, `ref`/`out`/`in` parameters, `lock`, string interpolation, `List`,
+`Dictionary`, `HashSet`, `Queue`, `Stack`, arrays and most of LINQ. `float` and `int` arithmetic is the game's, see
+MW0005; its floats have no NaN or infinity (MW0042), and its square roots and sines are off by up to about 2 parts in
+100,000 (Maths).
 
 ## The build
 

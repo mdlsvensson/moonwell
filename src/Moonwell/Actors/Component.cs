@@ -14,9 +14,16 @@ namespace Moonwell
         /// <summary>The bit mask of the reactions this class overrides, worked out when the component is added.</summary>
         internal int Mask;
 
-        /// <summary>The actor the component is on. Before the component is added it is null, though its type does not say so: read it from OnAdded on, not in the constructor.</summary>
+        /// <summary>The actor the component is on, from OnAdded on. Read before the component is added, in its constructor, a development build throws a MoonwellException that says so; a release build gives null, though the type does not say so (decision 78).</summary>
         [LocalSafe]
-        public Actor Actor => actor!;
+        public Actor Actor
+        {
+            get
+            {
+                Dev.Check(actor != null, "Component.Actor: read before " + Names.NameOf(this) + " was added to an actor; read it from OnAdded on, not in the constructor");
+                return actor!;
+            }
+        }
 
         /// <summary>The reactions this kind of component declares.</summary>
         internal abstract HookTable Table { get; }

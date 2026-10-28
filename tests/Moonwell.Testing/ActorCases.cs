@@ -253,6 +253,26 @@ namespace Moonwell.Testing
             Expect.Equal(2, ticker.Runs, "runs after the component was removed");
         }
 
+        /// <summary>In a development build, reading Actor before the component is added throws a MoonwellException that names the component and says to read it from OnAdded on; once added, Actor is its actor (decision 78).</summary>
+        public static void ActorBeforeAdded(FakeWorld world)
+        {
+            var probe = new Probe();
+            var message = "";
+            try
+            {
+                var early = probe.Actor;
+            }
+            catch (MoonwellException error)
+            {
+                message = error.Message;
+            }
+
+            Expect.True(message.Contains("Component.Actor: read before") && message.Contains("Probe") && message.Contains("from OnAdded on"), "the message: " + message);
+            var actor = new TestActor();
+            actor.Add(probe);
+            Expect.Same(actor, probe.Actor, "the actor once added");
+        }
+
         /// <summary>An error in OnAdded is reported, and the component stays on the actor.</summary>
         public static void ErrorInOnAdded(FakeWorld world)
         {

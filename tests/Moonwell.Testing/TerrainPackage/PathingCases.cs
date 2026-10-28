@@ -179,6 +179,27 @@ namespace Moonwell.Testing
             Expect.Equal(1, fake.HeightCalls, "one read of the world");
         }
 
+        /// <summary>The pathing flags, CanStand and LocalHeight of a Vector2 answer as of its X and Y (decision 79).</summary>
+        public static void VectorPoint(FakeWorld world)
+        {
+            var fake = new FakeTerrainWorld();
+            fake.Block(112f, 80f, FakeTerrainWorld.NoWalk | FakeTerrainWorld.NoBuild);
+            Flat(fake, 0f, 0f);
+            var water = new Vector2(112f, 80f);
+            var dry = new Vector2(80f, 80f);
+            Expect.True(!Terrain.IsWalkable(water) && Terrain.IsWalkable(dry), "IsWalkable");
+            Expect.True(Terrain.IsWater(water) == Terrain.IsWater(112f, 80f) && Terrain.IsWater(dry) == Terrain.IsWater(80f, 80f), "IsWater");
+            Expect.True(!Terrain.IsBuildable(water) && Terrain.IsBuildable(dry), "IsBuildable");
+            Expect.True(Terrain.IsFlyable(water) == Terrain.IsFlyable(112f, 80f), "IsFlyable");
+            fake.Lands = true;
+            fake.LandsX = 80f;
+            fake.LandsY = 80f;
+            Expect.True(Terrain.CanStand(dry, out var landed), "CanStand on dry ground");
+            Expect.True(landed == dry, "nearest is the point");
+            fake.Ground = (x, y) => x + 2f * y;
+            Expect.Near(7f, Terrain.LocalHeight(new Vector2(3f, 2f)), "LocalHeight");
+        }
+
         /// <summary>A read before Install throws.</summary>
         public static void NotInstalled(FakeWorld world)
         {
