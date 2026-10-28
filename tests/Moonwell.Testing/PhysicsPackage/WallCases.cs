@@ -231,8 +231,24 @@ namespace Moonwell.Testing
         /// <summary>Installs the packages on fakes with ground that rises 64 a tile of 128 along x, 16 by 16 tiles from (0, 0), and the wall from (200, 100) to (1400, 1300) across it.</summary>
         private static void SlopeWithWall()
         {
-            Interactions.Install(new FakeInteractionWorld());
-            Physics.Install(new FakePhysicsWorld());
+            SlopeWithWall(0.0f);
+        }
+
+        /// <summary>As SlopeWithWall, the ground, the wall and the fakes' bounds moved by shift along x and along y.</summary>
+        private static void SlopeWithWall(float shift)
+        {
+            var interactions = new FakeInteractionWorld();
+            interactions.MinX += shift;
+            interactions.MinY += shift;
+            interactions.MaxX += shift;
+            interactions.MaxY += shift;
+            Interactions.Install(interactions);
+            var physics = new FakePhysicsWorld();
+            physics.MinX += shift;
+            physics.MinY += shift;
+            physics.MaxX += shift;
+            physics.MaxY += shift;
+            Physics.Install(physics);
             var row = "";
             for (var i = 0; i < 16; i++)
             {
@@ -245,8 +261,8 @@ namespace Moonwell.Testing
                 text = text + row;
             }
 
-            Terrain.Install(new FakeTerrainWorld(), 16, 16, 0.0f, 0.0f, text);
-            Wall.Create(200.0f, 100.0f, 1400.0f, 1300.0f);
+            Terrain.Install(new FakeTerrainWorld(), 16, 16, shift, shift, text);
+            Wall.Create(200.0f + shift, 100.0f + shift, 1400.0f + shift, 1300.0f + shift);
         }
 
         /// <summary>Lays a ball with the given contacts, Gravity 800 and Friction 20 against the slope's wall, its radius from the wall's line, y = x - 100, on the side the ground falls toward the wall from, and gives it back.</summary>
@@ -570,22 +586,35 @@ namespace Moonwell.Testing
         /// </summary>
         public static void SlideRadiusZero(FakeWorld world)
         {
-            AlongWallThin(world, Contact.Slide, Contact.Slide, "rolling: ");
-            AlongWallThin(world, Contact.Bounce, Contact.Bounce, "Bounce: ");
+            AlongWallThin(world, Contact.Slide, Contact.Slide, "rolling: ", 0.0f);
+            AlongWallThin(world, Contact.Bounce, Contact.Bounce, "Bounce: ", 0.0f);
         }
 
-        /// <summary>Lays a ball of radius 0 with the given contacts 1 off the slope's wall, and checks it stays on its own side for 3 seconds.</summary>
-        private static void AlongWallThin(FakeWorld world, Contact ground, Contact side, string what)
+        /// <summary>
+        /// As SlideRadiusZero, 12,288 from the world's origin along x and y, where a float's last bits are about 0.001: a
+        /// thin ball meets the wall with its middle on the line, and its normal was taken from how far its middle was from
+        /// the wall's nearest point, which was only those bits there (and in the game's own Lua at 1,000, whose additions drop
+        /// more of them), so it pointed any way and the ball went through the wall. On the wall's straight part the normal is
+        /// the wall's own.
+        /// </summary>
+        public static void SlideRadiusZeroFar(FakeWorld world)
         {
-            SlopeWithWall();
+            AlongWallThin(world, Contact.Slide, Contact.Slide, "rolling: ", 12288.0f);
+            AlongWallThin(world, Contact.Bounce, Contact.Bounce, "Bounce: ", 12288.0f);
+        }
+
+        /// <summary>Lays a ball of radius 0 with the given contacts 1 off the slope's wall, the slope and the wall moved by shift along x and y, and checks it stays on its own side for 3 seconds.</summary>
+        private static void AlongWallThin(FakeWorld world, Contact ground, Contact side, string what, float shift)
+        {
+            SlopeWithWall(shift);
             var ball = new Ball();
             ball.GroundContact = ground;
             ball.WallContact = side;
             ball.Gravity = 800.0f;
             ball.Friction = 20.0f;
             ball.Radius = 0.0f;
-            var x = 1000.0f + 0.70710678f;
-            var y = 900.0f - 0.70710678f;
+            var x = 1000.0f + 0.70710678f + shift;
+            var y = 900.0f - 0.70710678f + shift;
             Missile.Create(ball, x, y, Physics.GroundHeight(x, y));
             var least = 1.0f;
             for (var i = 0; i < 96; i++)
