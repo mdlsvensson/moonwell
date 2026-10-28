@@ -45,6 +45,12 @@ public static class GameInstall
         return Require(Places(folder), string.IsNullOrWhiteSpace(folder));
     }
 
+    /// <summary>Whether <paramref name="folder"/> holds an install: it has <c>.build.info</c>.</summary>
+    public static bool IsInstall(string folder)
+    {
+        return File.Exists(Path.Combine(folder, BuildInfo));
+    }
+
     /// <summary>The active build of the install in <paramref name="folder"/>.</summary>
     /// <exception cref="InvalidDataException"><c>.build.info</c> names no active build.</exception>
     public static GameBuild Build(string folder)
@@ -78,7 +84,7 @@ public static class GameInstall
 
     internal static string? Find(IEnumerable<string> places)
     {
-        return places.FirstOrDefault(place => File.Exists(Path.Combine(place, BuildInfo)));
+        return places.FirstOrDefault(IsInstall);
     }
 
     internal static string Require(IReadOnlyList<string> places, bool hint)

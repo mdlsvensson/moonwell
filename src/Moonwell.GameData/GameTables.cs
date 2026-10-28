@@ -240,6 +240,22 @@ public sealed class GameTables : IDisposable
     }
 
     /// <summary>
+    /// The rows of any SLK table by its path in the tables (<c>units/unitui.slk</c>), read as the other tables are: the
+    /// first column is the id and the cells are the file's text, empty ones left out. Null when the tables have no such
+    /// file.
+    /// </summary>
+    public IReadOnlyList<MetaRow>? Table(string relative)
+    {
+        var key = _files.Find(relative);
+        if (key == null)
+        {
+            return null;
+        }
+
+        return ReadTable(key, relative).Select(row => new MetaRow(row.Id, row.Cells)).ToList();
+    }
+
+    /// <summary>
     /// The kind's objects with every table and text value merged. <paramref name="set"/> is null for the base tables,
     /// else <c>melee_v0</c>, <c>custom_v0</c> or <c>custom_v1</c>.
     /// </summary>

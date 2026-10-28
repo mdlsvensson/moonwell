@@ -217,6 +217,22 @@ public class GameTablesTests
     }
 
     [Fact]
+    public void a_table_by_its_path_gives_its_rows_as_the_file_spells_them()
+    {
+        var rows = GameTables.OpenExport(MiniExport()).Table("units/unitui.slk");
+
+        Assert.NotNull(rows);
+        Assert.Contains(rows, row => row.Id == "Hpal");
+        Assert.Equal("HUnit02", rows.Single(row => row.Id == "hfoo").Columns["unitClass"]);
+    }
+
+    [Fact]
+    public void a_table_the_tables_lack_is_null()
+    {
+        Assert.Null(GameTables.OpenExport(MiniExport()).Table("units/nothing.slk"));
+    }
+
+    [Fact]
     public void meta_of_each_kind_comes_from_its_table()
     {
         var tables = GameTables.OpenExport(MiniExport());
