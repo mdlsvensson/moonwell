@@ -32216,7 +32216,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (ruined, nvr0.</summary>
+            /// <summary>Night Elf Fishing Village (ruined), nvr0.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvr0")]
             public class NightElfFishingVillageNvr0 : global::Moonwell.Objects.StandardUnit
@@ -32285,7 +32285,7 @@ namespace Moonwell.Objects
                     Model = "buildings\\other\\ElvenFishVillageBuildingRuined0\\ElvenFishVillageBuildingRuined0";
                     ModelFileExtraVersions = 0;
                     Name = "Night Elf Fishing Village";
-                    NameEditorSuffix = "(ruined";
+                    NameEditorSuffix = "(ruined)";
                     NeutralBuildingShowsMinimapIcon = false;
                     OccluderHeight = 200f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -32332,7 +32332,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (ruined, nvr1.</summary>
+            /// <summary>Night Elf Fishing Village (ruined), nvr1.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvr1")]
             public class NightElfFishingVillageNvr1 : global::Moonwell.Objects.StandardUnit
@@ -32401,7 +32401,7 @@ namespace Moonwell.Objects
                     Model = "buildings\\other\\ElvenFishVillageBuildingRuined1\\ElvenFishVillageBuildingRuined1";
                     ModelFileExtraVersions = 0;
                     Name = "Night Elf Fishing Village";
-                    NameEditorSuffix = "(ruined";
+                    NameEditorSuffix = "(ruined)";
                     NeutralBuildingShowsMinimapIcon = false;
                     OccluderHeight = 200f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;
@@ -32448,7 +32448,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Night Elf Fishing Village (ruined, nvr2.</summary>
+            /// <summary>Night Elf Fishing Village (ruined), nvr2.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("nvr2")]
             public class NightElfFishingVillageNvr2 : global::Moonwell.Objects.StandardUnit
@@ -32517,7 +32517,7 @@ namespace Moonwell.Objects
                     Model = "buildings\\other\\ElvenFishVillageBuildingRuined2\\ElvenFishVillageBuildingRuined2";
                     ModelFileExtraVersions = 0;
                     Name = "Night Elf Fishing Village";
-                    NameEditorSuffix = "(ruined";
+                    NameEditorSuffix = "(ruined)";
                     NeutralBuildingShowsMinimapIcon = false;
                     OccluderHeight = 200f;
                     OcclusionTypeHD = global::Moonwell.Objects.OcclusionType.Auto;

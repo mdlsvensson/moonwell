@@ -2679,7 +2679,7 @@ namespace Moonwell.Objects
                 }
             }
 
-            /// <summary>Frost Attack (New, Afrc.</summary>
+            /// <summary>Frost Attack (New), Afrc.</summary>
             /// @CSharpLua.Ignore
             [global::Moonwell.Objects.Standard("Afrc")]
             public class FrostAttackAfrc : global::Moonwell.Objects.StandardAbility
@@ -2694,7 +2694,7 @@ namespace Moonwell.Objects
                     CheckDependencies = true;
                     Cooldown = Levels(0f);
                     Duration = Levels(10f);
-                    EditorSuffix = "(New";
+                    EditorSuffix = "(New)";
                     HeroAbility = false;
                     HeroDuration = Levels(4f);
                     Icon = "ReplaceableTextures\\PassiveButtons\\PASBTNFrost.blp";

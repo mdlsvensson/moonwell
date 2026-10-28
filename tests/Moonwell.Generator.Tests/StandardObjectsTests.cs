@@ -623,6 +623,19 @@ public class StandardObjectsTests
     }
 
     [Fact]
+    public void an_editor_suffix_cut_at_a_comma_inside_its_brackets_has_them_closed()
+    {
+        // World Editor shows nvr0's (ruined, two story) as (ruined), in the tree and in the field (Sven, 2026-10-28).
+        using var copy = new Copy();
+        copy.Replace("units/unitmetadata.slk", "K\"unsf\"", "C;X4;K-1", "C;X4;K0");
+        copy.Replace("_locales/enus.w3mod/units/humanunitstrings.txt", "[hfoo]", "Name=Footman", "Name=Footman\r\nEditorSuffix=(ruined, two story)");
+
+        var footman = Find(Of(copy.Tables(), Kind.Unit), "hfoo");
+        Assert.Equal("(ruined)", footman.EditorSuffix);
+        Assert.Equal("(ruined)", footman.Values["unsf"]);
+    }
+
+    [Fact]
     public void an_upgrade_has_the_editor_suffix_of_its_first_level()
     {
         using var copy = new Copy();
