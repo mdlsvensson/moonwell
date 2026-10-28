@@ -385,10 +385,10 @@ public static class StandardObjects
         {
             Field = field;
             _specific = new HashSet<string>(field.Specific, StringComparer.Ordinal);
-            _notSpecific = new HashSet<string>(Codes(Cell(meta, "notSpecific")), StringComparer.Ordinal);
-            _hero = Cell(meta, "useHero") == "1";
-            _unit = Cell(meta, "useUnit") == "1";
-            _building = Cell(meta, "useBuilding") == "1";
+            _notSpecific = new HashSet<string>(field.NotSpecific, StringComparer.Ordinal);
+            _hero = field.ForHero;
+            _unit = field.ForUnit;
+            _building = field.ForBuilding;
             _appended = Cell(meta, "appendIndex") == "1";
             _element = -1;
             _column = field.Column;
@@ -507,18 +507,6 @@ public static class StandardObjects
         private static string Cell(MetaRow meta, string column)
         {
             return meta.Columns.TryGetValue(column, out var value) ? value.Trim() : "";
-        }
-
-        private static IEnumerable<string> Codes(string cell)
-        {
-            foreach (var part in cell.Split(',', '.'))
-            {
-                var code = part.Trim();
-                if (code.Length > 0)
-                {
-                    yield return code;
-                }
-            }
         }
     }
 

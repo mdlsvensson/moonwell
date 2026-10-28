@@ -87,6 +87,13 @@ public sealed record FieldRules(
 /// <param name="Store">How an object file stores the field's value: <c>int</c>, <c>real</c>, <c>unreal</c> or <c>string</c>.</param>
 /// <param name="Rules">What World Editor allows the field to hold; <see cref="FieldRules.None"/> when not given.</param>
 /// <param name="Choice">For a <see cref="FieldType.Choice"/> field, the enum it holds; null for any other type.</param>
+/// <param name="ForUnit">True when the metadata's <c>useUnit</c> is 1: a unit that is neither a hero nor a building has the field.</param>
+/// <param name="ForHero">True when <c>useHero</c> is 1: a hero has the field (<c>ustr</c>, the strength, is for heroes only).</param>
+/// <param name="ForBuilding">True when <c>useBuilding</c> is 1: a building has the field.</param>
+/// <param name="NotSpecific">
+/// For a common ability field, the codes of the abilities that do not have it, from <c>notSpecific</c> (<c>Arpb</c>,
+/// <c>Arpl</c>); empty for none. Never null.
+/// </param>
 public sealed record Field(
     Kind Kind,
     string Id,
@@ -101,10 +108,17 @@ public sealed record Field(
     bool HeroOnly = false,
     string Store = "string",
     FieldRules? Rules = null,
-    ChoiceType? Choice = null)
+    ChoiceType? Choice = null,
+    bool ForUnit = false,
+    bool ForHero = false,
+    bool ForBuilding = false,
+    IReadOnlyList<string>? NotSpecific = null)
 {
     /// <summary>What World Editor allows the field to hold; never null.</summary>
     public FieldRules Rules { get; init; } = Rules ?? FieldRules.None;
+
+    /// <summary>The codes of the abilities that do not have the field; empty for none, never null.</summary>
+    public IReadOnlyList<string> NotSpecific { get; init; } = NotSpecific ?? Array.Empty<string>();
 }
 
 /// <summary>The fields of each kind of object, from the metadata tables.</summary>
@@ -235,7 +249,11 @@ public static class Fields
                 kind == Kind.Unit && Value(row, "useHero") == "1" && Value(row, "useUnit") != "1" && Value(row, "useBuilding") != "1",
                 StoreOf(Value(row, "type")),
                 RulesOf(row, LabelOf(tables, row)),
-                choice));
+                choice,
+                Value(row, "useUnit") == "1",
+                Value(row, "useHero") == "1",
+                Value(row, "useBuilding") == "1",
+                Split(Value(row, "notSpecific"))));
             var column = ColumnOf(row, repeat, pointer, perField);
             candidates.Add(new NameCandidate(row.Id, name!, listed, GroupsOf(kind, row, specific, mentioned, aliases, column, listedColumns), member != null));
         }
