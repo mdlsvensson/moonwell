@@ -224,13 +224,14 @@ public class LocalTests
     public void gizmo_create_is_rejected_inside()
     {
         var found = MapCode.Check("""
+            var unit = Unit.Of(u)!;
             Local.For(p, () =>
             {
-                Gizmo.Create(new Well(), 0f, 0f, p);
+                Gizmo.Create(new Well(), 0f, 0f, unit);
             });
             """, "public sealed class Well : Gizmo { }");
 
-        Assert.Equal(new[] { "MW0001: Gizmo.Create(new Well(), 0f, 0f, p)" }, found);
+        Assert.Equal(new[] { "MW0001: Gizmo.Create(new Well(), 0f, 0f, unit)" }, found);
     }
 
     [Fact]
