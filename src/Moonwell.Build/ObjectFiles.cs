@@ -165,7 +165,7 @@ namespace Moonwell.Build
                 catch (ArgumentException failure) when (failure.ParamName == "Value")
                 {
                     // An object file stores a text NUL-terminated as UTF-8: no NUL, no half of a surrogate pair.
-                    var reason = value is string text && text.Contains(' ')
+                    var reason = value is string text && text.Contains('\0')
                         ? "a NUL character, which an object file cannot store"
                         : "text that is not valid Unicode (half of a surrogate pair)";
                     throw new BuildException($"{one.ClassName}: {fieldId} holds {reason}");
