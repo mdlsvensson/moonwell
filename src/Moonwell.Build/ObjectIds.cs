@@ -127,6 +127,12 @@ namespace Moonwell.Build
             // Rawcodes are Latin-1: a character up to 0xFF (such as Å) is one byte and written as itself, but is no ASCII sign; one above 0xFF is refused by Rawcodes.From (only IdOf maps it to '?'), and the Lua would show it as another id still.
             if (!MapFiles.ObjectIds.IsValid(id))
             {
+                // The game splits a list field that names objects (a unit's abilities) at the comma.
+                if (id.Contains(','))
+                {
+                    throw new BuildException($"{owner} has the id \"{id}\", with a comma, which splits a list field that names the object");
+                }
+
                 throw new BuildException($"{owner} has the id \"{id}\", with a character that is not an ASCII letter, digit or sign");
             }
 

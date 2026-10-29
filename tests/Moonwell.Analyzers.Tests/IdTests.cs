@@ -193,6 +193,30 @@ public class IdTests
     }
 
     [Fact]
+    public void an_id_with_a_comma_is_an_error()
+    {
+        Assert.Equal(new[]
+        {
+            "Comma has the id \"h0,0\", with a comma, which splits a list field that names the object",
+        }, MapCode.MessagesOfIds("""
+            using Moonwell.Objects;
+
+            namespace Map
+            {
+                [ObjectId("h0,0")]
+                public sealed class Comma : Human.Units.Footman
+                {
+                }
+
+                [ObjectId("h0'0")]
+                public sealed class Quote : Human.Units.Footman
+                {
+                }
+            }
+            """));
+    }
+
+    [Fact]
     public void a_wrong_case_message_says_why()
     {
         Assert.Equal(new[]

@@ -27,6 +27,10 @@ public class ObjectIdsTests
     {
         Assert.True(ObjectIds.IsValid("A00!"));
         Assert.True(ObjectIds.IsValid("h000"));
+        Assert.True(ObjectIds.IsValid("h0'0"));
+        Assert.True(ObjectIds.IsValid("h0\"0"));
+        Assert.True(ObjectIds.IsValid("h0\\0"));
+        Assert.False(ObjectIds.IsValid("A0,0"));
         Assert.False(ObjectIds.IsValid("A00 "));
         Assert.False(ObjectIds.IsValid("A0é0"));
         Assert.False(ObjectIds.IsValid("A00"));

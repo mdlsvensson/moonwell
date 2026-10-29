@@ -10,7 +10,7 @@ namespace Moonwell.Analyzers;
 
 /// <summary>
 /// The build's id checks in the editor: a declared object class with no <c>[ObjectId]</c>, a buff with no carrier id
-/// (MW0013), and an id that is not four characters from ASCII's <c>!</c> to <c>~</c> or whose first letter's case is wrong
+/// (MW0013), and an id that is not four characters from ASCII's <c>!</c> to <c>~</c> (not the comma, which splits a list field) or whose first letter's case is wrong
 /// for a unit or a hero (MW0014).
 /// A declared class is one the build makes an object of: not abstract or generic, and inheriting a standard object's
 /// kind base (<c>StandardUnit</c> and the rest). Which ids are free, and which a standard object has, only the build
@@ -107,6 +107,10 @@ public sealed class IdAnalyzer : DiagnosticAnalyzer
         if (id.Text.Length != 4)
         {
             why = $"has the id \"{id.Text}\", which is not four characters";
+        }
+        else if (id.Text.IndexOf(',') >= 0)
+        {
+            why = $"has the id \"{id.Text}\", with a comma, which splits a list field that names the object";
         }
         else if (id.Text.Any(letter => letter < '!' || letter > '~'))
         {

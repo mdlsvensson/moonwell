@@ -55,10 +55,14 @@ public static class ObjectIds
         return null;
     }
 
-    /// <summary>Whether an id can be an object's id: four characters, each from <c>!</c> to <c>~</c> (an ASCII sign, letter or digit).</summary>
+    /// <summary>
+    /// Whether an id can be an object's id: four characters, each from <c>!</c> to <c>~</c> (an ASCII sign, letter or
+    /// digit) except the comma. The game splits a list field that names objects, such as a unit's abilities, at the
+    /// comma, so an object whose id holds one works when code adds it but not when a list names it.
+    /// </summary>
     /// <param name="id">The id.</param>
     /// <returns>True when it is valid.</returns>
-    public static bool IsValid(string id) => id.Length == 4 && id.All(character => character >= '!' && character <= '~');
+    public static bool IsValid(string id) => id.Length == 4 && id.All(character => character >= '!' && character <= '~' && character != ',');
 
     /// <summary>
     /// Whether a unit with this id is a hero: the first character is an ASCII upper-case letter. The game makes such a
