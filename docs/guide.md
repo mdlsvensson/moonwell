@@ -229,10 +229,12 @@ public sealed class KillCounter : UnitComponent
 - Game work starts in a reaction. Top-level code and static fields make nothing in the game.
 
 **Scopes.** What code makes belongs to the scope named where it is made, and ends when that scope ends: the game, a
-player, a unit, item or destructable, a component, a buff, an ability, a cast, an area, an interaction or its pair, or a
-gizmo. Timers are made on their scope: inside a class, `After(2f, Puff)` and `Every(1f, Pulse)` are the class's own;
+unit, item or destructable, a component, a buff, an ability, a cast, an area, an interaction or its pair, or a gizmo.
+Timers are made on their scope: inside a class, `After(2f, Puff)` and `Every(1f, Pulse)` are the class's own;
 elsewhere the line names it, as `cast.Every(0.5f, Pulse)` or `Game.Instance.After(30f, Respawn)`. `Create`, `Fire`,
-`Wall.Create` and `Interact` take the scope as an argument. Nothing has a default, so a static helper is given one.
+`Wall.Create` and `Interact` take the scope as an argument. Nothing has a default, so a static helper is given one. A
+player is a scope too, but it lasts the whole game, and one where a scope goes is most often meant as the owner
+(`Gizmo.Create(gizmo, x, y, scope, owner)`), so it is error MW0043: write `Game.Instance`, or pass it as the owner.
 
 ```csharp
 public sealed class Respawns : UnitComponent
@@ -258,7 +260,9 @@ static void Smoke(Scope scope, Unit unit) // a helper is told whose
   runs in one instant (a timer that keeps starting itself, say) are reported, and the rest wait 1/32 s. `Every` needs
   seconds above 0: 0 or less is reported, and that timer never runs.
 - A development build reports a timer its scope ended in the instant it was made, before it ran: its line named a scope
-  on its way out, as `After` in a missile's `OnImpact` does when a `Stop` ends the missile.
+  on its way out, as `After` in a missile's `OnImpact` does when a `Stop` ends the missile. Two game events in one frame
+  can trip it when the line was right: a buff whose `OnApply` makes a timer, applied by a hit that kills, or a channel
+  stopped in the frame it began. A halt or a step of the debug mode in between does not.
 
 ## Units, heroes and items
 
