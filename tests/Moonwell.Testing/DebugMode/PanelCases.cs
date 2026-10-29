@@ -60,7 +60,7 @@ namespace Moonwell.Testing
             Expect.Equal("DEBUG  running · step 1,204 (37.6 s) · speed 1/4", debug.PanelLines()[0], "the status after -speed 1/4");
         }
 
-        /// <summary>A selected footman with a line of its own and a component that adds "kills 3": the object line (no owner: the game made it), the footman's line, then "kills 3"; the marker on the footman.</summary>
+        /// <summary>A selected footman with a line of its own and a component that adds "kills 3": the object line (no scope: the game made it), the footman's line, then "kills 3"; the marker on the footman.</summary>
         public static void SelectedUnit(FakeWorld world)
         {
             RegisterFootman();
@@ -93,10 +93,10 @@ namespace Moonwell.Testing
             Expect.True(debug.PanelLines()[1].StartsWith("Footman 2 (unit)"), "the second footman's line: " + debug.PanelLines()[1]);
             DebugMode.Select(first);
             Expect.True(debug.PanelLines()[1].StartsWith("Footman 1 (unit)"), "the first footman's line again: " + debug.PanelLines()[1]);
-            var third = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Two, 0.0f, 0.0f, owner: first);
+            var third = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Two, 0.0f, 0.0f, first);
             world.PlaceUnit(third.Handle, 1000.4f, 1234.6f);
             DebugMode.Select(third);
-            Expect.Equal("Footman 3 (unit) at 1,000, 1,235 · Player 2 · owned by Footman 1", debug.PanelLines()[1], "the third footman's line");
+            Expect.Equal("Footman 3 (unit) at 1,000, 1,235 · Player 2 · in Footman 1", debug.PanelLines()[1], "the third footman's line");
         }
 
         /// <summary>40 lines from IDebugShown, with the status and object lines 42: 30 lines shown, the last "and 13 more".</summary>
@@ -300,7 +300,7 @@ namespace Moonwell.Testing
             DebugViews.Add(new CircleView());
             var debug = On(world);
             debug.Advance(0.01f);
-            Timer.Every(0.25f, () => { debug.ClockSeconds += 0.002f; });
+            Game.Instance.Every(0.25f, () => { debug.ClockSeconds += 0.002f; });
             debug.Advance(2.0f);
             var printed = world.PrintedTexts.Count;
             debug.Chat(0, "-stats");

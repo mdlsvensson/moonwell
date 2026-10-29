@@ -86,7 +86,7 @@ namespace Moonwell.Testing
             var target = UnitAt(world, -1000.0f, 0.0f, 0.0f);
             var dart = new Dart();
             dart.VX = 600.0f;
-            Missile.Create(dart, 0.0f, 0.0f, Middle);
+            Missile.Create(dart, 0.0f, 0.0f, Middle, Game.Instance);
             var homing = dart.Add(new Homing { Target = target, TurnRate = 180.0f });
             Expect.Same(target, homing.Target, "the target");
             Within(180.0f, homing.TurnRate, 0.0f, "the turn rate");
@@ -131,7 +131,7 @@ namespace Moonwell.Testing
             var target = UnitAt(world, 0.0f, 300.0f, 0.0f);
             var dart = new Dart();
             dart.VX = 600.0f;
-            Missile.Create(dart, 0.0f, 0.0f, Middle);
+            Missile.Create(dart, 0.0f, 0.0f, Middle, Game.Instance);
             dart.Add(new Homing { Target = target, TurnRate = 90.0f });
             Steps(world, 4);
             Within(600.0f, dart.VX, 0.001f, "it flies on straight: x");
@@ -160,7 +160,7 @@ namespace Moonwell.Testing
             var dead = UnitAt(world, 1000.0f, 0.0f, 0.0f);
             var dart = new Dart();
             dart.VY = 600.0f;
-            Missile.Create(dart, 0.0f, 0.0f, Middle);
+            Missile.Create(dart, 0.0f, 0.0f, Middle, Game.Instance);
             var homing = dart.Add(new Homing { Target = dead, TurnRate = 90.0f });
             Steps(world, 8);
             Expect.True(dart.VX > 0.0f, "it has begun to turn to the target");
@@ -179,7 +179,7 @@ namespace Moonwell.Testing
             var gone = UnitAt(world, 1000.0f, 500.0f, 0.0f);
             var ender = new Dart();
             ender.VY = 600.0f;
-            Missile.Create(ender, 0.0f, 500.0f, Middle);
+            Missile.Create(ender, 0.0f, 500.0f, Middle, Game.Instance);
             ender.Add(new Homing { Target = gone, TurnRate = 90.0f, EndsWithTarget = true });
             Steps(world, 2);
             Expect.True(!ender.HasEnded, "it flies while the target is there");
@@ -190,10 +190,10 @@ namespace Moonwell.Testing
             Expect.Equal(calls, world.GoneCalls, "nothing reads the removed unit");
 
             var ball = new Dart();
-            Missile.Create(ball, 1000.0f, -500.0f, Middle);
+            Missile.Create(ball, 1000.0f, -500.0f, Middle, Game.Instance);
             var follower = new Dart();
             follower.VY = -600.0f;
-            Missile.Create(follower, 0.0f, -500.0f, Middle);
+            Missile.Create(follower, 0.0f, -500.0f, Middle, Game.Instance);
             var follows = follower.Add(new Homing { Target = ball, TurnRate = 90.0f });
             Steps(world, 8);
             Expect.True(follower.VX > 0.0f, "it turns to the gizmo");
@@ -214,14 +214,14 @@ namespace Moonwell.Testing
             var target = UnitAt(world, 500.0f, 200.0f, 0.0f);
             var seeker = new HomingDart(180.0f);
             seeker.Speed = 600.0f;
-            source.Fire(seeker, target);
+            source.Fire(seeker, target, Game.Instance);
             var homing = seeker.Get<Homing>();
             Expect.True(homing != null, "the Homing listed in its constructor is on it");
             Expect.Same(target, homing!.Target, "Fire at a unit sets its target");
             Within(180.0f, homing.TurnRate, 0.0f, "its turn rate");
             var aimless = new HomingDart(180.0f);
             aimless.Speed = 600.0f;
-            source.Fire(aimless, 500.0f, 0.0f);
+            source.Fire(aimless, 500.0f, 0.0f, Game.Instance);
             Expect.True(aimless.Get<Homing>()!.Target == null, "Fire at a point gives it no target");
             Steps(world, 4);
             Within(600.0f, aimless.Speed, 0.01f, "with no target it flies on");
@@ -247,7 +247,7 @@ namespace Moonwell.Testing
             var shell = new HomingDart(0.0f);
             shell.Speed = 700.0f;
             shell.Arc = 0.35f;
-            source.Fire(shell, walker);
+            source.Fire(shell, walker, Game.Instance);
             var walk = 270.0f * Interactions.Step;
             var walkerY = 0.0f;
             var previousX = shell.X;
@@ -285,7 +285,7 @@ namespace Moonwell.Testing
             var target = UnitAt(world, 500.0f, 0.0f, 0.0f);
             var dart = new Dart();
             dart.VX = 600.0f;
-            Missile.Create(dart, 500.0f, 0.0f, Middle);
+            Missile.Create(dart, 500.0f, 0.0f, Middle, Game.Instance);
             dart.Add(new Homing { Target = target, TurnRate = 180.0f });
             Steps(world, 1);
             Numbers(dart, "at the target's place");
@@ -298,25 +298,25 @@ namespace Moonwell.Testing
             lob.VX = 300.0f;
             lob.Arc = 0.35f;
             lob.Gravity = 800.0f;
-            Missile.Create(lob, 500.0f, 0.0f, Middle);
+            Missile.Create(lob, 500.0f, 0.0f, Middle, Game.Instance);
             lob.Add(new Homing { Target = target });
             Steps(world, 9);
             Numbers(lob, "an arc at the target's place");
 
             var still = new Dart();
-            Missile.Create(still, 500.0f, 0.0f, 100.0f);
+            Missile.Create(still, 500.0f, 0.0f, 100.0f, Game.Instance);
             still.Add(new Homing { Target = target });
             Steps(world, 9);
             Numbers(still, "a still missile");
             Within(0.0f, still.Speed, 0.0f, "a still missile is not turned into motion");
 
             var high = new Dart();
-            Missile.Create(high, 1540.0f, 1000.0f, 332.0f);
+            Missile.Create(high, 1540.0f, 1000.0f, 332.0f, Game.Instance);
             var late = new Dart();
             late.VX = 700.0f;
             late.Arc = 0.35f;
             late.Gravity = 800.0f;
-            Missile.Create(late, 1500.0f, 1000.0f, Middle);
+            Missile.Create(late, 1500.0f, 1000.0f, Middle, Game.Instance);
             late.Add(new Homing { Target = high });
             Steps(world, 1);
             Numbers(late, "an arc two steps from a target 300 above");
@@ -330,7 +330,7 @@ namespace Moonwell.Testing
             var dart = new Dart();
             dart.VX = 320.0f;
             dart.VZ = 320.0f;
-            Missile.Create(dart, 0.0f, 0.0f, 16.0f);
+            Missile.Create(dart, 0.0f, 0.0f, 16.0f, Game.Instance);
             var shadow = dart.Add(new Shadow());
             Expect.Equal(1, fake.Images.Count, "an image is made");
             var image = fake.Images[0];
@@ -354,7 +354,7 @@ namespace Moonwell.Testing
 
             var second = new Dart();
             second.VX = 100.0f;
-            Missile.Create(second, 0.0f, 500.0f, 16.0f);
+            Missile.Create(second, 0.0f, 500.0f, 16.0f, Game.Instance);
             var set = second.Add(new Shadow { Path = @"Textures\Other.blp", Size = 100.0f, Alpha = 128 });
             var other = fake.Images[0];
             Expect.Equal(@"Textures\Other.blp", fake.ImageFiles[other], "its path");
@@ -374,7 +374,7 @@ namespace Moonwell.Testing
             var dart = new Dart();
             dart.Radius = 0.0f;
             dart.VZ = 320.0f;
-            Missile.Create(dart, 0.0f, 0.0f, 0.0f);
+            Missile.Create(dart, 0.0f, 0.0f, 0.0f, Game.Instance);
             var shadow = dart.Add(new Shadow());
             Within(0.0f, shadow.Size, 0.0f, "twice a radius of 0");
             var image = fake.Images[0];
@@ -392,10 +392,10 @@ namespace Moonwell.Testing
         {
             var fake = Fresh();
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var dart = new Dart();
             dart.VX = 300.0f;
-            Missile.Create(dart, 0.0f, 0.0f, 100.0f, null, owner);
+            Missile.Create(dart, 0.0f, 0.0f, 100.0f, owner);
             var hum = dart.Add(new LoopingSound(Hum));
             Expect.Equal(Hum, hum.Path, "its path");
             Within(100.0f, hum.Volume, 0.0f, "Volume is 100 unless set");
@@ -423,7 +423,7 @@ namespace Moonwell.Testing
             Expect.True(fake.Stopped.Contains(sound), "the sound was stopped");
 
             var quiet = new Dart();
-            Missile.Create(quiet, 0.0f, 0.0f, 100.0f);
+            Missile.Create(quiet, 0.0f, 0.0f, 100.0f, Game.Instance);
             quiet.Add(new LoopingSound(Hum) { Volume = 50.0f, FadeOut = 0.0f });
             var halved = fake.Loops[0];
             Expect.Equal(64, fake.Volumes[halved], "half volume is 64 of 127");

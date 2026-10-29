@@ -75,15 +75,15 @@ public class LocalTests
             {
                 var slot = p.Slot;
                 var handle = unit.Handle;
-                var owner = unit.Player;
+                var owner = unit.Owner;
                 var map = new OrderedMap<int, int>();
                 map[1] = slot;
                 unit.Remove();
-                Timer.After(1f, () => { });
+                unit.After(1f, () => { });
             });
             """);
 
-        Assert.Equal(new[] { "MW0001: unit.Remove()", "MW0001: Timer.After(1f, () => { })" }, found);
+        Assert.Equal(new[] { "MW0001: unit.Remove()", "MW0001: unit.After(1f, () => { })" }, found);
     }
 
     [Fact]
@@ -141,11 +141,11 @@ public class LocalTests
     [Fact]
     public void fire_is_rejected_inside()
     {
-        Assert.Equal(new[] { "MW0001: unit.Fire(new Bolt(), 0f, 0f)" }, MapCode.Check("""
+        Assert.Equal(new[] { "MW0001: unit.Fire(new Bolt(), 0f, 0f, unit)" }, MapCode.Check("""
             var unit = Unit.Of(u)!;
             Local.For(p, () =>
             {
-                unit.Fire(new Bolt(), 0f, 0f);
+                unit.Fire(new Bolt(), 0f, 0f, unit);
             });
             """, "public class Bolt : Missile { }"));
     }
@@ -224,13 +224,14 @@ public class LocalTests
     public void gizmo_create_is_rejected_inside()
     {
         var found = MapCode.Check("""
+            var unit = Unit.Of(u)!;
             Local.For(p, () =>
             {
-                Gizmo.Create(new Well(), 0f, 0f);
+                Gizmo.Create(new Well(), 0f, 0f, unit);
             });
             """, "public sealed class Well : Gizmo { }");
 
-        Assert.Equal(new[] { "MW0001: Gizmo.Create(new Well(), 0f, 0f)" }, found);
+        Assert.Equal(new[] { "MW0001: Gizmo.Create(new Well(), 0f, 0f, unit)" }, found);
     }
 
     [Fact]
@@ -241,7 +242,7 @@ public class LocalTests
             var aura = new FireAura();
             Local.For(p, () =>
             {
-                unit.Interact(aura);
+                unit.Interact(aura, unit);
             });
             """, """
             public sealed class FireAura : Interaction<Unit, Unit>
@@ -253,7 +254,7 @@ public class LocalTests
             }
             """);
 
-        Assert.Equal(new[] { "MW0001: unit.Interact(aura)" }, found);
+        Assert.Equal(new[] { "MW0001: unit.Interact(aura, unit)" }, found);
     }
 
     [Fact]

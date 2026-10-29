@@ -1,6 +1,6 @@
 namespace Moonwell
 {
-    /// <summary>Reactions to a unit's push, on the unit's class, its components or its buffs; write only the ones needed, as public methods. They run with the unit as the current owner: on the class first, then on the components and buffs in the order they were added, each guarded.</summary>
+    /// <summary>Reactions to a unit's push, on the unit's class, its components or its buffs; write only the ones needed, as public methods. They run on the class first, then on the components and buffs in the order they were added, each guarded.</summary>
     public interface IPushTarget
     {
         /// <summary>The unit was pushed: by Push, by Knockback or by a missile. Runs at each push, inside the call that pushed it.</summary>

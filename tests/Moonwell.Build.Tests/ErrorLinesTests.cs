@@ -25,7 +25,7 @@ namespace Moonwell.Build.Tests
                     Red + "Moonwell: ReadsNull.OnGameStart failed:|r attempt to index a nil value (field 'holder') (Failing.cs:25)",
                     Red + "Moonwell: CallsHelper.OnGameStart failed:|r from helper (Failing.cs:39)",
                     Red + "Moonwell: ReadsProperty.OnGameStart failed:|r from property (Failing.cs:60)",
-                    Red + "Moonwell: Timer.Every failed:|r seconds must be more than 0, not 0 (Failing.cs:69)",
+                    Red + "Moonwell: EveryZero.Every failed:|r seconds must be more than 0, not 0 (Failing.cs:69)",
                     Red + "Moonwell: TimerThrows.Timer failed:|r from timer (Failing.cs:49)",
                 },
                 builds.Development.Screen);
@@ -41,7 +41,7 @@ namespace Moonwell.Build.Tests
                     Red + "Moonwell: ReadsNull.OnGameStart failed|r (Failing.cs:25)",
                     Red + "Moonwell: CallsHelper.OnGameStart failed|r (Failing.cs:39)",
                     Red + "Moonwell: ReadsProperty.OnGameStart failed|r (Failing.cs:60)",
-                    Red + "Moonwell: Timer.Every failed|r (Failing.cs:69)",
+                    Red + "Moonwell: EveryZero.Every failed|r (Failing.cs:69)",
                     Red + "Moonwell: TimerThrows.Timer failed|r (Failing.cs:49)",
                 },
                 builds.Release.Screen);
@@ -56,7 +56,7 @@ namespace Moonwell.Build.Tests
                 "Moonwell: ReadsNull.OnGameStart failed: attempt to index a nil value (field 'holder') (Failing.cs:25)",
                 "Moonwell: CallsHelper.OnGameStart failed: from helper (Failing.cs:39, from Failing.cs:34)",
                 "Moonwell: ReadsProperty.OnGameStart failed: from property (Failing.cs:60)",
-                "Moonwell: Timer.Every failed: seconds must be more than 0, not 0 (Failing.cs:69)",
+                "Moonwell: EveryZero.Every failed: seconds must be more than 0, not 0 (Failing.cs:69)",
                 "Moonwell: TimerThrows.Timer failed: from timer (Failing.cs:49)",
             };
             Assert.Equal(expected, builds.Development.Log);

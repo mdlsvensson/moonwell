@@ -272,7 +272,7 @@ namespace Moonwell.Testing
             world.PlacedDestructables.Add(barrel);
             var shot = new Shot();
             shot.DestructableContact = Contact.Stop;
-            Missile.Create(shot, 300.0f, 512.0f, 200.0f);
+            Missile.Create(shot, 300.0f, 512.0f, 200.0f, Game.Instance);
             shot.VX = 600.0f;
             for (var i = 0; i < 48 && !shot.HasEnded; i++)
             {
@@ -293,14 +293,14 @@ namespace Moonwell.Testing
             Placed(world, fake);
             var low = new Ball();
             low.VX = 600.0f;
-            Missile.Create(low, 300.0f, 512.0f, 50.0f);
+            Missile.Create(low, 300.0f, 512.0f, 50.0f, Game.Instance);
             Steps(world, 20);
             Expect.Equal(0, low.Impacts, "under the deck: no impact");
             Expect.True(!low.HasEnded && low.X > 600.0f, "it flew on past it; at " + low.X);
             var dropped = new Ball();
             dropped.Gravity = 800.0f;
             dropped.VZ = -100.0f;
-            Missile.Create(dropped, 512.0f, 496.0f, 400.0f);
+            Missile.Create(dropped, 512.0f, 496.0f, 400.0f, Game.Instance);
             Steps(world, 40);
             Expect.Equal(1, dropped.Impacts, "dropped onto the deck: one impact");
             Within(125.0f, dropped.Read[3], 0.5f, "on the deck, half a cell from its middle");
@@ -313,7 +313,7 @@ namespace Moonwell.Testing
             arcing.Gravity = 800.0f;
             arcing.VY = 250.0f;
             arcing.VZ = 200.0f;
-            Missile.Create(arcing, 512.0f, 200.0f, 600.0f);
+            Missile.Create(arcing, 512.0f, 200.0f, 600.0f, Game.Instance);
             Steps(world, 64);
             Expect.Equal(1, arcing.Impacts, "coming down onto it from over the low ground: one impact");
             Expect.True(arcing.Read[2] > 400.0f && arcing.Read[2] < 624.0f, "on the deck; at y " + arcing.Read[2]);
@@ -331,19 +331,19 @@ namespace Moonwell.Testing
             var falling = new Shot();
             falling.UnitContact = Contact.Pass;
             falling.GroundContact = Contact.None;
-            Missile.Create(falling, 512.0f, 512.0f, 400.0f);
+            Missile.Create(falling, 512.0f, 512.0f, 400.0f, Game.Instance);
             falling.VZ = -600.0f;
             Steps(world, 20);
             Expect.Equal(1, falling.Impacts.Count, "it met the footman once");
             Within(178.0f, falling.Reads[3], 0.01f, "at its top, 48 above the deck");
             var bolt = new Shot();
             bolt.Speed = 600.0f;
-            footman.Fire(bolt, 800.0f, 512.0f);
+            footman.Fire(bolt, 800.0f, 512.0f, Game.Instance);
             Within(190.0f, bolt.Z, 0.01f, "Fire launches 60 above the deck");
             var beside = FootmanAt(world, 800.0f, 800.0f);
             var other = new Shot();
             other.Speed = 600.0f;
-            beside.Fire(other, 1000.0f, 800.0f);
+            beside.Fire(other, 1000.0f, 800.0f, Game.Instance);
             Within(60.0f, other.Z, 0.01f, "and 60 above the ground beside it");
         }
 
@@ -583,7 +583,7 @@ namespace Moonwell.Testing
                     }
                 };
                 var startY = k == 0 ? 300.0f : 296.0f + 16.0f * k;
-                Missile.Create(ball, 512.0f, startY, 400.0f);
+                Missile.Create(ball, 512.0f, startY, 400.0f, Game.Instance);
                 Steps(world, 48);
                 var what = "the ball from y " + startY + ", met at y " + first[0];
                 Expect.True(ball.Impacts >= 1, what + ": it met the deck");
@@ -623,7 +623,7 @@ namespace Moonwell.Testing
             ball.Gravity = 800.0f;
             ball.Friction = 1000.0f;
             ball.VZ = -10.0f;
-            Missile.Create(ball, 512.0f, 512.0f, 87.0f);
+            Missile.Create(ball, 512.0f, 512.0f, 87.0f, Game.Instance);
             Steps(world, 32);
             Expect.True(ball.Rested >= 1, "the ball rests on the deck");
             Within(86.0f, ball.Z, 0.5f, "on it");

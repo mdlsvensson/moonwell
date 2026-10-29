@@ -6,10 +6,10 @@ namespace Moonwell.Testing
         /// <summary>The aura it starts.</summary>
         public FireAura Aura = new FireAura();
 
-        /// <summary>Starts the aura on the unit; the unit is the current owner here.</summary>
+        /// <summary>Starts the aura on the unit, in the unit's scope.</summary>
         protected override void OnCreated()
         {
-            this.Interact(Aura);
+            this.Interact(Aura, this);
         }
     }
 }

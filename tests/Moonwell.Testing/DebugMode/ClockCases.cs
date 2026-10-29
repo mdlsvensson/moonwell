@@ -6,6 +6,38 @@ namespace Moonwell.Testing
     /// <summary>Cases for Moonwell's clock in a development build: halting it, stepping it, and running it faster or slower than game time, with the timers it runs.</summary>
     public static class ClockCases
     {
+        /// <summary>A timer made while Moonwell's clock is halted, whose scope ends after the game has gone on 3 s, is not reported as never run: the game's own clock moved, though Moonwell's did not.</summary>
+        public static void HaltedTimerEndedLaterIsQuiet(FakeWorld world)
+        {
+            HaltNow(world);
+            var scope = new TestScope("scope", new List<string>());
+            scope.After(1.0f, () => { });
+            world.Advance(3.0f);
+            scope.End();
+            Expect.Equal(0, ScopeCases.NeverRanReports(world), "the reports: " + string.Join(" | ", world.Logged));
+        }
+
+        /// <summary>A timer made while halted, whose scope ends after a step, is not reported: Moonwell's clock moved, though the game's did not.</summary>
+        public static void SteppedTimerEndedLaterIsQuiet(FakeWorld world)
+        {
+            HaltNow(world);
+            var scope = new TestScope("scope", new List<string>());
+            scope.After(1.0f, () => { });
+            Step(1.0f / 32.0f);
+            scope.End();
+            Expect.Equal(0, ScopeCases.NeverRanReports(world), "the reports: " + string.Join(" | ", world.Logged));
+        }
+
+        /// <summary>A timer made while halted, whose scope ends in that same instant, is still reported.</summary>
+        public static void HaltedTimerEndedAsMadeIsReported(FakeWorld world)
+        {
+            HaltNow(world);
+            var scope = new TestScope("scope", new List<string>());
+            scope.After(1.0f, () => { });
+            scope.End();
+            Expect.Equal(1, ScopeCases.NeverRanReports(world), "the reports: " + string.Join(" | ", world.Logged));
+        }
+
         /// <summary>Halts the clock at the fake's game time.</summary>
         private static void HaltNow(FakeWorld world)
         {
@@ -37,7 +69,7 @@ namespace Moonwell.Testing
         public static void Halt(FakeWorld world)
         {
             var ran = 0;
-            Timer.Every(0.5f, () => { ran++; });
+            Game.Instance.Every(0.5f, () => { ran++; });
             world.Advance(1.0f);
             Expect.Equal(2, ran, "runs in the first second");
             HaltNow(world);
@@ -57,7 +89,7 @@ namespace Moonwell.Testing
         {
             var ran = 0;
             var at = -1.0f;
-            Timer.Every(0.5f, () =>
+            Game.Instance.Every(0.5f, () =>
             {
                 ran++;
                 at = Runtime.World.Now();
@@ -81,7 +113,7 @@ namespace Moonwell.Testing
         public static void Speed(FakeWorld world)
         {
             var ran = 0;
-            Timer.Every(0.5f, () => { ran++; });
+            Game.Instance.Every(0.5f, () => { ran++; });
             ChangeSpeed(world, 4.0f);
             Expect.Near(4.0f, Runtime.Clock.Speed, "the speed");
             world.Advance(1.0f);
@@ -127,8 +159,8 @@ namespace Moonwell.Testing
             HaltNow(world);
             var ran = 0;
             var atOnce = 0;
-            Timer.After(1.0f, () => { ran++; });
-            Timer.After(0.0f, () => { atOnce++; });
+            Game.Instance.After(1.0f, () => { ran++; });
+            Game.Instance.After(0.0f, () => { atOnce++; });
             world.Advance(5.0f);
             Expect.Equal(0, ran, "runs while halted for 5 seconds of game time");
             Expect.Equal(0, atOnce, "runs of the 0 s timer while halted");
@@ -148,12 +180,12 @@ namespace Moonwell.Testing
         public static void HaltInsideTimer(FakeWorld world)
         {
             var log = new List<string>();
-            Timer.After(1.0f, () =>
+            Game.Instance.After(1.0f, () =>
             {
                 log.Add("first");
                 Runtime.Clock.Halt(world.Time);
             });
-            Timer.After(1.0f, () => { log.Add("second"); });
+            Game.Instance.After(1.0f, () => { log.Add("second"); });
             world.Advance(1.0f);
             Expect.Equal(1, log.Count, "runs when the first halts");
             Expect.Equal("first", log[0], "the run before the halt");
@@ -177,17 +209,17 @@ namespace Moonwell.Testing
             var halves = 0;
             var thirds = 0;
             var once = 0;
-            Timer.Every(0.5f, () =>
+            Game.Instance.Every(0.5f, () =>
             {
                 halves++;
                 dues.Add(0.5f * halves);
             });
-            Timer.Every(0.3f, () =>
+            Game.Instance.Every(0.3f, () =>
             {
                 thirds++;
                 dues.Add(0.3f * thirds);
             });
-            Timer.After(2.45f, () =>
+            Game.Instance.After(2.45f, () =>
             {
                 once++;
                 dues.Add(2.45f);

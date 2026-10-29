@@ -57,7 +57,7 @@ namespace Moonwell.Testing
         {
             StartAt(world, time);
             var runs = 0;
-            Timer.Every(interval, () => { runs++; });
+            Game.Instance.Every(interval, () => { runs++; });
             world.Advance(seconds);
             return runs;
         }
@@ -70,7 +70,7 @@ namespace Moonwell.Testing
         public static void EveryLateNoDrift(FakeWorld world)
         {
             var early = 0;
-            Timer.Every(0.01f, () => { early++; });
+            Game.Instance.Every(0.01f, () => { early++; });
             world.Advance(10.0f);
             var late = RunsFrom(world, 7200.0f, 0.01f, 10.0f);
             var later = RunsFrom(world, 20000.0f, 0.03f, 30.0f);
@@ -87,7 +87,7 @@ namespace Moonwell.Testing
             StartAt(world, 3600.0f);
             var runs = 0;
             Timer? timer = null;
-            timer = Timer.Every(0.0001f, () =>
+            timer = Game.Instance.Every(0.0001f, () =>
             {
                 runs++;
                 if (runs >= 100000)
@@ -111,7 +111,7 @@ namespace Moonwell.Testing
             StartAt(world, 33000.0f);
             var runs = 0;
             Timer? timer = null;
-            timer = Timer.Every(0.001f, () =>
+            timer = Game.Instance.Every(0.001f, () =>
             {
                 runs++;
                 if (runs >= 100000)
@@ -146,11 +146,11 @@ namespace Moonwell.Testing
         public static void NearTimesOrder(FakeWorld world)
         {
             var log = new List<string>();
-            Timer.After(0.0016f, () => { log.Add("a"); });
-            Timer.After(0.0008f, () => { log.Add("b"); });
-            Timer.After(0.3f, () => { });
-            Timer.After(0.3f, () => { });
-            Timer.After(0.0f, () => { log.Add("c"); });
+            Game.Instance.After(0.0016f, () => { log.Add("a"); });
+            Game.Instance.After(0.0008f, () => { log.Add("b"); });
+            Game.Instance.After(0.3f, () => { });
+            Game.Instance.After(0.3f, () => { });
+            Game.Instance.After(0.0f, () => { log.Add("c"); });
             world.Advance(0.0005f);
             var early = log.Count;
             world.Advance(0.01f);
@@ -167,7 +167,7 @@ namespace Moonwell.Testing
             for (var i = 19; i >= 0; i--)
             {
                 var due = 0.0004f * i;
-                Timer.After(due, () => { dues.Add(due); });
+                Game.Instance.After(due, () => { dues.Add(due); });
             }
 
             world.Advance(0.1f);
@@ -188,10 +188,10 @@ namespace Moonwell.Testing
                 times.Add(Runtime.World.Now());
                 if (times.Count < 5)
                 {
-                    Timer.After(0.0f, link!);
+                    Game.Instance.After(0.0f, link!);
                 }
             };
-            Timer.After(1.1f, link);
+            Game.Instance.After(1.1f, link);
             world.Advance(1.1f);
             Expect.Equal(5, times.Count, "links run by 1.1 s");
             for (var i = 0; i < times.Count; i++)
@@ -207,7 +207,7 @@ namespace Moonwell.Testing
         /// </summary>
         public static void AfterZeroRunaway(FakeWorld world)
         {
-            var owner = new TestOwner("owner", new List<string>());
+            var owner = new TestScope("owner", new List<string>());
             var runs = 0;
             Action? link = null;
             link = () =>
@@ -215,10 +215,10 @@ namespace Moonwell.Testing
                 runs++;
                 if (runs < 30000)
                 {
-                    Timer.After(0.0f, link!);
+                    owner.After(0.0f, link!);
                 }
             };
-            owner.Run(() => { Timer.After(1.1f, link); });
+            owner.After(1.1f, link);
             world.Advance(1.1f);
             var first = runs;
             world.Advance(0.03f);
@@ -227,7 +227,7 @@ namespace Moonwell.Testing
             var second = runs;
             owner.End();
             world.Advance(1.0f);
-            var reported = LoggedWith(world, "TestOwner.Timer failed: more than 10000 timer runs in one instant");
+            var reported = LoggedWith(world, "TestScope.Timer failed: more than 10000 timer runs in one instant");
             Expect.Equal("10000 10000 20000 20000 1", first + " " + waited + " " + second + " " + runs + " " + reported, "runs at 1.1 s, at 1.13 s, at 1.132 s and after its owner ended, and the lines reported");
         }
 
@@ -240,7 +240,7 @@ namespace Moonwell.Testing
             var runs = 0;
             for (var i = 0; i < 12000; i++)
             {
-                Timer.After(1.1f, () => { runs++; });
+                Game.Instance.After(1.1f, () => { runs++; });
             }
 
             world.Advance(1.1f);
@@ -257,7 +257,7 @@ namespace Moonwell.Testing
         public static void CatchUpNotRunaway(FakeWorld world)
         {
             var runs = 0;
-            Timer.Every(0.001f, () => { runs++; });
+            Game.Instance.Every(0.001f, () => { runs++; });
             world.Time = 4.9995f;
             Runtime.Wake();
             Expect.Equal("5000 0", runs + " " + world.Logged.Count, "runs in the wake after a frame of 5 s, and the lines reported");
@@ -276,7 +276,7 @@ namespace Moonwell.Testing
             for (var i = 0; i < periods.Length; i++)
             {
                 Timer? timer = null;
-                timer = Timer.Every(periods[i], () =>
+                timer = Game.Instance.Every(periods[i], () =>
                 {
                     runs++;
                     if (runs % 10000 == 0)
@@ -297,7 +297,7 @@ namespace Moonwell.Testing
                 }
             }
 
-            var reported = LoggedWith(world, "Timer.Every failed: seconds must be more than 0");
+            var reported = LoggedWith(world, "Game.Every failed: seconds must be more than 0");
             var count = periods.Length;
             Expect.Equal("0 " + count + " " + count, runs + " " + ended + " " + reported, "runs of Every(0), Every(-1) and Every(NaN) in 1 s, the timers ended, and the lines reported");
         }
@@ -307,7 +307,7 @@ namespace Moonwell.Testing
         {
             var seen = new List<float>();
             Timer? timer = null;
-            timer = Timer.Every(0.5f, () => { seen.Add(timer!.Remaining); });
+            timer = Game.Instance.Every(0.5f, () => { seen.Add(timer!.Remaining); });
             world.Advance(1.0f);
             Expect.Equal(2, seen.Count, "runs in 1 s");
             Expect.Near(0.5f, seen[0], "Remaining inside the first run");
@@ -325,7 +325,7 @@ namespace Moonwell.Testing
             Runtime.Clock.SetSpeed(4.0f, world.Time);
             Runtime.Scheduler.Rearm();
             var runs = 0;
-            Timer.Every(0.01f, () => { runs++; });
+            Game.Instance.Every(0.01f, () => { runs++; });
             world.Advance(10.0f);
             // The game's Lua drops what an addition adds below two float steps, so there the last run can fall past the 10 s (3999, seen 10-27).
             if (GameNumbers.HasNaN)

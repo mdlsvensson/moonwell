@@ -10,7 +10,7 @@ namespace Moonwell.Testing
         public static void After(FakeWorld world)
         {
             var ran = 0;
-            var timer = Timer.After(2f, () => { ran++; });
+            var timer = Game.Instance.After(2f, () => { ran++; });
             world.Advance(1.9f);
             Expect.Equal(0, ran, "runs after 1.9 seconds");
             world.Advance(0.2f);
@@ -22,7 +22,7 @@ namespace Moonwell.Testing
         public static void Every(FakeWorld world)
         {
             var ran = 0;
-            Timer.Every(1f, () => { ran++; });
+            Game.Instance.Every(1f, () => { ran++; });
             world.Advance(3.05f);
             Expect.Equal(3, ran, "runs after 3.05 seconds");
         }
@@ -31,7 +31,7 @@ namespace Moonwell.Testing
         public static void NoDrift(FakeWorld world)
         {
             var ran = 0;
-            Timer.Every(0.1f, () => { ran++; });
+            Game.Instance.Every(0.1f, () => { ran++; });
             world.Advance(10.0f);
             Expect.Equal(100, ran, "runs after 10 seconds at 0.1 seconds each");
         }
@@ -45,7 +45,7 @@ namespace Moonwell.Testing
             world.WakeLate = 0.01f;
             var ran = 0;
             var hundredth = 0.0f;
-            Timer.Every(0.1f, () =>
+            Game.Instance.Every(0.1f, () =>
             {
                 ran++;
                 if (ran == 100)
@@ -62,8 +62,8 @@ namespace Moonwell.Testing
         public static void SameTimeInCreationOrder(FakeWorld world)
         {
             var log = new List<string>();
-            Timer.After(1f, () => { log.Add("a"); });
-            Timer.After(1f, () => { log.Add("b"); });
+            Game.Instance.After(1f, () => { log.Add("a"); });
+            Game.Instance.After(1f, () => { log.Add("b"); });
             world.Advance(1f);
             Expect.Equal(2, log.Count, "runs after 1 second");
             Expect.Equal("a", log[0], "the first run");
@@ -82,7 +82,7 @@ namespace Moonwell.Testing
             for (var i = 0; i < dues.Length; i++)
             {
                 var index = i;
-                Timer.After(dues[index], () =>
+                Game.Instance.After(dues[index], () =>
                 {
                     order.Add(index);
                     times.Add(world.Now());
@@ -103,7 +103,7 @@ namespace Moonwell.Testing
         public static void EndCancels(FakeWorld world)
         {
             var ran = 0;
-            var timer = Timer.After(1f, () => { ran++; });
+            var timer = Game.Instance.After(1f, () => { ran++; });
             timer.End();
             Expect.True(timer.HasEnded, "the timer has ended");
             world.Advance(2f);
@@ -114,43 +114,29 @@ namespace Moonwell.Testing
         public static void OwnerAdopts(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             Timer? made = null;
-            owner.Run(() => { made = Timer.After(2f, () => { }); });
+            made = owner.After(2f, () => { });
             var timer = made!;
-            Expect.Same(owner, timer.Owner, "the timer's owner");
+            Expect.Same(owner, timer.Parent, "the timer's owner");
             owner.End();
             Expect.True(timer.HasEnded, "the timer has ended with its owner");
-        }
-
-        /// <summary>Inside the callback, Owner.Current is the timer's owner.</summary>
-        public static void CurrentInCallback(FakeWorld world)
-        {
-            var log = new List<string>();
-            var owner = new TestOwner("owner", log);
-            Owner? seen = null;
-            owner.Run(() => { Timer.After(1f, () => { seen = Owner.Current; }); });
-            world.Advance(1f);
-            Expect.Same(owner, seen, "Owner.Current inside the callback");
         }
 
         /// <summary>A timer that throws is reported, and a timer due at the same time still runs.</summary>
         public static void ErrorIsolated(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var second = 0;
-            owner.Run(() =>
-            {
-                Timer.After(1f, () => { throw new InvalidOperationException("boom"); });
-                Timer.After(1f, () => { second++; });
-            });
+            owner.After(1f, () => { throw new InvalidOperationException("boom"); });
+            owner.After(1f, () => { second++; });
             world.Advance(1f);
             Expect.Equal(1, second, "runs of the timer after the one that threw");
             var reported = false;
             foreach (var line in world.Logged)
             {
-                if (line.Contains("TestOwner.Timer failed"))
+                if (line.Contains("TestScope.Timer failed"))
                 {
                     reported = true;
                 }
@@ -162,7 +148,7 @@ namespace Moonwell.Testing
         /// <summary>Remaining is the time until the timer is due.</summary>
         public static void Remaining(FakeWorld world)
         {
-            var timer = Timer.After(5f, () => { });
+            var timer = Game.Instance.After(5f, () => { });
             world.Advance(2f);
             Expect.Near(3f, timer.Remaining, "remaining after 2 of 5 seconds");
         }

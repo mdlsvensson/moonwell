@@ -3,7 +3,7 @@ using System;
 namespace Moonwell
 {
     /// <summary>An action that runs once after a delay, or again at every interval, until it ends.</summary>
-    public sealed class Timer : Owned
+    public sealed class Timer : Scoped
     {
         /// <summary>The action each run calls.</summary>
         internal readonly Action action;
@@ -14,6 +14,12 @@ namespace Moonwell
         /// <summary>The game time the timer is next due.</summary>
         internal float due = 0.0f;
 
+        /// <summary>Whether the scheduler has called the action at least once.</summary>
+        internal bool ran;
+
+        /// <summary>Whether Moonwell made it for its own work (a buff's tick and expiry, an area's first sweep), which the never-ran report skips: no line of the map named its scope.</summary>
+        internal bool own;
+
         /// <summary>
         /// How many intervals after its start a repeating timer is next due; 1 until it first runs. Its due time is worked out
         /// from the start and this count, not added up run by run, so the rounding of a float late in a game does not add up.
@@ -21,9 +27,12 @@ namespace Moonwell
         internal int intervals = 1;
 
         /// <summary>Makes a timer due the seconds after its start, again at every interval of them when it repeats; it is not yet adopted or scheduled.</summary>
-        private Timer(float start, float seconds, bool periodic, Action action)
+        internal Timer(float start, float seconds, bool periodic, Action action)
         {
             this.start = start;
+#if DEBUG
+            madeAt = Runtime.Clock.LastGame;
+#endif
             due = start + seconds;
             Interval = periodic ? seconds : 0.0f;
             IsPeriodic = periodic;
@@ -48,35 +57,12 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Runs an action once after the seconds, for the owner or else the current owner.</summary>
-        public static Timer After(float seconds, Action action, Owner? owner = null)
-        {
-            Dev.Check(seconds >= 0.0f, "Timer.After: seconds must be 0 or more");
-            return Start(new Timer(Runtime.World.Now(), seconds, false, action), owner);
-        }
-
         /// <summary>
-        /// Runs an action at every interval of the seconds, for the owner or else the current owner. Seconds of 0 or less are
-        /// reported and refused in every build, since such a timer would freeze the game: the timer given back has ended and
-        /// never runs (decision 74).
+        /// Reports seconds of 0 or less given to a scope's Every, under the label, and gives back a timer that has ended without
+        /// being adopted or scheduled. The error is thrown and caught here so that in Lua it records where it was thrown, which
+        /// names the C# line that called Every.
         /// </summary>
-        public static Timer Every(float seconds, Action action, Owner? owner = null)
-        {
-            // Not more than 0, so NaN is refused too.
-            if (!(seconds > 0.0f))
-            {
-                return Refuse(seconds, action);
-            }
-
-            return Start(new Timer(Runtime.World.Now(), seconds, true, action), owner);
-        }
-
-        /// <summary>
-        /// Reports seconds of 0 or less given to Every, and gives back a timer that has ended without being adopted or scheduled.
-        /// The error is thrown and caught here so that in Lua it records where it was thrown, which names the C# line that called
-        /// Every.
-        /// </summary>
-        private static Timer Refuse(float seconds, Action action)
+        internal static Timer Refuse(string label, float seconds, Action action)
         {
             try
             {
@@ -84,7 +70,7 @@ namespace Moonwell
             }
             catch (MoonwellException error)
             {
-                Errors.Report("Timer.Every", error);
+                Errors.Report(label, error);
             }
 
             var timer = new Timer(Runtime.World.Now(), seconds, true, action);
@@ -92,10 +78,33 @@ namespace Moonwell
             return timer;
         }
 
-        /// <summary>Adopts a new timer under its owner, and schedules it unless its owner has already ended.</summary>
-        private static Timer Start(Timer timer, Owner? owner)
+#if DEBUG
+        /// <summary>The game time the timer was made at, as Moonwell's clock last read it; start is Moonwell's time, which a halt holds still.</summary>
+        internal readonly float madeAt;
+
+        /// <summary>
+        /// Reports, in a development build, a timer its scope ended in the instant it was made, before it ran: the line that
+        /// made it named a scope already on its way out, so it does nothing, and nothing else says so. The instant is the
+        /// same on both clocks, the game's and Moonwell's, so a halt or a step of the debug mode in between is not one. A
+        /// timer ended by its own End, or one Moonwell made for its own work, is not reported.
+        /// </summary>
+        internal override void Finish()
         {
-            (owner ?? Owner.Current).Adopt(timer);
+            if (!ran && !own && Parent != null && Parent.ending)
+            {
+                var now = Runtime.World.Now();
+                if (start == now && madeAt == Runtime.Clock.LastGame)
+                {
+                    Errors.Report(Names.NameOf(Parent) + ".Timer", new MoonwellException("ended with its scope in the instant it was made, before it ran; name a scope that lasts"));
+                }
+            }
+        }
+#endif
+
+        /// <summary>Adopts a new timer into its scope, and schedules it unless the scope has already ended.</summary>
+        internal static Timer Start(Timer timer, Scope scope)
+        {
+            scope.Adopt(timer);
             if (!timer.HasEnded)
             {
                 Runtime.Scheduler.Add(timer);

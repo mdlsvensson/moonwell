@@ -42,7 +42,7 @@ namespace Moonwell
         private static bool statsShown;
 
         /// <summary>The objects the panel has named, in the order it first named them; searched by reference, as a map's class may hold static fields.</summary>
-        private static List<Owner> named = new List<Owner>();
+        private static List<Scope> named = new List<Scope>();
 
         /// <summary>The number of each object in named, counted within its class.</summary>
         private static List<int> numbers = new List<int>();
@@ -56,7 +56,7 @@ namespace Moonwell
             runs = 0;
             endedLine = null;
             statsShown = false;
-            named = new List<Owner>();
+            named = new List<Scope>();
             numbers = new List<int>();
         }
 
@@ -134,7 +134,7 @@ namespace Moonwell
         }
 
         /// <summary>The name the panel gives an object: "Game", "Player 1", or its class and its number within the class, given the first time it is named.</summary>
-        internal static string NameOf(Owner obj)
+        internal static string NameOf(Scope obj)
         {
             if (obj is Game)
             {
@@ -332,7 +332,7 @@ namespace Moonwell
             return line;
         }
 
-        /// <summary>"Footman 1 (unit) at 512, -256 · Player 1 · owned by Inferno 3": what is known of the object's place, player and owner.</summary>
+        /// <summary>"Footman 1 (unit) at 512, -256 · Player 1 · in Inferno 3": what is known of the object's place, player and scope.</summary>
         private static string ObjectLine(Actor actor)
         {
             var line = NameOf(actor) + " (" + KindOf(actor) + ")";
@@ -343,17 +343,17 @@ namespace Moonwell
 
             if (actor is Unit unit)
             {
-                line = line + " · " + PlayerName(unit.Player);
+                line = line + " · " + PlayerName(unit.Owner);
             }
             else if (actor is Item item)
             {
-                line = line + " · " + PlayerName(item.Player);
+                line = line + " · " + PlayerName(item.Owner);
             }
 
-            var owner = actor.Owner;
-            if (owner != null)
+            var parent = actor.Parent;
+            if (parent != null)
             {
-                line = line + " · owned by " + NameOf(owner);
+                line = line + " · in " + NameOf(parent);
             }
 
             return line;
@@ -413,7 +413,7 @@ namespace Moonwell
         }
 
         /// <summary>The number of an object within its class: the one it was given, or the next of its class, given now.</summary>
-        private static int NumberOf(Owner obj)
+        private static int NumberOf(Scope obj)
         {
             var at = named.IndexOf(obj);
             if (at >= 0)

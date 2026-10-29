@@ -2,7 +2,7 @@ namespace Moonwell
 {
     /// <summary>One cast of a spell: it begins when the spell takes effect, and ends at the spell's end or when the caster's next cast begins.</summary>
     [LocalSafe]
-    public sealed class Cast : Owner
+    public sealed class Cast : Scope
     {
         /// <summary>Makes the cast of an ability by a caster, at a target and a place, with the level the ability has now.</summary>
         internal Cast(Ability ability, Unit caster, Unit? target, float x, float y, int level)

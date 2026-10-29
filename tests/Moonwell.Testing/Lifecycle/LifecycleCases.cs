@@ -33,7 +33,7 @@ namespace Moonwell.Testing
             var holder = Unit.Of(FootmanAt(world, 0.0f, 0.0f))!;
             var aura = new FireAura(300.0f, 0.125f);
             aura.Tag = unit => unit.Handle == before ? "before" : "trained";
-            holder.Interact(aura);
+            holder.Interact(aura, Game.Instance);
             Expect.True(KnownUnits.Find(before) != null, "the unit already in the world is taken in at the first ask for units");
 
             var trained = FootmanAt(world, 100.0f, 0.0f);
@@ -54,7 +54,7 @@ namespace Moonwell.Testing
                 world.LocalSlot = machine;
                 var player = Player.Get(1);
                 player.Gold = 0;
-                Timer.After(1.0f, () =>
+                Game.Instance.After(1.0f, () =>
                 {
                     Local.For(Player.Get(0), () => { throw new InvalidOperationException("only on player 1's machine"); });
                     player.Gold += 10;
@@ -128,10 +128,10 @@ namespace Moonwell.Testing
                     pair.Other.Remove<Chilled>();
                 }
             };
-            holder.Interact(aura);
+            holder.Interact(aura, Game.Instance);
             Steps(world, 8);
             Expect.True(kept.Has<Chilled>() && removed.Has<Chilled>(), "both others are chilled while near");
-            Expect.Same(kept, kept.Get<Chilled>()!.Owner, "the owner of the buff the pair applied");
+            Expect.Same(kept, kept.Get<Chilled>()!.Parent, "the owner of the buff the pair applied");
 
             world.MoveUnit(kept.Handle, 900.0f, 900.0f);
             world.MoveUnit(removed.Handle, -900.0f, -900.0f);
@@ -181,7 +181,7 @@ namespace Moonwell.Testing
             var a = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             var b = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             var ran = 0;
-            b.Run(() => { Timer.Every(1.0f, () => { ran++; }); });
+            b.Every(1.0f, () => { ran++; });
             var shared = a.Add(new Marker());
             try
             {
@@ -196,7 +196,7 @@ namespace Moonwell.Testing
             Expect.True(shared.Actor == a && !b.Has<Marker>(), "the component stays on the first unit only");
             a.Remove();
             world.Advance(2.5f);
-            Expect.Equal("2 False 1", ran + " " + b.HasEnded + " " + b.OwnedCount, "runs of the second unit's timer after the first was removed, whether it ended, and what it owns");
+            Expect.Equal("2 False 1", ran + " " + b.HasEnded + " " + b.ChildCount, "runs of the second unit's timer after the first was removed, whether it ended, and what it owns");
         }
 
         /// <summary>A Separate buff that applies itself again in OnExpire is refused, in every build: it is reported, the buff starts nothing again and ends at its expiry, and its unit ends (in a release build it used to be linked twice, and its unit's end never returned) (decision 74).</summary>
@@ -210,7 +210,7 @@ namespace Moonwell.Testing
             Expect.Equal(1, buff.Applied, "the buff's applies");
             target.Remove();
             Expect.True(target.HasEnded, "the unit has ended");
-            Expect.Equal(0, target.OwnedCount, "what the ended unit still owns");
+            Expect.Equal(0, target.ChildCount, "what the ended unit still owns");
         }
 
         /// <summary>Removing a component from another actor than the one it is on is refused, in every build: it is reported, and the component stays on its actor (decision 74).</summary>
@@ -266,7 +266,7 @@ namespace Moonwell.Testing
             var id = ObjectTypes.FourCC("H0CR");
             ObjectTypes.Unit(id, () => new CountedHero());
             var watch = Game.Instance.Add(new CreatedWatch());
-            var made = Unit.Create<CountedHero>(Player.Get(0), 0.0f, 0.0f);
+            var made = Unit.Create<CountedHero>(Player.Get(0), 0.0f, 0.0f, Game.Instance);
             var handle = made.Handle;
             made.Remove();
             Inbound.Entered(handle);
@@ -347,7 +347,7 @@ namespace Moonwell.Testing
 
             var entering = FootmanAt(world, 0.0f, 50.0f);
             Inbound.Entered(entering);
-            var made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0.0f, 0.0f);
+            var made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0.0f, 0.0f, Game.Instance);
             Expect.Equal(2, watch.Seen.Count, "OnUnitCreated's runs for a unit that enters and one Unit.Create makes");
             Expect.True(watch.Seen[0] == KnownUnits.Find(entering) && watch.Seen[1] == made, "the units OnUnitCreated was given");
         }
@@ -363,8 +363,8 @@ namespace Moonwell.Testing
             ObjectTypes.Item(ObjectTypes.FourCC("I0EO"), () => new CountedItem());
             var owner = Game.Instance.Add(new CreatedWatch());
             owner.End();
-            var unit = Unit.Create<CountedHero>(Player.Get(0), 0.0f, 0.0f, owner: owner);
-            var item = Item.Create<CountedItem>(0.0f, 0.0f, owner: owner);
+            var unit = Unit.Create<CountedHero>(Player.Get(0), 0.0f, 0.0f, owner);
+            var item = Item.Create<CountedItem>(0.0f, 0.0f, owner);
             Expect.True(unit.HasEnded && item.HasEnded, "the unit and the item have ended");
             Expect.True(world.RemovedUnits.Contains(unit.Handle) && world.RemovedItems.Contains(item.Handle), "the unit and the item are removed from the game");
             Expect.Equal("0 0 0 0", CountedHero.Created + " " + CountedHero.Left + " " + CountedItem.Created + " " + CountedItem.Left, "the unit's OnCreated and OnLeave runs, and the item's");
@@ -402,7 +402,7 @@ namespace Moonwell.Testing
             var unitError = "none";
             try
             {
-                Unit.Create(ObjectTypes.FourCC("h00X"), Player.Get(0), 0.0f, 0.0f);
+                Unit.Create(ObjectTypes.FourCC("h00X"), Player.Get(0), 0.0f, 0.0f, Game.Instance);
             }
             catch (MoonwellException error)
             {
@@ -416,7 +416,7 @@ namespace Moonwell.Testing
             var itemError = "none";
             try
             {
-                Item.Create(ObjectTypes.FourCC("I00X"), 0.0f, 0.0f);
+                Item.Create(ObjectTypes.FourCC("I00X"), 0.0f, 0.0f, Game.Instance);
             }
             catch (MoonwellException error)
             {
@@ -437,7 +437,7 @@ namespace Moonwell.Testing
             var first = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             var second = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             var ran = 0;
-            var timer = Timer.Every(1.0f, () => { ran++; }, first);
+            var timer = first.Every(1.0f, () => { ran++; });
             try
             {
                 second.Adopt(timer);
@@ -447,10 +447,10 @@ namespace Moonwell.Testing
                 Expect.True(false, "the adopt threw: " + error.Message);
             }
 
-            Expect.Equal(1, Logged(world, "Unit.Adopt failed: Timer already has an owner or has ended"), "the reports of the adopt: " + string.Join(" | ", world.Logged));
+            Expect.Equal(1, Logged(world, "Unit.Adopt failed: Timer already has a parent or has ended"), "the reports of the adopt: " + string.Join(" | ", world.Logged));
             second.Remove();
             world.Advance(2.5f);
-            Expect.Equal("2 1 0", ran + " " + first.OwnedCount + " " + second.OwnedCount, "the timer's runs after the second owner was removed, and what each owns");
+            Expect.Equal("2 1 0", ran + " " + first.ChildCount + " " + second.ChildCount, "the timer's runs after the second owner was removed, and what each owns");
         }
     }
 }

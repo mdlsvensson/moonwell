@@ -18,17 +18,11 @@ namespace Moonwell.Testing
         /// <summary>The slowest closing speed of its impacts; a billion before one.</summary>
         public float Slowest = 1000000000.0f;
 
-        /// <summary>The owner that was current when OnImpact last ran.</summary>
-        public Owner? ImpactedWith;
-
         /// <summary>Whether it had ended when OnImpact last ran.</summary>
         public bool EndedInImpact;
 
         /// <summary>How many times OnRest ran.</summary>
         public int Rested;
-
-        /// <summary>The owner that was current when OnRest last ran.</summary>
-        public Owner? RestedWith;
 
         /// <summary>Where the reactions write their names, in the order they ran; null for nowhere.</summary>
         public List<string>? Log;
@@ -36,7 +30,7 @@ namespace Moonwell.Testing
         /// <summary>An action OnImpact runs after it has recorded; null for none.</summary>
         public Action<Impact>? Impacting;
 
-        /// <summary>Records the impact, the current owner and whether it has ended, then runs the action.</summary>
+        /// <summary>Records the impact and whether it has ended, then runs the action.</summary>
         public override void OnImpact(Impact impact)
         {
             Impacts++;
@@ -54,7 +48,6 @@ namespace Moonwell.Testing
             {
                 Slowest = impact.Speed;
             }
-            ImpactedWith = Owner.Current;
             EndedInImpact = HasEnded;
             if (Log != null)
             {
@@ -67,11 +60,10 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>Counts the rest and keeps the current owner.</summary>
+        /// <summary>Counts the rest.</summary>
         public override void OnRest()
         {
             Rested++;
-            RestedWith = Owner.Current;
             if (Log != null)
             {
                 Log.Add("ball.rest");

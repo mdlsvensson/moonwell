@@ -123,9 +123,9 @@ namespace Moonwell.Testing
             var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"), slot: 1);
             var unit = Unit.Of(handle)!;
             world.VanishUnit(handle);
-            Expect.Equal(1, unit.Player.Slot, "the owner's slot before the sweep");
+            Expect.Equal(1, unit.Owner.Slot, "the owner's slot before the sweep");
             world.Advance(0.3f);
-            Expect.Equal(1, unit.Player.Slot, "the owner's slot after the sweep");
+            Expect.Equal(1, unit.Owner.Slot, "the owner's slot after the sweep");
         }
 
         /// <summary>A unit's player is set in the game, with the unit's colour changed to the new player's; once the unit is gone, setting does nothing.</summary>
@@ -134,16 +134,16 @@ namespace Moonwell.Testing
             var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"), slot: 1);
             var unit = Unit.Of(handle)!;
 
-            unit.Player = Player.Get(3);
+            unit.Owner = Player.Get(3);
 
-            Expect.Equal(3, unit.Player.Slot, "the new player");
+            Expect.Equal(3, unit.Owner.Slot, "the new player");
             Expect.Equal(3, world.SlotOf(world.OwnerOf(handle)), "the game's player");
             Expect.Equal("owner 3 True", world.UnitCalls[world.UnitCalls.Count - 1], "the call changes the colour");
 
             unit.Remove();
             var calls = world.UnitCalls.Count;
-            unit.Player = Player.Get(5);
-            Expect.Equal(3, unit.Player.Slot, "the last player once gone");
+            unit.Owner = Player.Get(5);
+            Expect.Equal(3, unit.Owner.Slot, "the last player once gone");
             Expect.Equal(calls, world.UnitCalls.Count, "no call once gone");
         }
 
@@ -674,32 +674,30 @@ namespace Moonwell.Testing
         public static void OwnedByOwner(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
-            var made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0f, 0f, 0f, owner);
-            Expect.Same(owner, made.Owner, "the owner of the unit");
+            var owner = new TestScope("owner", log);
+            var made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0f, 0f, owner, 0f);
+            Expect.Same(owner, made.Parent, "the owner of the unit");
             owner.End();
             Expect.Equal(1, world.RemovedUnits.Count, "the units the game was asked to remove");
             Expect.Same(made.Handle, world.RemovedUnits[0], "the handle removed");
         }
 
-        /// <summary>A unit created inside Run without an owner is not owned by the current owner, and outlives it.</summary>
+        /// <summary>A unit is in the scope its Create line names, and outlives another scope that ends.</summary>
         public static void NotOwnedByCurrent(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
-            Unit? made = null;
-            owner.Run(() => { made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0f, 0f, 0f); });
-            var kept = made!;
-            Expect.True(kept.Owner == null, "the unit has no owner");
+            var owner = new TestScope("owner", log);
+            var kept = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0f, 0f, Game.Instance, 0f);
+            Expect.Same(Game.Instance, kept.Parent, "the unit is in the scope its line names");
             owner.End();
-            Expect.True(!kept.HasEnded, "the unit outlives the owner");
+            Expect.True(!kept.HasEnded, "the unit outlives another scope");
         }
 
         /// <summary>Create of a class gives an object of that class, made from its registered id.</summary>
         public static void CreateGeneric(FakeWorld world)
         {
             ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new TestHero());
-            var made = Unit.Create<TestHero>(Player.Get(0), 0f, 0f, 0f);
+            var made = Unit.Create<TestHero>(Player.Get(0), 0f, 0f, Game.Instance, 0f);
             Expect.Equal(ObjectTypes.FourCC("H001"), made.TypeId, "the type id");
         }
 
@@ -707,10 +705,10 @@ namespace Moonwell.Testing
         public static void CreatePlace(FakeWorld world)
         {
             ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new TestHero());
-            var made = Unit.Create<TestHero>(Player.Get(0), 30f, -40f);
+            var made = Unit.Create<TestHero>(Player.Get(0), 30f, -40f, Game.Instance);
             Expect.Near(30f, made.X, "the x of Create<T>");
             Expect.Near(-40f, made.Y, "the y of Create<T>");
-            var plain = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(1), -75f, 120f);
+            var plain = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(1), -75f, 120f, Game.Instance);
             Expect.Near(-75f, plain.X, "the x of Create with a type id");
             Expect.Near(120f, plain.Y, "the y of Create with a type id");
         }
@@ -1062,7 +1060,7 @@ namespace Moonwell.Testing
             heroDefault.SetLevel(5);
             var revived = heroDefault.Revive(0.0f, 0.0f);
             itemDefault.MoveTo(10.0f, 20.0f);
-            itemDefault.Player = Player.Get(1);
+            itemDefault.Owner = Player.Get(1);
 
             world.CallsThrow = false;
             Expect.True(!ordered, "an order to the default object");

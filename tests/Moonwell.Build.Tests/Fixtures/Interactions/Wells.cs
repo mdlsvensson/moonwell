@@ -8,9 +8,9 @@ namespace InteractionsFixture
     {
         public override void OnGameStart()
         {
-            Unit.Create<Human.Units.Footman>(Player.One, 100f, 0f);
-            var well = Gizmo.Create(new Well(), 0f, 0f, Player.One);
-            Timer.After(1f, () =>
+            Unit.Create<Human.Units.Footman>(Player.One, 100f, 0f, Game.Instance);
+            var well = Gizmo.Create(new Well(), 0f, 0f, Game.Instance, Player.One);
+            After(1f, () =>
             {
                 var near = Find.InRange<Unit>(well.X, well.Y, 500f);
                 Game.Print("near the well: " + near.Count);
@@ -23,7 +23,7 @@ namespace InteractionsFixture
     {
         protected override void OnCreated()
         {
-            this.Interact(new FireAura());
+            this.Interact(new FireAura(), this);
         }
     }
 
@@ -38,7 +38,7 @@ namespace InteractionsFixture
 
         public override bool Accepts(Unit other)
         {
-            return Holder.Player.IsEnemy(other.Player);
+            return Holder.Owner.IsEnemy(other.Owner);
         }
 
         public override void OnTick(Pair pair)

@@ -73,7 +73,7 @@ namespace Moonwell.Engine
             dueStep = -1;
         }
 
-        /// <summary>Runs the check, and puts the interaction on the ring again for a tick from now, unless it has ended. A paused one is left off the ring until Resume. An error the package's own code raised in the check is reported as ClassName.Check, the interaction's class, with the current owner as it was before the check, and the interaction still checks at its next tick: nothing leaves the cycle's step, so what is due after it in the step still runs.</summary>
+        /// <summary>Runs the check, and puts the interaction on the ring again for a tick from now, unless it has ended. A paused one is left off the ring until Resume. An error the package's own code raised in the check is reported as ClassName.Check, the interaction's class, and the interaction still checks at its next tick: nothing leaves the cycle's step, so what is due after it in the step still runs.</summary>
         public void RunDue(int step)
         {
             dueStep = -1;
@@ -82,12 +82,10 @@ namespace Moonwell.Engine
                 return;
             }
 
-            var previous = Owner.current;
             var failure = interaction.RunCheck();
             Arm();
             if (failure != null)
             {
-                Owner.current = previous;
                 Errors.Report(Names.NameOf(interaction) + ".Check", failure);
             }
         }

@@ -14,6 +14,6 @@ namespace PhysicsFixture
             DamageKind = DamageKind.Fire;
         }
 
-        public override bool CanHit(Actor other) => other is Unit unit && Source!.Player.IsEnemy(unit.Player);
+        public override bool CanHit(Actor other) => other is Unit unit && Source!.Owner.IsEnemy(unit.Owner);
     }
 }

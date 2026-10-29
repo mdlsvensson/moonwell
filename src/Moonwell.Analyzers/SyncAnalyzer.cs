@@ -211,7 +211,7 @@ public sealed partial class SyncAnalyzer : DiagnosticAnalyzer
             context.ReportDiagnostic(Diagnostic.Create(finding.Unseen ? Rules.Unfollowed : Rules.StateInLocal, location, finding.Message(finding.Name)));
         }
 
-        private const string Clock = "; it is this machine's clock: time game logic with Timer.After or Timer.Every";
+        private const string Clock = "; it is this machine's clock: time game logic with After or Every on a scope";
 
         private const string Address = "; in the game's Lua it is the object's address: key by the object itself, or by a number the map assigns";
 

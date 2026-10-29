@@ -576,18 +576,18 @@ namespace Moonwell.Engine
         }
 
         /// <summary>Notes that a thing is the other of a pair, so the pair parts when the thing ends.</summary>
-        public static void AddPartner(Entry entry, Owner pair)
+        public static void AddPartner(Entry entry, Scope pair)
         {
             if (entry.Partners == null)
             {
-                entry.Partners = new List<Owner>();
+                entry.Partners = new List<Scope>();
             }
 
             entry.Partners.Add(pair);
         }
 
         /// <summary>Forgets that a thing is the other of a pair that is parting; one it is not the other of is passed over.</summary>
-        public static void RemovePartner(Entry entry, Owner pair)
+        public static void RemovePartner(Entry entry, Scope pair)
         {
             var partners = entry.Partners;
             if (partners == null)
@@ -793,7 +793,7 @@ namespace Moonwell.Engine
         {
             if (!Running)
             {
-                timer = Timer.Every(Interactions.Step, Run, Runtime.Root);
+                timer = Game.Instance.Every(Interactions.Step, Run);
             }
         }
 

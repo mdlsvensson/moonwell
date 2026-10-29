@@ -80,7 +80,7 @@ namespace Moonwell.Testing
             Fresh();
             var unit = UnitAt(world, 10.0f, 10.0f);
             var item = ItemAt(world, 20.0f, 20.0f);
-            var well = Gizmo.Create(new Well(), 30.0f, 30.0f);
+            var well = Gizmo.Create(new Well(), 30.0f, 30.0f, Game.Instance);
             var all = Find.InRange<Actor>(0.0f, 0.0f, 100.0f);
             Expect.Equal(3, all.Count, "Actor gives all three");
             Expect.True(Holds(all, unit) && Holds(all, item) && Holds(all, well), "the unit, the item and the gizmo");
@@ -416,8 +416,8 @@ namespace Moonwell.Testing
                 count = Find.InRange(0.0f, 0.0f, 100.0f, found);
             };
             var second = new Well(Interactions.Step);
-            Gizmo.Create(first, 0.0f, 0.0f);
-            Gizmo.Create(second, 0.0f, 0.0f);
+            Gizmo.Create(first, 0.0f, 0.0f, Game.Instance);
+            Gizmo.Create(second, 0.0f, 0.0f, Game.Instance);
             Steps(world, 1);
             Expect.Equal(1, count, "the Find from inside OnTick found the unit");
             Expect.Same(near, found[0], "the unit");
@@ -610,7 +610,7 @@ namespace Moonwell.Testing
             Fresh();
             var a = UnitAt(world, 10.0f, 10.0f);
             var b = UnitAt(world, 255.0f, 10.0f);
-            var well = Gizmo.Create(new Well(), 320.0f, 20.0f);
+            var well = Gizmo.Create(new Well(), 320.0f, 20.0f, Game.Instance);
             Expect.Equal(1, Find.InRange<Actor>(0.0f, 0.0f, 100.0f).Count, "outside Local.For the first Find tracks the units and finds the one near");
             var entries = new List<Entry>();
             entries.Add(Tracked(a));
@@ -669,7 +669,7 @@ namespace Moonwell.Testing
                 Local.For(Player.Get(0), () => { cached = Find.InRange<Unit>(0.0f, 0.0f, 100.0f).Count; });
                 well.Ticking = null;
             };
-            Gizmo.Create(well, 0.0f, 0.0f);
+            Gizmo.Create(well, 0.0f, 0.0f, Game.Instance);
             Steps(world, 1);
             Expect.Equal(1, cached, "inside the step the place read this step is used, though the unit has moved");
             Expect.Near(10.0f, entry.X, "and it is kept as read");
@@ -717,7 +717,7 @@ namespace Moonwell.Testing
         public static void LocalMixed(FakeWorld world)
         {
             Fresh();
-            var well = Gizmo.Create(new Well(), 15.0f, 15.0f);
+            var well = Gizmo.Create(new Well(), 15.0f, 15.0f, Game.Instance);
             var unit = UnitAt(world, 10.0f, 10.0f);
             var found = new List<Actor>();
             Local.For(Player.Get(0), () => { found = Find.InRange<Actor>(0.0f, 0.0f, 100.0f); });

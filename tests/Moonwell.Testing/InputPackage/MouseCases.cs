@@ -126,7 +126,7 @@ namespace Moonwell.Testing
             Expect.True(mouse.IsDown(MouseButton.Left), "and the left button still is");
         }
 
-        /// <summary>An event of Player 1 runs the game's components in add order, then Player 1's, never Player 2's; the reactions give the mouse and the button and run with the component as the current owner.</summary>
+        /// <summary>An event of Player 1 runs the game's components in add order, then Player 1's, never Player 2's; the reactions give the mouse and the button.</summary>
         public static void Order(FakeWorld world)
         {
             var fake = Fresh(world);
@@ -141,9 +141,6 @@ namespace Moonwell.Testing
             Game.Instance.Add(second);
             fake.Move(Player.One, 10f, 20f);
             ExpectLog(log, new[] { "game a moved", "game b moved", "player 1 moved" }, "a move of Player 1");
-            Expect.Same(first, first.OwnerSeen, "the game's component is the owner");
-            Expect.Same(one, one.OwnerSeen, "the player's component is the owner");
-            Expect.True(two.OwnerSeen == null, "Player 2's component was not called");
             log.Clear();
             fake.Press(Player.Two, MouseButton.Right, 10f, 20f);
             ExpectLog(log, new[] { "game a pressed Right", "game b pressed Right", "player 2 pressed Right" }, "a press of Player 2");

@@ -10,9 +10,6 @@ namespace Moonwell
         /// <summary>The world the runtime talks to; set by Reset.</summary>
         internal static IWorld World = null!;
 
-        /// <summary>The owner of everything no other owner holds; set by Reset.</summary>
-        internal static Owner Root = null!;
-
         /// <summary>The scheduler that runs the timers; set by Reset.</summary>
         internal static Scheduler Scheduler = null!;
 
@@ -33,20 +30,18 @@ namespace Moonwell
             Hooks.Reset();
             Events.Reset();
             Game.Instance = new Game();
-            Root = Game.Instance;
             Player.Reset();
             KnownUnits.Reset();
             KnownItems.Reset();
             KnownDestructables.Reset();
             ObjectTypes.Reset();
-            Owner.current = null;
 #if DEBUG
             DebugSession.Reset();
             DebugViews.Reset();
             DebugPanel.Reset();
             DebugStats.Reset();
 #endif
-            Timer.Every(0.25f, Sweep.Run, Game.Instance);
+            Game.Instance.Every(0.25f, Sweep.Run);
         }
 
         /// <summary>Called when a wake request is due; runs the timers that are due.</summary>
@@ -98,8 +93,6 @@ namespace Moonwell
         internal static void Begin(Action setup)
         {
             ListenForCarriers();
-            var previous = Owner.current;
-            Owner.current = Game.Instance;
             try
             {
                 setup();
@@ -108,8 +101,6 @@ namespace Moonwell
             {
                 Errors.Report("Moonwell.Setup", error);
             }
-
-            Owner.current = previous;
 
             foreach (var handle in World.UnitsInWorld())
             {

@@ -84,7 +84,7 @@ namespace Moonwell.Build.Tests
                     "    <ProjectReference Include=\"..\\..\\..\\..\\src\\Moonwell.Interactions\\Moonwell.Interactions.csproj\" />\n  </ItemGroup>\n\n</Project>"));
             File.WriteAllText(
                 Path.Combine(project, "Wells.cs"),
-                "using Moonwell;\n\nnamespace AreasFixture\n{\n    public sealed class Well : Gizmo\n    {\n    }\n\n    public static class Wells\n    {\n        public static Well Make()\n        {\n            return Gizmo.Create(new Well(), 0f, 0f);\n        }\n    }\n}\n");
+                "using Moonwell;\n\nnamespace AreasFixture\n{\n    public sealed class Well : Gizmo\n    {\n    }\n\n    public static class Wells\n    {\n        public static Well Make()\n        {\n            return Gizmo.Create(new Well(), 0f, 0f, Game.Instance);\n        }\n    }\n}\n");
 
             var views = new[] { "InteractionsView", "AreasView", "DebugViews", "IDebugView", "DebugSession" };
             var development = Build(project, false);

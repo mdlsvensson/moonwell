@@ -4,21 +4,17 @@ namespace Moonwell.Testing
     public sealed class Volley : Buff
     {
         /// <summary>The owner the dart is fired with; null for none.</summary>
-        public Owner? Given;
+        public Scope? Given;
 
         /// <summary>The dart fired; null before OnApply.</summary>
         public Dart? Fired;
 
-        /// <summary>The owner that was current inside OnApply.</summary>
-        public Owner? Seen;
-
         /// <summary>Fires the dart.</summary>
         public override void OnApply()
         {
-            Seen = Owner.Current;
             var dart = new Dart();
             dart.Speed = 100.0f;
-            Fired = Unit.Fire(dart, 1000.0f, 0.0f, Given);
+            Fired = Unit.Fire(dart, 1000.0f, 0.0f, Given ?? Game.Instance);
         }
     }
 }

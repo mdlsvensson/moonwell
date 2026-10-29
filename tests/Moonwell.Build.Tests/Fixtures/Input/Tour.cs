@@ -8,7 +8,7 @@ namespace InputFixture
     {
         public override void OnGameStart()
         {
-            var hero = Unit.Create<Human.Units.Paladin>(Player.One, 0f, 0f);
+            var hero = Unit.Create<Human.Units.Paladin>(Player.One, 0f, 0f, Game.Instance);
             Player.One.Camera().Apply(CameraSetup.Named("Intro"), 2f);
             Player.One.Add(new Aim(hero));
         }

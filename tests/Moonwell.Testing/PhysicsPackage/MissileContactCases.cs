@@ -34,7 +34,7 @@ namespace Moonwell.Testing
             var shot = new Shot();
             shot.MissileContact = contact;
             shot.Impacting = impact => TestLog.Lines.Add(label);
-            Missile.Create(shot, x, y, 100.0f);
+            Missile.Create(shot, x, y, 100.0f, Game.Instance);
             shot.VX = vx;
             return shot;
         }
@@ -166,7 +166,7 @@ namespace Moonwell.Testing
             var bolt = new Shot();
             bolt.MissileContact = Contact.Pass;
             bolt.GroundContact = Contact.None;
-            Missile.Create(bolt, 300.0f, 500.0f, 24.0f);
+            Missile.Create(bolt, 300.0f, 500.0f, 24.0f, Game.Instance);
             bolt.VX = 300.0f;
             Steps(world, 64);
             Expect.Equal(1, bolt.Impacts.Count, "the bolt met the ball once");
@@ -180,7 +180,7 @@ namespace Moonwell.Testing
             refused.MissileContact = Contact.Pass;
             refused.Hit = thing => false;
             refused.GroundContact = Contact.None;
-            Missile.Create(refused, 300.0f, 1000.0f, 24.0f);
+            Missile.Create(refused, 300.0f, 1000.0f, 24.0f, Game.Instance);
             refused.VX = 300.0f;
             for (var i = 0; i < 40 && refused.Asked.Count == 0; i++)
             {
@@ -232,12 +232,12 @@ namespace Moonwell.Testing
             var ball = new Shot();
             ball.MissileContact = Contact.Bounce;
             ball.GroundContact = Contact.Slide;
-            Missile.Create(ball, 500.0f, 500.0f, 17.0f);
+            Missile.Create(ball, 500.0f, 500.0f, 17.0f, Game.Instance);
             ball.VZ = -4.0f;
             var bolt = new Shot();
             bolt.MissileContact = Contact.Stop;
             bolt.GroundContact = Contact.None;
-            Missile.Create(bolt, 470.0f, 537.5f, 16.0f);
+            Missile.Create(bolt, 470.0f, 537.5f, 16.0f, Game.Instance);
             for (var i = 0; i < 32 && !ball.resting; i++)
             {
                 Steps(world, 1);
@@ -311,7 +311,7 @@ namespace Moonwell.Testing
             ball.MissileContact = Contact.Bounce;
             ball.GroundContact = Contact.Slide;
             ball.Gravity = 800.0f;
-            Missile.Create(ball, x, 500.0f, 16.0f);
+            Missile.Create(ball, x, 500.0f, 16.0f, Game.Instance);
             ball.VX = vx;
             return ball;
         }
@@ -350,7 +350,7 @@ namespace Moonwell.Testing
             var ball = new Shot();
             ball.MissileContact = Contact.Bounce;
             ball.GroundContact = Contact.Slide;
-            Missile.Create(ball, x, y, 16.0f);
+            Missile.Create(ball, x, y, 16.0f, Game.Instance);
             ball.VZ = -1.0f;
             for (var i = 0; i < 16 && !ball.resting; i++)
             {

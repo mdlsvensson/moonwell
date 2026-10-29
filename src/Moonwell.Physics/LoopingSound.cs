@@ -7,7 +7,7 @@ namespace Moonwell
     /// <summary>
     /// A looping 3D sound that follows a missile: <c>Components.Add(new LoopingSound(path))</c>. It starts where the missile
     /// is when added, is moved with it each step, and when the missile ends, or the sound is removed, it fades out over
-    /// FadeOut and stops. The fade belongs to the game, so it outlives the missile and its owner. The game plays at most 4
+    /// FadeOut and stops. The fade belongs to the game, so it outlives the missile and its scope. The game plays at most 4
     /// of one sound file at once (a claim in game facts), so a volley of 20 hums as 4.
     /// </summary>
     public sealed class LoopingSound : MissileComponent
@@ -122,7 +122,7 @@ namespace Moonwell
 
             faded = 0.0f;
             fadeFrom = Level(volume);
-            fader = Timer.Every(FadeStep, () => Fade(), Runtime.Root);
+            fader = Game.Instance.Every(FadeStep, () => Fade());
         }
 
         /// <summary>Moves a missile's sounds to a place; the pass calls it with the missile's effects, every step it moves.</summary>

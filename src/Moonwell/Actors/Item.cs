@@ -65,7 +65,7 @@ namespace Moonwell
         {
         }
 
-        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Owner).
+        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Scope).
 
         /// <summary>The charges last read or set.</summary>
         internal int lastCharges;
@@ -136,7 +136,7 @@ namespace Moonwell
 
         /// <summary>The player that owns the item; a new item belongs to the neutral passive player. Picking the item up or dropping it does not change the owner, so this is not the carrier's player. Setting it takes effect at once and leaves the item's colour as it is. Once the game has removed the item, the last player read or set (the one it had when Moonwell took it in, if none); the neutral passive player when the game gives none. Setting does nothing then.</summary>
         [LocalSafe]
-        public Player Player
+        public Player Owner
         {
             get
             {
@@ -272,8 +272,8 @@ namespace Moonwell
             return KnownItems.TakeIn(handle, null);
         }
 
-        /// <summary>Creates an item of a type at a place; owner, when given, owns it. Throws a MoonwellException naming the id when the game makes no item of the type.</summary>
-        public static Item Create(int typeId, float x, float y, Owner? owner = null)
+        /// <summary>Creates an item of a type at a place, in a scope, which ends it when it ends. Throws a MoonwellException naming the id when the game makes no item of the type.</summary>
+        public static Item Create(int typeId, float x, float y, Scope scope)
         {
             var handle = Runtime.World.SpawnItem(typeId, x, y);
             if (handle == null)
@@ -281,20 +281,20 @@ namespace Moonwell
                 throw new MoonwellException("Item.Create: the game made no item of type " + Names.IdText(typeId));
             }
 
-            var made = KnownItems.TakeIn(handle, owner)!;
-            if (owner != null && made.Owner == null)
+            var made = KnownItems.TakeIn(handle, scope)!;
+            if (made.Parent == null)
             {
-                owner.Adopt(made);
+                scope.Adopt(made);
             }
 
             return made;
         }
 
-        /// <summary>Creates an item of a registered class at a place; owner, when given, owns it.</summary>
-        public static T Create<T>(float x, float y, Owner? owner = null)
+        /// <summary>Creates an item of a registered class at a place, in a scope, which ends it when it ends.</summary>
+        public static T Create<T>(float x, float y, Scope scope)
             where T : Item
         {
-            return (T)Create(ObjectTypes.IdOf<T>(), x, y, owner);
+            return (T)Create(ObjectTypes.IdOf<T>(), x, y, scope);
         }
 
         /// <summary>Adds a component to the item, and returns it.</summary>
@@ -315,7 +315,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the item leaves the game, before its components end; HasEnded is still false here. It runs once for each OnCreated: one made for an owner that had already ended, which ends at once, runs neither.</summary>
+        /// <summary>Runs when the item leaves the game, before its components end; HasEnded is still false here. It runs once for each OnCreated: one made in a scope that had already ended, which ends at once, runs neither.</summary>
         protected virtual void OnLeave()
         {
         }
@@ -338,7 +338,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the item leaves the game. One that never came in, as one made for an owner that had ended, runs neither, as it ran no OnCreated.</summary>
+        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the item leaves the game. One that never came in, as one made in a scope that had ended, runs neither, as it ran no OnCreated.</summary>
         protected sealed override void OnEnd()
         {
             if (!entered)
@@ -347,8 +347,6 @@ namespace Moonwell
             }
 
             Hooks.CallEnding(this);
-            var previous = Owner.current;
-            Owner.current = this;
             try
             {
                 OnLeave();
@@ -357,8 +355,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnLeave", error);
             }
-
-            Owner.current = previous;
         }
 
         /// <summary>Removes the item from the game unless the game has already, and forgets it.</summary>

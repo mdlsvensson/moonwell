@@ -27,9 +27,6 @@ namespace Moonwell.Testing
         /// <summary>The seconds Since gave for each OnUnitStays, in order.</summary>
         public List<float> SinceAtStay = new List<float>();
 
-        /// <summary>The current owner seen in the last reaction.</summary>
-        public Owner? OwnerSeen;
-
         /// <summary>How many times Accepts was asked.</summary>
         public int AcceptsAsked;
 
@@ -68,7 +65,6 @@ namespace Moonwell.Testing
         /// <summary>Logs the unit.</summary>
         public override void OnUnitEntered(Unit enteringUnit)
         {
-            OwnerSeen = Owner.Current;
             Log.Add("entered " + Label(enteringUnit));
             if (WhenEntered != null)
             {
@@ -79,7 +75,6 @@ namespace Moonwell.Testing
         /// <summary>Logs the unit and how long it has been inside.</summary>
         public override void OnUnitStays(Unit stayingUnit)
         {
-            OwnerSeen = Owner.Current;
             Log.Add("stays " + Label(stayingUnit));
             SinceAtStay.Add(Since(stayingUnit));
             if (WhenStays != null)
@@ -91,7 +86,6 @@ namespace Moonwell.Testing
         /// <summary>Logs the unit.</summary>
         public override void OnUnitLeft(Unit leavingUnit)
         {
-            OwnerSeen = Owner.Current;
             Log.Add("left " + Label(leavingUnit));
             if (WhenLeft != null)
             {

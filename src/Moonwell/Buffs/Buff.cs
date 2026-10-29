@@ -81,7 +81,7 @@ namespace Moonwell
 
             if (Tick > 0.0f)
             {
-                Timer.Every(Tick, () => CallTick(), this);
+                OwnEvery(Tick, () => CallTick());
             }
 
             if (Duration > 0.0f)
@@ -169,7 +169,7 @@ namespace Moonwell
             }
 
             Timer? made = null;
-            made = Timer.After(Duration, () => Expire(made), this);
+            made = OwnAfter(Duration, () => Expire(made));
             expiry = made;
         }
 
@@ -196,8 +196,6 @@ namespace Moonwell
                 return;
             }
 
-            var previous = Owner.current;
-            Owner.current = this;
             try
             {
                 OnApply();
@@ -206,8 +204,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnApply", error);
             }
-
-            Owner.current = previous;
         }
 
         /// <summary>Runs OnTick as a reaction of the buff.</summary>
@@ -218,8 +214,6 @@ namespace Moonwell
                 return;
             }
 
-            var previous = Owner.current;
-            Owner.current = this;
             try
             {
                 OnTick();
@@ -228,8 +222,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnTick", error);
             }
-
-            Owner.current = previous;
         }
 
         /// <summary>Runs OnExpire as a reaction of the buff.</summary>
@@ -240,8 +232,6 @@ namespace Moonwell
                 return;
             }
 
-            var previous = Owner.current;
-            Owner.current = this;
             try
             {
                 OnExpire();
@@ -250,8 +240,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnExpire", error);
             }
-
-            Owner.current = previous;
         }
     }
 }

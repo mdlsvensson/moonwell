@@ -6,9 +6,6 @@ namespace Moonwell.Testing
         /// <summary>The cast the last OnCast was given; null when none.</summary>
         public Cast? Given;
 
-        /// <summary>The owner that was current when the last OnCast ran.</summary>
-        public Owner? Seen;
-
         /// <summary>How many times the timer started by the last cast with no owner given has run.</summary>
         public int Ticks;
 
@@ -20,9 +17,8 @@ namespace Moonwell.Testing
         {
             TestLog.Lines.Add("bolt cast");
             Given = cast;
-            Seen = Owner.Current;
-            Timer.Every(0.5f, () => { Ticks++; });
-            Timer.Every(0.5f, () => { ChannelTicks++; }, cast);
+            Every(0.5f, () => { Ticks++; });
+            cast.Every(0.5f, () => { ChannelTicks++; });
         }
     }
 }

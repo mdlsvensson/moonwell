@@ -93,7 +93,7 @@ public static class Rules
         Category,
         DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        description: "Code the analyzer checks as code of one machine must not also run on every machine, where its machine-local reads desync the game: a delegate parameter given to Local.For (whose callers' lambdas are checked as blocks) called outside it, and [MachineLocal] on an override or an interface implementation (Moonwell calls OnGameStart on every machine) or on a lambda given to a method or event that runs it (Timer.Every). [MachineLocal] on an override of a map method that has it too is right." + Silence);
+        description: "Code the analyzer checks as code of one machine must not also run on every machine, where its machine-local reads desync the game: a delegate parameter given to Local.For (whose callers' lambdas are checked as blocks) called outside it, and [MachineLocal] on an override or an interface implementation (Moonwell calls OnGameStart on every machine) or on a lambda given to a method or event that runs it (a scope's Every). [MachineLocal] on an override of a map method that has it too is right." + Silence);
 
     public static ImmutableArray<DiagnosticDescriptor> All { get; } =
         ImmutableArray.Create(StateInLocal, LocalOutside, HandleId, HashLoop, NumberType, Desyncs, UnseededRandom, Unfollowed, OneMachineCode);
@@ -155,6 +155,18 @@ public static class Rules
 
     /// <summary>The rules for names that moved between Moonwell's namespaces.</summary>
     public static ImmutableArray<DiagnosticDescriptor> Moved { get; } = ImmutableArray.Create(MovedChoice);
+
+    public static readonly DiagnosticDescriptor PlayerScope = new(
+        "MW0043",
+        "A player where a scope goes",
+        "'{0}' is a player, which lasts the whole game, so it is no scope to make things in: write Game.Instance for what should last the game, or pass the player as the owner where the call takes one",
+        "Scopes",
+        DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "What code makes belongs to the scope named where it is made (decision 81). A player is a scope, as every actor is, but it never ends during a game, so Game.Instance does the same, and a player there is most often meant as the owner: Gizmo.Create(gizmo, x, y, scope, owner) and Missile.Create(missile, x, y, z, scope, owner) take the owning player after the scope, and the compiler cannot tell the two apart. The rule checks the scope argument of Moonwell's methods (Create, Fire, Interact) and what a scope's After and Every are called on; a player held in a variable typed Scope is not seen.");
+
+    /// <summary>The rules for the scopes code makes things in.</summary>
+    public static ImmutableArray<DiagnosticDescriptor> Scopes { get; } = ImmutableArray.Create(PlayerScope);
 
     public static readonly DiagnosticDescriptor UnseenReaction = new(
         "MW0036",

@@ -24,9 +24,40 @@ namespace Moonwell.Testing
             AddAuditAreas(list);
             AddInput(list);
             AddLifecycle(list);
+            AddScope(list);
             AddAuditDocs(list);
             AddDebug(list);
             return list;
+        }
+
+        /// <summary>Adds the cases for explicit scopes: what code makes belongs to the scope named where it is made.</summary>
+        private static void AddScope(List<Case> list)
+        {
+            list.Add(new Case { Name = "scope.after-belongs-to-its-scope", Run = ScopeCases.AfterBelongsToItsScope });
+            list.Add(new Case { Name = "scope.every-belongs-to-its-scope", Run = ScopeCases.EveryBelongsToItsScope });
+            list.Add(new Case { Name = "scope.death-after-is-the-units", Run = ScopeCases.DeathAfterIsTheUnits });
+            list.Add(new Case { Name = "scope.impact-after-is-the-missiles", Run = ContactCases.ImpactAfterIsTheMissiles });
+            list.Add(new Case { Name = "scope.struck-after-is-the-units", Run = ContactCases.StruckAfterIsTheUnits });
+            list.Add(new Case { Name = "scope.pair-after-is-the-interactions", Run = PairCases.PairAfterIsTheInteractions });
+            list.Add(new Case { Name = "scope.part-after-runs", Run = PairCases.PartAfterRuns });
+            list.Add(new Case { Name = "scope.helper-uses-its-scope", Run = ScopeCases.HelperUsesItsScope });
+            list.Add(new Case { Name = "scope.create-adopts", Run = ContactCases.CreateAdopts });
+            list.Add(new Case { Name = "scope.missile-has-no-default", Run = ContactCases.MissileHasNoDefault });
+            list.Add(new Case { Name = "scope.interact-ends-with-scope-or-holder", Run = PairCases.InteractEndsWithScopeOrHolder });
+            list.Add(new Case { Name = "scope.made-in-ended-scope-ends", Run = ContactCases.MadeInEndedScopeEnds });
+            list.Add(new Case { Name = "scope.timer-ended-as-made-is-reported", Run = ScopeCases.TimerEndedAsMadeIsReported });
+            list.Add(new Case { Name = "scope.timer-in-ended-scope-is-reported", Run = ScopeCases.TimerInEndedScopeIsReported });
+            list.Add(new Case { Name = "scope.timer-made-while-ending-is-reported", Run = ScopeCases.TimerMadeWhileEndingIsReported });
+            list.Add(new Case { Name = "scope.impact-timer-is-reported", Run = ContactCases.ImpactTimerIsReported });
+            list.Add(new Case { Name = "scope.timer-ended-by-itself", Run = ScopeCases.TimerEndedByItself });
+            list.Add(new Case { Name = "scope.timer-ended-later", Run = ScopeCases.TimerEndedLater });
+            list.Add(new Case { Name = "scope.timer-that-ran", Run = ScopeCases.TimerThatRan });
+            list.Add(new Case { Name = "scope.refused-every-once", Run = ScopeCases.RefusedEveryOnce });
+            list.Add(new Case { Name = "scope.buff-ended-as-applied-is-quiet", Run = BuffCases.EndedAsAppliedIsQuiet });
+            list.Add(new Case { Name = "scope.area-ended-as-added-is-quiet", Run = AreaCases.EndedAsAddedIsQuiet });
+            list.Add(new Case { Name = "scope.expire-timer-is-reported", Run = ScopeCases.ExpireTimerIsReported });
+            list.Add(new Case { Name = "scope.pair-after-in-part-is-reported", Run = PairCases.PairAfterInPartIsReported });
+            list.Add(new Case { Name = "scope.interact-ends-with-holder-then-scope", Run = PairCases.InteractEndsWithHolderThenScope });
         }
 
         /// <summary>Adds the cases for the full audit's doc fixes: OrderedMap and OrderedSet in a foreach, and the guide's forms to write instead.</summary>
@@ -83,6 +114,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "debug.clock.timer-while-halted", Run = ClockCases.TimerWhileHalted });
             list.Add(new Case { Name = "debug.clock.halt-inside-timer", Run = ClockCases.HaltInsideTimer });
             list.Add(new Case { Name = "debug.clock.catchup", Run = ClockCases.Catchup });
+            list.Add(new Case { Name = "debug.clock.halted-timer-ended-later-is-quiet", Run = ClockCases.HaltedTimerEndedLaterIsQuiet });
+            list.Add(new Case { Name = "debug.clock.stepped-timer-ended-later-is-quiet", Run = ClockCases.SteppedTimerEndedLaterIsQuiet });
+            list.Add(new Case { Name = "debug.clock.halted-timer-ended-as-made-is-reported", Run = ClockCases.HaltedTimerEndedAsMadeIsReported });
             list.Add(new Case { Name = "debug.session.off-at-start", Run = SessionCases.OffAtStart });
             list.Add(new Case { Name = "debug.actors.actor-before-added", Run = ActorCases.ActorBeforeAdded });
             list.Add(new Case { Name = "debug.session.toggle", Run = SessionCases.Toggle });
@@ -153,8 +187,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.grid.reset", Run = InteractionsGridCases.Reset });
             list.Add(new Case { Name = "interactions.grid.settings-checked", Run = InteractionsGridCases.SettingsChecked });
             list.Add(new Case { Name = "interactions.gizmo.create", Run = GizmoCases.Create });
-            list.Add(new Case { Name = "interactions.gizmo.reaction-owner", Run = GizmoCases.ReactionOwner });
-            list.Add(new Case { Name = "interactions.gizmo.default-owner", Run = GizmoCases.DefaultOwner });
             list.Add(new Case { Name = "interactions.gizmo.tick", Run = GizmoCases.Tick });
             list.Add(new Case { Name = "interactions.gizmo.tick-rounding", Run = GizmoCases.TickRounding });
             list.Add(new Case { Name = "interactions.gizmo.no-tick", Run = GizmoCases.NoTick });
@@ -167,7 +199,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.gizmo.long-tick", Run = GizmoCases.LongTick });
             list.Add(new Case { Name = "interactions.gizmo.cycle-lists", Run = GizmoCases.CycleLists });
             list.Add(new Case { Name = "interactions.gizmo.throwing-tick", Run = GizmoCases.ThrowingTick });
-            list.Add(new Case { Name = "interactions.gizmo.tick-owner", Run = GizmoCases.TickOwner });
             list.Add(new Case { Name = "interactions.gizmo.throwing-reactions", Run = GizmoCases.ThrowingReactions });
             list.Add(new Case { Name = "interactions.gizmo.shadowed-fields", Run = GizmoCases.ShadowedFields });
             list.Add(new Case { Name = "interactions.gizmo.components", Run = GizmoCases.Components });
@@ -437,7 +468,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "areas.area.end-inside-enter", Run = AreaCases.EndInsideEnter });
             list.Add(new Case { Name = "areas.area.remove-inside-left", Run = AreaCases.RemoveInsideLeft });
             list.Add(new Case { Name = "areas.area.throwing", Run = AreaCases.Throwing });
-            list.Add(new Case { Name = "areas.area.reaction-owner", Run = AreaCases.ReactionOwner });
             list.Add(new Case { Name = "areas.area.cells", Run = AreaCases.Cells });
             list.Add(new Case { Name = "areas.area.no-shape", Run = AreaCases.NoShape });
             list.Add(new Case { Name = "areas.area.region-before-install", Run = AreaCases.RegionBeforeInstall });
@@ -686,7 +716,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "ownership.child-ends-alone", Run = OwnershipCases.ChildEndsAlone });
             list.Add(new Case { Name = "ownership.adopt-while-ending", Run = OwnershipCases.AdoptWhileEnding });
             list.Add(new Case { Name = "ownership.error-does-not-stop", Run = OwnershipCases.ErrorDoesNotStop });
-            list.Add(new Case { Name = "ownership.run-sets-current", Run = OwnershipCases.RunSetsCurrent });
             list.Add(new Case { Name = "ownership.adopt-in-finish", Run = OwnershipCases.AdoptInFinish });
             list.Add(new Case { Name = "timers.after", Run = TimerCases.After });
             list.Add(new Case { Name = "timers.every", Run = TimerCases.Every });
@@ -696,7 +725,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "timers.many-in-due-order", Run = TimerCases.ManyInDueOrder });
             list.Add(new Case { Name = "timers.end-cancels", Run = TimerCases.EndCancels });
             list.Add(new Case { Name = "timers.owned", Run = TimerCases.OwnerAdopts });
-            list.Add(new Case { Name = "timers.current-in-callback", Run = TimerCases.CurrentInCallback });
             list.Add(new Case { Name = "timers.error-isolated", Run = TimerCases.ErrorIsolated });
             list.Add(new Case { Name = "timers.remaining", Run = TimerCases.Remaining });
             list.Add(new Case { Name = "hooks.overrides", Run = HookCases.Overrides });
@@ -715,7 +743,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "actors.remove", Run = ActorCases.RemoveOne });
             list.Add(new Case { Name = "actors.remove-all", Run = ActorCases.RemoveAllOf });
             list.Add(new Case { Name = "actors.remove-of-class", Run = ActorCases.RemoveOf });
-            list.Add(new Case { Name = "actors.current-in-onadded", Run = ActorCases.CurrentInOnAdded });
             list.Add(new Case { Name = "actors.end-removes-last-first", Run = ActorCases.EndRemovesLastFirst });
             list.Add(new Case { Name = "actors.add-to-ended", Run = ActorCases.AddToEnded });
             list.Add(new Case { Name = "actors.component-owns-timer", Run = ActorCases.ComponentOwnsTimer });
@@ -869,7 +896,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "items.sweep", Run = ItemCases.SweepDetectsRemoval });
             list.Add(new Case { Name = "items.owned-create", Run = ItemCases.OwnedByOwner });
             list.Add(new Case { Name = "items.create-of-class", Run = ItemCases.CreateOfClass });
-            list.Add(new Case { Name = "shadowed-fields.owner", Run = ShadowFieldCases.Owner });
+            list.Add(new Case { Name = "shadowed-fields.owner", Run = ShadowFieldCases.Scope });
             list.Add(new Case { Name = "shadowed-fields.hero", Run = ShadowFieldCases.Hero });
             list.Add(new Case { Name = "shadowed-fields.item", Run = ShadowFieldCases.Item });
             list.Add(new Case { Name = "damage.deal-from-code", Run = DamageCases.DealFromCode });

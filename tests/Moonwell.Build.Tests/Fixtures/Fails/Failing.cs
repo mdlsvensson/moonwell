@@ -44,7 +44,7 @@ namespace Fails
     {
         public override void OnGameStart()
         {
-            Timer.After(0f, () =>
+            After(0f, () =>
             {
                 throw new InvalidOperationException("from timer");
             });
@@ -66,7 +66,7 @@ namespace Fails
     {
         public override void OnGameStart()
         {
-            Timer.Every(0f, () => { });
+            Every(0f, () => { });
         }
     }
 }

@@ -338,14 +338,14 @@ namespace Moonwell.Testing
             var unit = Labelled(world, area, "a");
             fake.Walk(unit.Handle, 10f, 10f);
             Expect.True(AreaTracker.Running && !AreaTracker.Stepping, "the check only");
-            var owned = Game.Instance.OwnedCount;
+            var owned = Game.Instance.ChildCount;
             fake.NoPlace.Add(unit.Handle);
             world.Advance(0.25f);
             ExpectLog(area, new[] { "entered a", "left a" }, "the hidden unit left at the check");
             fake.NoPlace.Remove(unit.Handle);
             world.Advance(0.25f);
             ExpectLog(area, new[] { "entered a", "left a", "entered a" }, "and entered when shown");
-            Expect.Equal(owned, Game.Instance.OwnedCount, "one timer all along");
+            Expect.Equal(owned, Game.Instance.ChildCount, "one timer all along");
         }
 
         /// <summary>Many corpses in an area are checked in the order they died, each found again when brought back, and forgotten once out of the region.</summary>
@@ -402,8 +402,8 @@ namespace Moonwell.Testing
             var fired = 0;
             area.WhenLeft = u =>
             {
-                own = Timer.After(1f, () => fired++);
-                Game.Instance.Run(() => kept = Timer.After(1f, () => fired += 10));
+                own = area.After(1f, () => fired++);
+                kept = Game.Instance.After(1f, () => fired += 10);
                 tally = u.Add(new Tally());
             };
             area.End();

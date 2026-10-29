@@ -163,6 +163,16 @@ namespace Moonwell.Testing
             Expect.True(TestLog.Lines.IndexOf("removed") > died, "the buff was removed after it saw the death");
         }
 
+        /// <summary>A buff that ends in the instant it was applied, here by its unit's death, ends its own tick and expiry timers without the never-ran report: no line of the map named their scope.</summary>
+        public static void EndedAsAppliedIsQuiet(FakeWorld world)
+        {
+            var target = Target(world);
+            var buff = target.Apply(new DyingBurn());
+            Inbound.Died(target.Handle, null);
+            Expect.True(buff.HasEnded, "the buff has ended");
+            Expect.Equal(0, ScopeCases.NeverRanReports(world), "the reports: " + string.Join(" | ", world.Logged));
+        }
+
         /// <summary>A buff whose class keeps it through death goes on ticking on the dead unit.</summary>
         public static void KeptThroughDeath(FakeWorld world)
         {

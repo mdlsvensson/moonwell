@@ -16,7 +16,7 @@ namespace PhysicsFixture
 
         public override void OnImpact(Impact impact)
         {
-            foreach (var unit in Find.InRange<Unit>(impact.X, impact.Y, 200f, u => Source!.Player.IsEnemy(u.Player)))
+            foreach (var unit in Find.InRange<Unit>(impact.X, impact.Y, 200f, u => Source!.Owner.IsEnemy(u.Owner)))
             {
                 Source!.Damage(unit, 60f, tag: this);
             }

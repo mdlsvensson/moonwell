@@ -9,10 +9,10 @@ namespace Moonwell.Engine
         where O : Actor
     {
         /// <summary>The interaction's pairs.</summary>
-        private readonly List<Owner> pairs;
+        private readonly List<Scope> pairs;
 
         /// <summary>Makes the view of an interaction's list of pairs.</summary>
-        public PairList(List<Owner> pairs)
+        public PairList(List<Scope> pairs)
         {
             this.pairs = pairs;
         }

@@ -75,7 +75,7 @@ namespace Moonwell.Testing
             dart.Speed = 900.0f;
             Within(900.0f, dart.VX, 0.001f, "a speed on a still missile goes along x");
             Within(0.0f, dart.VY, 0.001f, "no y");
-            Missile.Create(dart, 0.0f, 0.0f, 100.0f);
+            Missile.Create(dart, 0.0f, 0.0f, 100.0f, Game.Instance);
             Within(100.0f, dart.Z, 0.001f, "Create puts it at its height");
             Steps(world, 32);
             Within(900.0f, dart.X, 0.01f, "x after 32 steps");
@@ -101,7 +101,7 @@ namespace Moonwell.Testing
             dart.Gravity = 800.0f;
             dart.VZ = 400.0f;
             dart.VX = 100.0f;
-            Missile.Create(dart, 0.0f, 0.0f, 0.0f);
+            Missile.Create(dart, 0.0f, 0.0f, 0.0f, Game.Instance);
             var peak = -1000.0f;
             var landed = -1;
             for (var step = 1; step <= 40; step++)
@@ -131,7 +131,7 @@ namespace Moonwell.Testing
             dart.Speed = 300.0f;
             dart.Acceleration = 300.0f;
             dart.MaxSpeed = 600.0f;
-            Missile.Create(dart, 0.0f, 0.0f, 100.0f);
+            Missile.Create(dart, 0.0f, 0.0f, 100.0f, Game.Instance);
             Steps(world, 16);
             Within(450.0f, dart.Speed, 0.01f, "the speed after half a second");
             Steps(world, 16);
@@ -150,9 +150,9 @@ namespace Moonwell.Testing
             dart.Speed = 700.0f;
             dart.Arc = 0.35f;
             dart.LaunchHeight = 0.0f;
-            source.Fire(dart, 800.0f, 0.0f);
+            source.Fire(dart, 800.0f, 0.0f, Game.Instance);
             Expect.Same(source, dart.Source, "the source");
-            Expect.Same(source.Player, dart.Player, "the source's player");
+            Expect.Same(source.Owner, dart.Owner, "the source's player");
             Within(0.0f, dart.Z, 0.01f, "it starts on the ground");
             Expect.True(dart.Gravity > 0.0f, "Fire gave it a gravity");
             var peak = -1000.0f;
@@ -189,7 +189,7 @@ namespace Moonwell.Testing
 #if DEBUG
             var still = new Dart();
             still.Arc = 0.35f;
-            Expect.Throws<MoonwellException>(() => source.Fire(still, 800.0f, 0.0f), "an Arc with no Speed fails in a development build");
+            Expect.Throws<MoonwellException>(() => source.Fire(still, 800.0f, 0.0f, Game.Instance), "an Arc with no Speed fails in a development build");
 #endif
         }
 
@@ -202,7 +202,7 @@ namespace Moonwell.Testing
             fake.Sizes[target.Handle] = 8.0f;
             var dart = new Dart();
             dart.Speed = 1000.0f;
-            source.Fire(dart, target);
+            source.Fire(dart, target, Game.Instance);
             Within(60.0f, dart.Z, 0.01f, "it leaves at the launch height");
             Within(1000.0f, dart.Speed, 0.01f, "at its speed");
             Within((12.0f - 60.0f) / 500.0f, dart.VZ / dart.VX, 0.001f, "it aims at 12 up, the middle of a unit 24 tall");
@@ -216,7 +216,7 @@ namespace Moonwell.Testing
             world.SetFlyHeight(flyer.Handle, 100.0f);
             var second = new Dart();
             second.Speed = 1000.0f;
-            source.Fire(second, flyer);
+            source.Fire(second, flyer, Game.Instance);
             var length = MathF.Sqrt(400.0f * 400.0f + (100.0f + 24.0f - 60.0f) * (100.0f + 24.0f - 60.0f));
             Within(1000.0f * (100.0f + 24.0f - 60.0f) / length, second.VZ, 0.05f, "a flyer's middle is its fly height and half its height up");
             Within(1000.0f * 400.0f / length, second.VY, 0.05f, "toward the flyer");
@@ -230,7 +230,7 @@ namespace Moonwell.Testing
             var dart = new Dart();
             dart.Speed = 900.0f;
             dart.LaunchOffset = 50.0f;
-            source.Fire(dart, 1000.0f, 0.0f);
+            source.Fire(dart, 1000.0f, 0.0f, Game.Instance);
             Within(50.0f, dart.X, 0.01f, "it leaves its offset ahead");
             Within(60.0f, dart.Z, 0.01f, "at the launch height");
             Within(0.0f, dart.VZ, 0.001f, "level");
@@ -243,7 +243,7 @@ namespace Moonwell.Testing
             var climber = UnitAt(world, 0.0f, 64.0f, 0.0f);
             var up = new Dart();
             up.Speed = 900.0f;
-            climber.Fire(up, 512.0f, 64.0f);
+            climber.Fire(up, 512.0f, 64.0f, Game.Instance);
             Within(60.0f, up.Z, 0.01f, "it leaves 60 above the foot of the hill");
             Within((260.0f - 60.0f) / 512.0f, up.VZ / up.VX, 0.001f, "it aims 60 above the hilltop");
         }
@@ -257,7 +257,7 @@ namespace Moonwell.Testing
             var dart = new Dart();
             dart.Speed = 512.0f;
             dart.FollowsGround = true;
-            source.Fire(dart, 1000.0f, 64.0f);
+            source.Fire(dart, 1000.0f, 64.0f, Game.Instance);
             var top = 0.0f;
             for (var step = 1; step <= 60; step++)
             {
@@ -273,7 +273,7 @@ namespace Moonwell.Testing
             Within(260.0f, top, 0.01f, "it went over the hilltop at 200");
         }
 
-        /// <summary>With Duration 1 it expires after 32 steps: OnExpire once, with the missile as the current owner and its effect drawn at its last place, then it ends.</summary>
+        /// <summary>With Duration 1 it expires after 32 steps: OnExpire once, with its effect drawn at its last place, then it ends.</summary>
         public static void Duration(FakeWorld world)
         {
             var fake = Fresh();
@@ -288,7 +288,7 @@ namespace Moonwell.Testing
                 endedInExpire = dart.HasEnded;
                 drawnX = fake.Places[dart.Effect!][0];
             };
-            Missile.Create(dart, 0.0f, 0.0f, 100.0f);
+            Missile.Create(dart, 0.0f, 0.0f, 100.0f, Game.Instance);
             Steps(world, 31);
             Expect.Equal(0, dart.Expired, "no expiry before a second");
             Expect.True(!dart.HasEnded, "flying before a second");
@@ -297,7 +297,6 @@ namespace Moonwell.Testing
             Expect.True(!endedInExpire, "it has not ended inside OnExpire");
             Within(100.0f, dart.X, 0.01f, "it moved this step before it expired");
             Within(dart.X, drawnX, 0.001f, "inside OnExpire its effect is drawn where it is");
-            Expect.Same(dart, dart.ExpiredWith, "OnExpire runs with the missile");
             Expect.True(dart.HasEnded, "then it ends");
             Steps(world, 4);
             Expect.Equal(1, dart.Expired, "OnExpire once");
@@ -310,7 +309,7 @@ namespace Moonwell.Testing
             var dart = new Dart();
             dart.Speed = 900.0f;
             dart.MaxDistance = 450.0f;
-            Missile.Create(dart, 0.0f, 0.0f, 100.0f);
+            Missile.Create(dart, 0.0f, 0.0f, 100.0f, Game.Instance);
             Steps(world, 15);
             Expect.Equal(0, dart.Expired, "no expiry before 450");
             Expect.True(!dart.HasEnded, "flying before 450");
@@ -330,16 +329,16 @@ namespace Moonwell.Testing
             var east = new Dart();
             east.Model = "dart.mdl";
             east.Speed = 900.0f;
-            Missile.Create(east, 900.0f, 0.0f, 100.0f);
+            Missile.Create(east, 900.0f, 0.0f, 100.0f, Game.Instance);
             var up = new Dart();
             up.VZ = 640.0f;
-            Missile.Create(up, 0.0f, 0.0f, 2990.0f);
+            Missile.Create(up, 0.0f, 0.0f, 2990.0f, Game.Instance);
             var down = new Dart();
             down.VZ = -640.0f;
-            Missile.Create(down, 0.0f, 0.0f, -1990.0f);
+            Missile.Create(down, 0.0f, 0.0f, -1990.0f, Game.Instance);
             var inside = new Dart();
             inside.VY = 100.0f;
-            Missile.Create(inside, 0.0f, 0.0f, 100.0f);
+            Missile.Create(inside, 0.0f, 0.0f, 100.0f, Game.Instance);
             Steps(world, 1);
             Expect.True(up.HasEnded, "above 3,000 it ends");
             Expect.True(down.HasEnded, "below -2,000 it ends");
@@ -360,32 +359,28 @@ namespace Moonwell.Testing
             Fresh();
             var source = UnitAt(world, 0.0f, 0.0f, 0.0f);
             var volley = source.Apply(new Volley());
-            Expect.Same(volley, volley.Seen, "the buff was the current owner when it fired");
             var dart = volley.Fired!;
-            Expect.Same(Game.Instance, dart.Owner, "fired with no owner, it belongs to the game");
+            Expect.Same(Game.Instance, dart.Parent, "fired with no owner, it belongs to the game");
             volley.End();
             Expect.True(!dart.HasEnded, "the buff ending does not end it");
             Steps(world, 2);
             Expect.True(dart.X > 0.0f, "it flies on");
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var other = UnitAt(world, 0.0f, 200.0f, 0.0f);
             var given = new Volley();
             given.Given = owner;
             other.Apply(given);
             var owned = given.Fired!;
-            Expect.Same(owner, owned.Owner, "fired with an owner, it belongs to it");
+            Expect.Same(owner, owned.Parent, "fired with an owner, it belongs to it");
             var placed = new Dart();
             var placedOwned = new Dart();
-            owner.Run(() =>
-            {
-                Missile.Create(placed, 0.0f, 0.0f, 100.0f);
-                Missile.Create(placedOwned, 0.0f, 0.0f, 100.0f, Player.Two, owner);
-            });
-            Expect.Same(Game.Instance, placed.Owner, "Create with no owner, inside an owner's Run, belongs to the game");
-            Expect.Same(Player.NeutralPassive, placed.Player, "Neutral Passive unless given a player");
-            Expect.Same(owner, placedOwned.Owner, "Create with an owner belongs to it");
-            Expect.Same(Player.Two, placedOwned.Player, "the player given");
+            Missile.Create(placed, 0.0f, 0.0f, 100.0f, Game.Instance);
+            Missile.Create(placedOwned, 0.0f, 0.0f, 100.0f, owner, Player.Two);
+            Expect.Same(Game.Instance, placed.Parent, "Create in the game's scope belongs to the game");
+            Expect.Same(Player.NeutralPassive, placed.Owner, "Neutral Passive unless given a player");
+            Expect.Same(owner, placedOwned.Parent, "Create in a scope belongs to it");
+            Expect.Same(Player.Two, placedOwned.Owner, "the player given");
             owner.End();
             Expect.True(owned.HasEnded, "it ends with its owner");
             Expect.True(placedOwned.HasEnded, "the placed one too");
@@ -400,7 +395,7 @@ namespace Moonwell.Testing
             dart.Model = "dart.mdl";
             dart.VX = 100.0f;
             dart.VY = 100.0f;
-            Missile.Create(dart, 0.0f, 0.0f, 1000.0f);
+            Missile.Create(dart, 0.0f, 0.0f, 1000.0f, Game.Instance);
             Steps(world, 1);
             var last = fake.Orientations.Count - 3;
             Within(Pi / 4.0f, fake.Orientations[last], 0.001f, "yaw north-east");
@@ -433,7 +428,7 @@ namespace Moonwell.Testing
             var source = UnitAt(world, 100.0f, 100.0f, 90.0f);
             var dart = new Dart();
             dart.Speed = 500.0f;
-            source.Fire(dart, 100.0f, 100.0f);
+            source.Fire(dart, 100.0f, 100.0f, Game.Instance);
             Number(dart.VX, "VX");
             Number(dart.VY, "VY");
             Number(dart.VZ, "VZ");
@@ -447,19 +442,19 @@ namespace Moonwell.Testing
             var target = UnitAt(world, 100.0f, 100.0f, 0.0f);
             var atUnit = new Dart();
             atUnit.Speed = 500.0f;
-            source.Fire(atUnit, target);
+            source.Fire(atUnit, target, Game.Instance);
             Within(500.0f, atUnit.VY, 0.01f, "at a unit on the spot: along the facing");
             Number(atUnit.VZ, "at a unit on the spot: VZ");
             var arced = new Dart();
             arced.Speed = 500.0f;
             arced.Arc = 0.35f;
-            source.Fire(arced, 100.0f, 100.0f);
+            source.Fire(arced, 100.0f, 100.0f, Game.Instance);
             Number(arced.VZ, "with an arc: VZ");
             Number(arced.Gravity, "with an arc: Gravity");
             Within(500.0f, arced.VY, 0.01f, "with an arc: along the facing");
             var high = new Dart();
             high.Speed = 500.0f;
-            source.Fire(high, 100.0f, 100.0f, 300.0f);
+            source.Fire(high, 100.0f, 100.0f, 300.0f, Game.Instance);
             Number(high.VZ, "at a height on the spot: VZ");
             Within(500.0f, high.VY, 0.01f, "at a height on the spot: along the facing");
             Steps(world, 2);
@@ -479,7 +474,7 @@ namespace Moonwell.Testing
             dart.VX = 320.0f;
             Expect.True(dart.Effect == null, "no effect before Create");
             Expect.Equal(0, fake.Effects.Count, "none made before Create");
-            Missile.Create(dart, 0.0f, 0.0f, 100.0f);
+            Missile.Create(dart, 0.0f, 0.0f, 100.0f, Game.Instance);
             Expect.Equal(2, fake.Effects.Count, "the model and the added effect");
             var main = dart.Effect!;
             var extra = fake.Effects[0] == main ? fake.Effects[1] : fake.Effects[0];
@@ -521,7 +516,7 @@ namespace Moonwell.Testing
             Expect.Equal(0, fake.Effects.Count, "all destroyed at the end");
             Expect.True(dart.Effect == null, "no effect after the end");
             var plain = new Dart();
-            Missile.Create(plain, 0.0f, 0.0f, 0.0f);
+            Missile.Create(plain, 0.0f, 0.0f, 0.0f, Game.Instance);
             Expect.True(plain.Effect == null, "no model, no effect");
             Expect.Equal(0, fake.Effects.Count, "none made");
         }
@@ -536,7 +531,7 @@ namespace Moonwell.Testing
             dart.AddEffect("glow.mdl", 10.0f);
             dart.Speed = 600.0f;
             dart.LaunchOffset = 50.0f;
-            source.Fire(dart, 1000.0f, 200.0f);
+            source.Fire(dart, 1000.0f, 200.0f, Game.Instance);
             Expect.Equal(2, fake.Effects.Count, "the model and the added effect");
             for (var i = 0; i < fake.Effects.Count; i++)
             {
@@ -547,23 +542,21 @@ namespace Moonwell.Testing
 
             var placed = new Dart();
             placed.Model = "placed.mdl";
-            Missile.Create(placed, 700.0f, 900.0f, 50.0f);
+            Missile.Create(placed, 700.0f, 900.0f, 50.0f, Game.Instance);
             var look = placed.Effect!;
             Within(700.0f, fake.MadeAt[look][0], 0.001f, "one placed with Create is made where it is placed: x");
             Within(900.0f, fake.MadeAt[look][1], 0.001f, "y");
         }
 
-        /// <summary>A missile placed through Gizmo.Create, or Missile.Create with no height, is a missile all the same: it belongs to the game, starts at its LaunchHeight above the ground, has its effect, and moves.</summary>
+        /// <summary>A missile placed through Gizmo.Create, or Missile.Create with no height, is a missile all the same: it belongs to the scope given, starts at its LaunchHeight above the ground, has its effect, and moves.</summary>
         public static void GizmoCreate(FakeWorld world)
         {
             var fake = Fresh();
-            var log = new List<string>();
-            var owner = new TestOwner("owner", log);
             var dart = new Dart();
             dart.Model = "dart.mdl";
             dart.Speed = 320.0f;
-            owner.Run(() => Gizmo.Create(dart, 0.0f, 0.0f));
-            Expect.Same(Game.Instance, dart.Owner, "it belongs to the game, not the current owner");
+            Gizmo.Create(dart, 0.0f, 0.0f, Game.Instance);
+            Expect.Same(Game.Instance, dart.Parent, "it belongs to the scope given");
             Within(60.0f, dart.Z, 0.001f, "its LaunchHeight above the ground");
             Expect.True(dart.Effect != null, "it has its effect");
             Within(60.0f, fake.Places[dart.Effect!][2], 0.001f, "drawn at its height");
@@ -573,13 +566,11 @@ namespace Moonwell.Testing
             var low = new Dart();
             low.Speed = 320.0f;
             low.LaunchHeight = 20.0f;
-            Missile.Create(low, 5.0f, 5.0f);
-            Expect.Same(Game.Instance, low.Owner, "with no height: the game's");
+            Missile.Create(low, 5.0f, 5.0f, Game.Instance);
+            Expect.Same(Game.Instance, low.Parent, "with no height: the game's");
             Within(20.0f, low.Z, 0.001f, "with no height: its LaunchHeight above the ground");
             Steps(world, 1);
             Within(15.0f, low.X, 0.001f, "with no height: it moves");
-            owner.End();
-            Expect.True(!dart.HasEnded, "the owner ending does not end it");
         }
 
         /// <summary>Missile A's OnExpire ends missile B, made after it and expiring in the same step: B gets no OnExpire and no move after, and its effect is destroyed once.</summary>
@@ -594,8 +585,8 @@ namespace Moonwell.Testing
             second.VY = 100.0f;
             second.Duration = 1.0f;
             first.Expiring = () => second.End();
-            Missile.Create(first, 0.0f, 0.0f, 100.0f);
-            Missile.Create(second, 0.0f, 0.0f, 100.0f);
+            Missile.Create(first, 0.0f, 0.0f, 100.0f, Game.Instance);
+            Missile.Create(second, 0.0f, 0.0f, 100.0f, Game.Instance);
             var look = second.Effect!;
             Steps(world, 31);
             var lastY = second.Y;

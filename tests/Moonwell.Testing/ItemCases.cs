@@ -81,9 +81,9 @@ namespace Moonwell.Testing
         public static void OwnedByOwner(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var made = Item.Create(ObjectTypes.FourCC("ofoo"), 0f, 0f, owner);
-            Expect.Same(owner, made.Owner, "the owner of the item");
+            Expect.Same(owner, made.Parent, "the owner of the item");
             owner.End();
             Expect.Equal(1, world.RemovedItems.Count, "the items the game was asked to remove");
             Expect.Same(made.Handle, world.RemovedItems[0], "the handle removed");
@@ -93,7 +93,7 @@ namespace Moonwell.Testing
         public static void CreateOfClass(FakeWorld world)
         {
             ObjectTypes.Item(ObjectTypes.FourCC("I002"), () => new TestOrb());
-            var orb = Item.Create<TestOrb>(5.0f, 6.0f);
+            var orb = Item.Create<TestOrb>(5.0f, 6.0f, Game.Instance);
             Expect.True(orb.Has<OrbGlow>(), "the orb has its starting component");
             Expect.Near(5.0f, orb.X, "the orb's x");
             Expect.Near(6.0f, orb.Y, "the orb's y");
@@ -202,11 +202,11 @@ namespace Moonwell.Testing
         {
             var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
             var item = Item.Of(handle)!;
-            Expect.Equal(0, item.Player.Slot, "the player before");
+            Expect.Equal(0, item.Owner.Slot, "the player before");
 
-            item.Player = Player.Get(3);
+            item.Owner = Player.Get(3);
 
-            Expect.Equal(3, item.Player.Slot, "the new player");
+            Expect.Equal(3, item.Owner.Slot, "the new player");
             Expect.Equal(3, world.SlotOf(world.ItemOwnerOf(handle)), "the game's player");
             Expect.Equal("owner 3 False", world.ItemCalls[0], "the call keeps the colour");
         }
@@ -214,7 +214,7 @@ namespace Moonwell.Testing
         /// <summary>An item is created at its place; X and Y read it, and MoveTo moves it.</summary>
         public static void Position(FakeWorld world)
         {
-            var item = Item.Create(ObjectTypes.FourCC("ofoo"), 100.5f, -50.0f);
+            var item = Item.Create(ObjectTypes.FourCC("ofoo"), 100.5f, -50.0f, Game.Instance);
             Expect.Near(100.5f, item.X, "x at creation");
             Expect.Near(-50.0f, item.Y, "y at creation");
 
@@ -380,7 +380,7 @@ namespace Moonwell.Testing
             ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new CarrierWatch());
             var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             unit.PlaceAt(70.0f, 80.0f);
-            var watch = (CarrierWatch)Item.Create(ObjectTypes.FourCC("I001"), 5.0f, 6.0f);
+            var watch = (CarrierWatch)Item.Create(ObjectTypes.FourCC("I001"), 5.0f, 6.0f, Game.Instance);
             unit.Give(watch);
 
             unit.Kill();
@@ -397,7 +397,7 @@ namespace Moonwell.Testing
         {
             var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             unit.PlaceAt(100.0f, 200.0f);
-            var item = Item.Create(ObjectTypes.FourCC("ofoo"), 5.0f, 6.0f);
+            var item = Item.Create(ObjectTypes.FourCC("ofoo"), 5.0f, 6.0f, Game.Instance);
 
             unit.Give(item);
             unit.PlaceAt(300.0f, 400.0f);
@@ -443,7 +443,7 @@ namespace Moonwell.Testing
             world.SetInventorySize(handle, 1);
             var unit = Unit.Of(handle)!;
             Expect.True(unit.Give(Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!), "the first item fits");
-            var watch = (CarrierWatch)Item.Create(ObjectTypes.FourCC("I001"), 9.0f, 8.0f);
+            var watch = (CarrierWatch)Item.Create(ObjectTypes.FourCC("I001"), 9.0f, 8.0f, Game.Instance);
             world.InventoryCalls.Clear();
 
             Expect.True(!unit.Give(watch), "the full inventory answers false");
@@ -503,12 +503,12 @@ namespace Moonwell.Testing
             world.VanishItem(handle);
             world.Advance(0.3f);
             Expect.True(swept.IsGone, "the sweep found the item gone");
-            Expect.Equal(3, swept.Player.Slot, "the player it had when taken in");
+            Expect.Equal(3, swept.Owner.Slot, "the player it had when taken in");
 
             var ownerless = world.NewItem(ObjectTypes.FourCC("ofoo"));
             world.LoseItemOwner(ownerless);
             var neutral = Item.Of(ownerless)!;
-            Expect.Equal(world.NeutralPassiveSlot(), neutral.Player.Slot, "no owner given: the neutral passive player");
+            Expect.Equal(world.NeutralPassiveSlot(), neutral.Owner.Slot, "no owner given: the neutral passive player");
         }
 
         /// <summary>A removed item gives the last charges, player and place read or set, has no carrier, changes nothing and asks the game nothing.</summary>
@@ -517,12 +517,12 @@ namespace Moonwell.Testing
             var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
             var swept = Item.Of(handle)!;
             swept.Charges = 4;
-            swept.Player = Player.Get(2);
+            swept.Owner = Player.Get(2);
             swept.MoveTo(10.0f, 20.0f);
             Expect.Equal(4, swept.Charges, "read: charges");
             Expect.Near(10.0f, swept.X, "read: x");
             Expect.Near(20.0f, swept.Y, "read: y");
-            Expect.Equal(2, swept.Player.Slot, "read: player");
+            Expect.Equal(2, swept.Owner.Slot, "read: player");
             var carrier = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             carrier.Give(swept);
             Expect.True(swept.IsCarried, "carried before the removal");
@@ -533,14 +533,14 @@ namespace Moonwell.Testing
             Expect.True(swept.IsGone, "the sweep found the item gone");
             world.GoneCalls = 0;
             Expect.Equal(4, swept.Charges, "swept: charges");
-            Expect.Equal(2, swept.Player.Slot, "swept: player");
+            Expect.Equal(2, swept.Owner.Slot, "swept: player");
             Expect.Near(10.0f, swept.X, "swept: x");
             Expect.Near(20.0f, swept.Y, "swept: y");
             Expect.True(swept.Carrier == null, "swept: no carrier");
             Expect.True(!swept.IsCarried, "swept: not carried");
             ExpectNoCalls(world, swept, calls, "swept");
 
-            var removed = Item.Create(ObjectTypes.FourCC("ofoo"), 5.0f, 6.0f);
+            var removed = Item.Create(ObjectTypes.FourCC("ofoo"), 5.0f, 6.0f, Game.Instance);
             removed.Charges = 7;
             Expect.Equal(7, removed.Charges, "removed: charges read");
             Expect.Near(5.0f, removed.X, "removed: x read");
@@ -556,11 +556,11 @@ namespace Moonwell.Testing
             // Values set and never read: the setters keep them, so they are what a gone item gives.
             var unread = Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!;
             unread.Charges = 9;
-            unread.Player = Player.Get(4);
+            unread.Owner = Player.Get(4);
             unread.MoveTo(1.5f, 2.5f);
             unread.Remove();
             Expect.Equal(9, unread.Charges, "unread: charges");
-            Expect.Equal(4, unread.Player.Slot, "unread: player");
+            Expect.Equal(4, unread.Owner.Slot, "unread: player");
             Expect.Near(1.5f, unread.X, "unread: x");
             Expect.Near(2.5f, unread.Y, "unread: y");
         }
@@ -569,7 +569,7 @@ namespace Moonwell.Testing
         private static void ExpectNoCalls(FakeWorld world, Item item, int calls, string what)
         {
             item.Charges = 99;
-            item.Player = Player.Get(5);
+            item.Owner = Player.Get(5);
             item.MoveTo(500.0f, 600.0f);
             Expect.Equal(calls, world.ItemCalls.Count, what + ": calls that changed the item");
             Expect.Equal(0, world.GoneCalls, what + ": calls to the game for the gone item");

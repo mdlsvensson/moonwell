@@ -143,8 +143,8 @@ public sealed class Champion : Human.Units.Paladin
   characters, none of them a comma (the game splits a list field that names the object at a comma), and only a hero's
   starts with an upper-case letter (MW0014).
 - `[Replaces]` makes the class the game's object itself: every unit of that type is made as the class.
-- `Unit.Create<Champion>(player, x, y)` makes one in the game, facing 270 degrees unless a facing follows;
-  `Item.Create<EmberBlade>(x, y)` makes an item.
+- `Unit.Create<Champion>(player, x, y, scope)` makes one in the game, in the scope named (scopes, below), facing 270
+  degrees unless a facing follows; `Item.Create<EmberBlade>(x, y, scope)` makes an item.
 
 Each value a class sets is checked against World Editor's limits. One outside them fails the build with its line, and
 a constant is marked in the editor as error MW0009:
@@ -199,7 +199,7 @@ public sealed class KillCounter : UnitComponent
     public override void OnKill(Unit killedUnit)
     {
         kills++;
-        Unit.Player.Print("Kills: " + kills);
+        Unit.Owner.Print("Kills: " + kills);
     }
 }
 ```
@@ -224,18 +224,45 @@ public sealed class KillCounter : UnitComponent
   `OnApply`, `OnTick` and `OnExpire` are its reactions, and `unit.Apply(new Burn())` puts it on a unit. A second
   apply of its class refreshes the one there, unless its `Stacking` says otherwise: that one lasts the new apply's
   `Duration` from then on, and keeps its other values and what it has counted.
-- `Timer.After(seconds, action)` and `Timer.Every(seconds, action)` run code later. A timer belongs to whatever made
-  it, and ends with it. A component or buff belongs to the actor it is added to, whoever added it: it ends when it is
-  removed or that actor ends, so an aura that buffs others removes its buff in `OnPart` (Interactions, below).
-- `Timer.After(0, action)` inside a timer runs in the same instant, as the game's own 0 s timer does. More than 10000
-  timer runs in one instant (a timer that keeps starting itself, say) are reported, and the rest wait 1/32 s.
-  `Timer.Every` needs seconds above 0: 0 or less is reported, and that timer never runs.
-- What an ability's `OnCast` makes belongs to the ability, which lasts as long as the caster is in the game, so a
-  delayed effect runs after the spell has ended; work that should stop with a channel names the cast:
-  `Timer.Every(0.5f, Pulse, owner: cast)`. What a unit's own `OnDeath` makes belongs to the game, as death is not an
-  end and the corpse can go at any time, so a respawn timer runs; an effect that should end with the corpse names the
-  unit: `owner: this`. What a component's `OnDeath` makes belongs to the component, which ends when the corpse goes.
+- A component or buff belongs to the actor it is added to, whoever added it: it ends when it is removed or that actor
+  ends, so an aura that buffs others removes its buff in `OnPart` (Interactions, below).
 - Game work starts in a reaction. Top-level code and static fields make nothing in the game.
+
+**Scopes.** What code makes belongs to the scope named where it is made, and ends when that scope ends: the game, a
+unit, item or destructable, a component, a buff, an ability, a cast, an area, an interaction or its pair, or a gizmo.
+Timers are made on their scope: inside a class, `After(2f, Puff)` and `Every(1f, Pulse)` are the class's own;
+elsewhere the line names it, as `cast.Every(0.5f, Pulse)` or `Game.Instance.After(30f, Respawn)`. `Create`, `Fire`,
+`Wall.Create` and `Interact` take the scope as an argument. Nothing has a default, so a static helper is given one. A
+player is a scope too, but it lasts the whole game, and one where a scope goes is most often meant as the owner
+(`Gizmo.Create(gizmo, x, y, scope, owner)`), so it is error MW0043: write `Game.Instance`, or pass it as the owner.
+
+```csharp
+public sealed class Respawns : UnitComponent
+{
+    public override void OnDeath(Unit? killerUnit)
+    {
+        Game.Instance.After(30f, Respawn); // the game's: runs even if the corpse goes first
+        After(2f, Puff);                   // the component's: ends when the corpse goes
+    }
+}
+
+static void Smoke(Scope scope, Unit unit) // a helper is told whose
+{
+    scope.Every(1f, () => Puff(unit));
+}
+```
+
+- An ability's scope lasts as long as the caster is in the game, so what its `OnCast` makes there runs after the spell
+  has ended; work that should stop with a channel is made on the cast: `cast.Every(0.5f, Pulse)`.
+- Death is not an end: a unit and its components last until the corpse goes, which can be at once (exploded or raised),
+  so a respawn timer is made on the game.
+- `After(0, action)` inside a timer runs in the same instant, as the game's own 0 s timer does. More than 10000 timer
+  runs in one instant (a timer that keeps starting itself, say) are reported, and the rest wait 1/32 s. `Every` needs
+  seconds above 0: 0 or less is reported, and that timer never runs.
+- A development build reports a timer its scope ended in the instant it was made, before it ran: its line named a scope
+  on its way out, as `After` in a missile's `OnImpact` does when a `Stop` ends the missile. Two game events in one frame
+  can trip it when the line was right: a buff whose `OnApply` makes a timer, applied by a hit that kills, or a channel
+  stopped in the frame it began. A halt or a step of the debug mode in between does not.
 
 ## Units, heroes and items
 
@@ -247,7 +274,7 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 | Unit | |
 |---|---|
 | `Life`, `MaxLife`, `Mana`, `MaxMana` | read and set; a `Life` of 0.405 or less kills, above the most it clamps; the most are whole numbers |
-| `Player` | read and set; setting gives the unit the new owner's colour |
+| `Owner` | read and set; the player the unit belongs to; setting gives the unit the new owner's colour |
 | `X`, `Y` | read; `MoveTo(x, y)` through the game's pathing, `PlaceAt(x, y)` with none, not even the map's edge |
 | `Facing` | read and set (the unit turns, so a read at once gives the old one); `FaceNow(degrees)` turns at once, a walking unit turns back |
 | `Level` | read; a hero's hero level; a unit's level is set only in its declared class's constructor |
@@ -270,7 +297,7 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 
 | Item | |
 |---|---|
-| `Charges`, `Player` | read and set; 0 charges leaves the item in place; `Player` is the owner, which picking up or dropping does not change |
+| `Charges`, `Owner` | read and set; 0 charges leaves the item in place; `Owner` is the player the item belongs to, which picking up or dropping does not change |
 | `X`, `Y` | read; `MoveTo(x, y)` goes to a pathable spot; while a unit carries the item they are where it was picked up, so read the carrier's place |
 | `Carrier`, `IsCarried` | the unit that picked it up, while it still holds it: null for an item in a bag or equipped (the 3.0 inventory), and in `OnDropped` it is still the unit, except for a drop after `RemoveUnit` (below), where it is already null |
 
@@ -278,7 +305,7 @@ before Moonwell notices a removal, a read that gives 0 on a removed unit keeps t
 Moonwell listens for pick-ups and drops from the start, so an item a unit picks up is taken in; one a unit held before
 the map began has no `Carrier`. A unit that is not a hero drops its items when it dies, with no drop reactions; a hero
 keeps them. When a unit is removed from the game (`RemoveUnit`), its items leave it inside the call, but the game fires
-the drops after it. For a unit Moonwell removed (`Remove()`, or its owner ending) no drop reaction runs; for one a
+the drops after it. For a unit Moonwell removed (`Remove()`, or its scope ending) no drop reaction runs; for one a
 native removed, the drop reactions run for an object about to be swept, with `Carrier` already null. The items of a
 removed hero are removed with it, as seen; other units are assumed to do the same. A member's exact behaviour is in
 its comment.
@@ -421,7 +448,7 @@ comes near them, gizmos, and finding. A map that does not reference it carries n
 public sealed class FireAura : Interaction<Unit, Unit> // held by a unit, pairs with units
 {
     public FireAura() { Range = 300f; Tick = 0.5f; }
-    public override bool Accepts(Unit other) => Holder.Player.IsEnemy(other.Player);
+    public override bool Accepts(Unit other) => Holder.Owner.IsEnemy(other.Owner);
     public override void OnTick(Pair pair) { Holder.Damage(pair.Other, 10f); }
 }
 
@@ -432,16 +459,17 @@ public sealed class FrostAura : Interaction<Unit, Unit>
     public override void OnPart(Pair pair) { pair.Other.Remove<Chilled>(); } // the buff is the unit's, not the pair's
 }
 
-unit.Interact(new FireAura()); // made inside a buff, it ends with the buff
-var well = Gizmo.Create(new Well(), x, y, caster.Player); // a gizmo is a map's own object with a place
+unit.Interact(new FireAura(), this); // in a buff's scope: it ends with the buff, or with the unit
+var well = Gizmo.Create(new Well(), x, y, this, caster.Owner); // a gizmo is a map's own object with a place
 var near = Find.InRange<Unit>(x, y, 500f);                // a new list; or Find.InRange(x, y, 500f, list)
 ```
 
 - `Range` is centre to centre and flat. A pair is found at the next tick after they come within range, so a 1 s tick
   may start up to 1 s late (interactions started together take turns over its steps). Only a unit in the game (alive,
   not hidden, not loaded), a visible item on the ground, a live destructable and a gizmo have a place; `OnPart` runs
-  once, when a pair ends. A timer a pair's reactions make is the pair's and ends when it parts; a buff or component
-  they add is the unit's, so `OnPart` removes it, as `FrostAura` does.
+  once, when a pair ends. A timer made on the pair (`pair.After`) ends when it parts, one made with plain `After`
+  is the interaction's; a buff or component the reactions add is the unit's, so `OnPart` removes it, as `FrostAura`
+  does.
 - `Accepts` is asked before a meeting and again before each tick: a no parts the pair (`OnPart`), and the two meet
   again once it says yes, so `FireAura` stops burning a unit that changes sides (Charm, a new owner). Set
   `RecheckAccepts = false` in the constructor to ask only before a meeting, a call less per pair at each tick.
@@ -480,10 +508,10 @@ public sealed class Firebolt : Missile // a bolt that flies straight and burns t
         DamageKind = DamageKind.Fire;
     }
 
-    public override bool CanHit(Actor other) => other is Unit unit && Source!.Player.IsEnemy(unit.Player);
+    public override bool CanHit(Actor other) => other is Unit unit && Source!.Owner.IsEnemy(unit.Owner);
 }
 
-caster.Fire(new Firebolt(), target); // or Fire(missile, x, y), or Fire(missile, x, y, z)
+caster.Fire(new Firebolt(), target, this); // in this scope; or Fire(missile, x, y, scope), Fire(missile, x, y, z, scope)
 
 public sealed class Shell : Missile // a mortar shell that arcs to a point and blasts what is near where it lands
 {
@@ -498,7 +526,7 @@ public sealed class Shell : Missile // a mortar shell that arcs to a point and b
 
     public override void OnImpact(Impact impact)
     {
-        foreach (var unit in Find.InRange<Unit>(impact.X, impact.Y, 200f, u => Source!.Player.IsEnemy(u.Player)))
+        foreach (var unit in Find.InRange<Unit>(impact.X, impact.Y, 200f, u => Source!.Owner.IsEnemy(u.Owner)))
         {
             Source!.Damage(unit, 60f, tag: this);
         }
@@ -514,7 +542,7 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
 - `Fire` starts it `LaunchHeight` (60) above the unit, with the unit as `Source`. With `Arc` it sets its own `Gravity`
   and lands on the mark: the peak is above the line from launch to mark, an arc at a point lands with its bottom on the
   ground there, and an arc at a unit lands on its middle.
-  `Missile.Create(missile, x, y, z, player, owner)` places one at rest; one made touching the ground with
+  `Missile.Create(missile, x, y, z, scope, owner)` places one at rest; one made touching the ground with
   `GroundContact = Stop` ends at once.
 - `ImpactDamage` and the rest go through `source.Damage` with the missile as `Tag`. A missile with damage and no
   `Source` deals none. `Homing { TurnRate }` is given its target by `Fire(missile, unit)`.
@@ -530,8 +558,8 @@ target.Knockback(caster.AngleTo(target), 300f, 0.5f); // 300 away over half a se
   `Physics.Gravity` whatever their own `Gravity`, cannot move them against it, or where walls take that pull (a corner
   on a hill: one resting against a wall wakes when the wall ends or moves away from it); with `Friction = 0` they never
   slow.
-- **Ownership**: a missile belongs to the game unless `Fire` or `Create` is given an `owner`, so one fired in a spell
-  outlives the cast. `OnImpact` runs with the missile's owner.
+- **Scope**: a missile is in the scope `Fire` or `Create` names. A `Stop` ends it right after `OnImpact`, so what should
+  outlast it is made on another scope, such as the ability's or `Game.Instance`.
 - **Knockback** keeps the unit's order. It stops at trees, buildings, cliffs, walls (`Wall.Create`) and a bridge's
   rail, which keeps its body on the deck (a unit wider than the deck rides with it over both sides). A stopped push
   stops short of the edge, by up to a step's move and the unit's collision size (about 37 and its collision size at
@@ -573,9 +601,9 @@ public sealed class ShopFloor : Area // a game component: Components.Add(new Sho
 {
     public ShopFloor() { Shape = AreaShape.Region("Shop"); Tick = 1f; } // the region's name in World Editor
     public override bool Accepts(Unit unit) => unit is Hero;
-    public override void OnUnitEntered(Unit enteringUnit) { enteringUnit.Player.Print("Welcome."); }
+    public override void OnUnitEntered(Unit enteringUnit) { enteringUnit.Owner.Print("Welcome."); }
     public override void OnUnitStays(Unit stayingUnit) { stayingUnit.Life += 20f; }
-    public override void OnUnitLeft(Unit leavingUnit) { leavingUnit.Player.Print("Come again."); }
+    public override void OnUnitLeft(Unit leavingUnit) { leavingUnit.Owner.Print("Come again."); }
 }
 ```
 
@@ -592,9 +620,9 @@ public sealed class ShopFloor : Area // a game component: Components.Add(new Sho
   centre is inside, and always the cell its own centre is in (a polygon's centroid). So a small circle (a landmine) or a
   band thinner than a cell is never left without cells, but it may be only that one. `Contains` is the true shape, so
   the two can disagree within a cell of an edge.
-- What a reaction makes that has an owner (a timer) is the area's and ends with it, so one made in `OnUnitLeft` while
-  the area ends is ended at once; a buff or component added to a unit is the unit's. Make it inside
-  `Game.Instance.Run(...)` to outlive the area.
+- A timer an area's reaction makes with `After` is the area's and ends with it, so one made in `OnUnitLeft` while the
+  area ends is ended at once; a buff or component added to a unit is the unit's. Make it on `Game.Instance` to outlive
+  the area.
 - Costs: a unit inside, hidden, dead or refused keeps a check running every 0.25 s; the 1/32 s step for `OnUnitStays`
   runs only while an area with a `Tick` has a unit inside. Adding an area lists every unit of every player once to find
   those already inside, so on a map of thousands of units an area made at each cast pays that at each cast.
@@ -679,7 +707,7 @@ table, so code that runs every tick over many keys loops by index with `KeyAt` a
 
 `[MachineLocal]` on a method of your own makes it code of one machine: its body is checked as a `Local.For` block, and
 calling it outside one is MW0002. Where the code runs on every machine anyway, on an override of Moonwell's
-(`OnGameStart`) or on a lambda given to `Timer.Every`, the attribute is MW0040. `[SyncUnchecked]` on a method turns the
+(`OnGameStart`) or on a lambda given to a scope's `Every`, the attribute is MW0040. `[SyncUnchecked]` on a method turns the
 checks off in its own body, except `decimal`; `Local.For` still follows a method so marked, so a block whose changes are
 meant is marked itself: `Local.For(p, [SyncUnchecked] () => ...)`. `Natives.BlzSendSyncData` inside `Local.For` sends a
 machine-local value to every machine. Not checked: a C# field written inside `Local.For` and read by code that runs on

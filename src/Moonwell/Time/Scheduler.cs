@@ -64,7 +64,7 @@ namespace Moonwell
         /// <summary>
         /// Runs every timer that is due, those made by the runs included (After(0) inside a timer runs in the same instant, as the
         /// game's own 0 s timer does), then asks the world to wake for the next one. More than RunawayRuns runs in one wake is a
-        /// runaway, a timer that keeps starting itself, say: it is reported, naming the owner of the timer that would have run
+        /// runaway, a timer that keeps starting itself, say: it is reported, naming the scope of the timer that would have run
         /// next, and the timers still due wait RunawayWait, so the game never freezes. In a development build, a timer that halts
         /// Moonwell's clock ends the run, and the timers due after it wait for the next step, and while the debug mode is on the
         /// run is timed for its statistics.
@@ -99,7 +99,7 @@ namespace Moonwell
                 if (runs == RunawayRuns)
                 {
                     runaway = true;
-                    Errors.Report(Names.NameOf(timer.Owner!) + ".Timer", new MoonwellException("more than 10000 timer runs in one instant; the rest wait 1/32 s"));
+                    Errors.Report(Names.NameOf(timer.Parent!) + ".Timer", new MoonwellException("more than 10000 timer runs in one instant; the rest wait 1/32 s"));
                     break;
                 }
 
@@ -169,12 +169,11 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Calls a timer's action with its owner as the current owner, and reports an error it throws.</summary>
+        /// <summary>Calls a timer's action, and reports an error it throws.</summary>
         private static void Run(Timer timer)
         {
-            var reactor = timer.Owner!;
-            var previous = Owner.current;
-            Owner.current = reactor;
+            var reactor = timer.Parent!;
+            timer.ran = true;
             try
             {
                 timer.action();
@@ -183,8 +182,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(reactor) + ".Timer", error);
             }
-
-            Owner.current = previous;
         }
 
         /// <summary>

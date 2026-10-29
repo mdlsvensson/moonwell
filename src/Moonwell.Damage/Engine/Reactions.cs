@@ -77,8 +77,8 @@ namespace Moonwell
 
             var source = hit.Source;
             var target = hit.Target;
-            var targetSlot = target.Player.Slot;
-            var sourceSlot = source == null ? -1 : source.Player.Slot;
+            var targetSlot = target.Owner.Slot;
+            var sourceSlot = source == null ? -1 : source.Owner.Slot;
             if (source != null)
             {
                 RunUnit(source, hit, null, SourceSlots + (int)stage);
@@ -105,7 +105,7 @@ namespace Moonwell
         /// <summary>Runs the burst reactions: the source and its components, the game's components, then the source's player's.</summary>
         internal static void RunBurst(Burst burst)
         {
-            var slot = burst.Source.Player.Slot;
+            var slot = burst.Source.Owner.Slot;
             RunUnit(burst.Source, null, burst, SourceSlots + (int)Stage.Burst);
             RunMap(Game.Instance, null, burst, WatchSlots + (int)Stage.Burst);
             var player = Player.Existing(slot);
@@ -160,11 +160,9 @@ namespace Moonwell
             return hit != null && hit.Stage == Stage.Lethal && !hit.Kills;
         }
 
-        /// <summary>Calls the reaction in a slot with the object as the current owner; a failing reaction is reported.</summary>
-        private static void Call(Owner obj, Hit? hit, Burst? burst, int slot)
+        /// <summary>Calls the reaction in a slot; a failing reaction is reported.</summary>
+        private static void Call(Scope obj, Hit? hit, Burst? burst, int slot)
         {
-            var previous = Owner.current;
-            Owner.current = obj;
             var running = burst != null ? burst.Hits[0] : hit!;
             Running.Add(running);
             try
@@ -193,7 +191,6 @@ namespace Moonwell
             }
 
             Running.RemoveAt(Running.Count - 1);
-            Owner.current = previous;
         }
 
         /// <summary>The bits of the reaction methods an object's class writes, worked out once per class. Only methods the class writes count: in Lua an interface's empty defaults are not there.</summary>

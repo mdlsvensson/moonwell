@@ -56,7 +56,7 @@ namespace Moonwell.Testing
                     pair.Wait(1.0f);
                 }
             };
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             var start = Tracking.StepNow;
             Steps(world, 8);
             Expect.Equal(1, aura.TickSteps.Count, "the tick at the meeting");
@@ -84,7 +84,7 @@ namespace Moonwell.Testing
                 tries.Add(pair.TryCooldown(0.25f));
                 left.Add(pair.Cooldown);
             };
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 10);
             Expect.Equal(10, tries.Count, "a tick at every step");
             Expect.True(tries[0], "true at first");
@@ -108,7 +108,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             var pair = aura.Pairs[0];
             pair.Pause();
@@ -135,7 +135,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             var pair = aura.Pairs[0];
             pair.Stop();
@@ -171,7 +171,7 @@ namespace Moonwell.Testing
                 seen.Add(pair.Data);
             };
             aura.Parting = pair => parted = pair.Data;
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             var met = aura.Pairs[0];
             Expect.Near(0.0f, since[0], "Since is 0 at the meeting");
@@ -193,7 +193,7 @@ namespace Moonwell.Testing
             Expect.Same(token, parted, "Data in OnPart");
         }
 
-        /// <summary>A pair belongs to its interaction; its reactions run with it as the current owner, so a timer made in OnMeet is the pair's and ends when it parts.</summary>
+        /// <summary>A pair belongs to its interaction, and a timer made with the pair's After in OnMeet is the pair's and ends when it parts.</summary>
         public static void PairOwns(FakeWorld world)
         {
             Fresh();
@@ -201,29 +201,108 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var aura = new FireAura();
             Timer? made = null;
-            Owner? meeting = null;
-            Owner? ticking = null;
-            Owner? parting = null;
-            aura.Meeting = pair =>
-            {
-                meeting = Owner.Current;
-                made = Timer.After(100.0f, () => { });
-            };
-            aura.Ticking = pair => ticking = Owner.Current;
-            aura.Parting = pair => parting = Owner.Current;
-            a.Interact(aura);
+            aura.Meeting = pair => { made = pair.After(100.0f, () => { }); };
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             var met = aura.Pairs[0];
-            Expect.Same(aura, met.Owner, "the pair is its interaction's");
-            Expect.Same(met, meeting, "OnMeet runs with the pair as the current owner");
-            Expect.Same(met, ticking, "and OnTick");
-            Expect.Same(met, made!.Owner, "the timer is the pair's");
+            Expect.Same(aura, met.Parent, "the pair is its interaction's");
+            Expect.Same(met, made!.Parent, "the timer is the pair's");
             Expect.True(!made!.HasEnded, "and runs");
             world.MoveUnit(b.Handle, 600.0f, 0.0f);
             Steps(world, 16);
-            Expect.Same(met, parting, "OnPart runs with the pair as the current owner");
             Expect.True(made!.HasEnded, "the timer ended with the pair");
-            Expect.True(Owner.Current == Runtime.Root, "and the root is current after");
+        }
+
+        /// <summary>After in an interaction's OnMeet is the interaction's; the pair's After is the pair's.</summary>
+        public static void PairAfterIsTheInteractions(FakeWorld world)
+        {
+            Fresh();
+            var a = UnitAt(world, 0.0f, 0.0f);
+            UnitAt(world, 100.0f, 0.0f);
+            var aura = new TimedAura();
+            a.Interact(aura, Game.Instance);
+            Steps(world, 16);
+            var met = aura.Pairs[0];
+            Expect.Same(aura, aura.Mine!.Parent, "After in OnMeet is the interaction's");
+            Expect.Same(met, aura.Paired!.Parent, "the pair's After is the pair's");
+        }
+
+        /// <summary>An interaction ends with its scope or its holder, whichever ends first, and each pair parts once.</summary>
+        public static void InteractEndsWithScopeOrHolder(FakeWorld world)
+        {
+            Fresh();
+            var u = UnitAt(world, 0.0f, 0.0f);
+            UnitAt(world, 100.0f, 0.0f);
+            var scope = new TestScope("scope", new List<string>());
+            var first = new FireAura();
+            var second = new FireAura();
+            var firstParts = 0;
+            first.Parting = pair => { firstParts++; };
+            u.Interact(first, scope);
+            u.Interact(second, Game.Instance);
+            Steps(world, 16);
+            Expect.Equal(1, first.Pairs.Count, "the first met the other unit");
+            scope.End();
+            Expect.True(first.HasEnded, "the first ended with its scope");
+            Expect.Equal(1, firstParts, "its pair parted once");
+            Expect.True(!second.HasEnded, "the second goes on");
+            u.Remove();
+            Steps(world, 16);
+            Expect.True(second.HasEnded, "the second ended with its holder");
+            Expect.Equal(1, firstParts, "and the first's pair did not part again");
+        }
+
+        /// <summary>A timer made with the pair's After in OnPart, in the pair as it ends, is reported in a development build.</summary>
+        public static void PairAfterInPartIsReported(FakeWorld world)
+        {
+            Fresh();
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var b = UnitAt(world, 100.0f, 0.0f);
+            var aura = new PartingTimerAura();
+            a.Interact(aura, Game.Instance);
+            Steps(world, 16);
+            world.MoveUnit(b.Handle, 600.0f, 0.0f);
+            Steps(world, 16);
+            Expect.True(aura.Made!.HasEnded, "the timer OnPart made ended with the pair");
+            ScopeCases.ExpectNeverRanCount(world, 1);
+        }
+
+        /// <summary>An interaction whose holder ends first ends then, each pair parting once, and its scope ending after does nothing more.</summary>
+        public static void InteractEndsWithHolderThenScope(FakeWorld world)
+        {
+            Fresh();
+            var u = UnitAt(world, 0.0f, 0.0f);
+            UnitAt(world, 100.0f, 0.0f);
+            var scope = new TestScope("scope", new List<string>());
+            var aura = new FireAura();
+            var parts = 0;
+            aura.Parting = pair => { parts++; };
+            u.Interact(aura, scope);
+            Steps(world, 16);
+            Expect.Equal(1, aura.Pairs.Count, "it met the other unit");
+            u.Remove();
+            Steps(world, 16);
+            Expect.True(aura.HasEnded, "it ended with its holder");
+            Expect.Equal(1, parts, "its pair parted once");
+            scope.End();
+            Expect.Equal(1, parts, "the scope ending parted nothing more");
+            Expect.Equal(0, scope.ChildCount, "and holds nothing");
+        }
+
+        /// <summary>After in an interaction's OnPart is the interaction's, so it runs after the pair has parted.</summary>
+        public static void PartAfterRuns(FakeWorld world)
+        {
+            Fresh();
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var b = UnitAt(world, 100.0f, 0.0f);
+            var aura = new TimedAura();
+            a.Interact(aura, Game.Instance);
+            Steps(world, 16);
+            world.MoveUnit(b.Handle, 600.0f, 0.0f);
+            Steps(world, 16);
+            Expect.Same(aura, aura.Parted!.Parent, "After in OnPart is the interaction's");
+            Steps(world, 40);
+            Expect.Equal(1, aura.PartRan, "and it ran after the parting");
         }
     }
 }

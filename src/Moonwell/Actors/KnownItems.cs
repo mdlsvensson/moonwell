@@ -24,7 +24,7 @@ namespace Moonwell
         }
 
         /// <summary>Takes a game item in: makes its object, adds its starting components, and runs OnCreated.</summary>
-        internal static Item? TakeIn(item handle, Owner? owner)
+        internal static Item? TakeIn(item handle, Scope? scope)
         {
             var existing = Find(handle);
             if (existing != null)
@@ -54,7 +54,7 @@ namespace Moonwell
             made.OwningPlayer = Runtime.World.ItemOwnerOf(handle);
             known[handle] = made;
             Live.Add(made);
-            owner?.Adopt(made);
+            scope?.Adopt(made);
             made.Mask = Hooks.MaskOf(made, Item.ItemHooks);
             Events.Need(made.Mask);
             for (var i = 0; i < made.StartComponents.Count; i++)
@@ -67,8 +67,6 @@ namespace Moonwell
             if (!made.HasEnded)
             {
                 made.entered = true;
-                var previous = Owner.current;
-                Owner.current = made;
                 try
                 {
                     made.CallEnter();
@@ -77,8 +75,6 @@ namespace Moonwell
                 {
                     Errors.Report(Names.NameOf(made) + ".OnCreated", error);
                 }
-
-                Owner.current = previous;
             }
 
             if (!made.HasEnded)

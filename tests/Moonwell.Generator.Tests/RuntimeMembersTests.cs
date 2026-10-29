@@ -12,7 +12,7 @@ public class RuntimeMembersTests
 
     [Theory]
     [InlineData(Kind.Unit, "Handle")]
-    [InlineData(Kind.Unit, "Player")]
+    [InlineData(Kind.Unit, "Owner")]
     [InlineData(Kind.Unit, "TypeId")]
     [InlineData(Kind.Unit, "Components")]
     [InlineData(Kind.Unit, "Of")]

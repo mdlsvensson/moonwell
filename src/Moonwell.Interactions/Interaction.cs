@@ -6,20 +6,20 @@ namespace Moonwell
 {
     /// <summary>
     /// What one thing, the holder, does with the things of a class near it. A map derives from Interaction&lt;THolder, TOther&gt;;
-    /// this base carries what the cycle and Interact need without the types. An interaction belongs to the owner that started
-    /// it and ends with it, with its holder, or by End; its pairs part first, newest first.
+    /// this base carries what the cycle and Interact need without the types. An interaction is in the scope Interact names, and
+    /// ends with it, with its holder, or by End; its pairs part first, newest first.
     /// </summary>
-    public abstract class Interaction : Owner
+    public abstract class Interaction : Scope
     {
         // The fields are internal, not private, as a map's subclass may name a field of its own the same:
         // CSharp.lua gives a subclass's field a name of its own only when it sees the base's field of that name,
         // and it does not see a private one, so in Lua the two would be one field.
 
-        /// <summary>The pairs, in the order they met; each is an Interaction&lt;THolder, TOther&gt;.Pair, kept as an Owner (see Pairing).</summary>
-        internal readonly List<Owner> pairs = new List<Owner>();
+        /// <summary>The pairs, in the order they met; each is an Interaction&lt;THolder, TOther&gt;.Pair, kept as a Scope (see Pairing).</summary>
+        internal readonly List<Scope> pairs = new List<Scope>();
 
         /// <summary>The pair of each other, by the other's entry id; a lookup only.</summary>
-        internal readonly Dictionary<int, Owner> byOther = new Dictionary<int, Owner>();
+        internal readonly Dictionary<int, Scope> byOther = new Dictionary<int, Scope>();
 
         /// <summary>The read-only view of the pairs that Pairs gives; made with the interaction.</summary>
         internal object? view;
@@ -136,8 +136,8 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Whether a pair or another owned object has begun to end. An object that has ended began to end first, so ending covers HasEnded.</summary>
-        internal static bool Gone(Owned owned)
+        /// <summary>Whether a pair or another scoped object has begun to end. An object that has ended began to end first, so ending covers HasEnded.</summary>
+        internal static bool Gone(Scoped owned)
         {
             return owned.ending;
         }
@@ -159,17 +159,17 @@ namespace Moonwell
         internal abstract string OtherClassName();
 
         /// <summary>Reads a pair of the interaction into the debug mode's facts; only the typed class can cast it.</summary>
-        internal abstract void ReadPair(Owner pair, PairFacts facts);
+        internal abstract void ReadPair(Scope pair, PairFacts facts);
 #endif
 
         /// <summary>The check itself, from the holder's read on; RunCheck runs it guarded, and takes what it added off the shared lists after, as a finally would.</summary>
         internal abstract void CheckNear();
 
         /// <summary>Runs OnPart for a pair that is parting, guarded.</summary>
-        internal abstract void RunPart(Owner pair);
+        internal abstract void RunPart(Scope pair);
 
-        /// <summary>Starts the interaction on a holder of a kind, for an owner or else the current one, with its first check within a tick: Interact's work. Fails in a development build when it was started before, when the holder is not of the holder class, or when Range is not more than 0. The holder is tracked on its own, without asking for its whole kind (Tracking.TrackHolder); the kinds of the others are asked for. A holder that has ended, or an owner that has, ends it at once.</summary>
-        internal void Begin(Actor holder, int kind, Owner? owner)
+        /// <summary>Starts the interaction on a holder of a kind, in a scope, with its first check within a tick: Interact's work. Fails in a development build when it was started before, when the holder is not of the holder class, or when Range is not more than 0. The holder is tracked on its own, without asking for its whole kind (Tracking.TrackHolder); the kinds of the others are asked for. A holder that has ended, or a scope that has, ends it at once.</summary>
+        internal void Begin(Actor holder, int kind, Scope scope)
         {
             Dev.Check(!started, Names.NameOf(this) + ".Interact: the interaction has been started already");
             Dev.Check(HeldBy(holder), Names.NameOf(this) + ".Interact: a " + Names.NameOf(holder) + " cannot hold it");
@@ -178,7 +178,7 @@ namespace Moonwell
             Interactions.EnsureInstalled();
             NeedOthers();
             BindHolder(holder);
-            (owner ?? Owner.Current).Adopt(this);
+            scope.Adopt(this);
             if (HasEnded)
             {
                 return;
@@ -201,7 +201,7 @@ namespace Moonwell
         }
 
         /// <summary>Joins a new pair to the interaction: it is the interaction's, last in meeting order, and found by its other's entry.</summary>
-        internal void Join(Owner pair, Entry other)
+        internal void Join(Scope pair, Entry other)
         {
             Adopt(pair);
             pairs.Add(pair);
@@ -216,7 +216,7 @@ namespace Moonwell
         }
 
         /// <summary>Takes a parting pair out of the interaction's lists and its other's; one already out is passed over.</summary>
-        internal void Unpair(Owner pair, Entry other)
+        internal void Unpair(Scope pair, Entry other)
         {
             for (var i = pairs.Count - 1; i >= 0; i--)
             {
@@ -233,7 +233,7 @@ namespace Moonwell
                 }
             }
 
-            Owner? found;
+            Scope? found;
             if (byOther.TryGetValue(other.Id, out found) && found == pair)
             {
                 byOther.Remove(other.Id);
@@ -421,8 +421,7 @@ namespace Moonwell
     /// constructor sets Range, and Tick unless a check at every step is wanted. At each tick the interaction checks what is
     /// within Range: a new other is asked about with Accepts and, if accepted, meets (OnMeet, then OnTick); an other still
     /// in range is asked again, unless RecheckAccepts is off, and ticks (OnTick); one refused, gone out of range or with
-    /// no place parts (OnPart). Reactions run guarded, the pair's with the pair as the current owner and Accepts with the
-    /// interaction.
+    /// no place parts (OnPart). Reactions run guarded.
     /// </summary>
     /// <typeparam name="THolder">The class of the holder: Unit, Item, Destructable, Gizmo, a map's class of one of them, or Actor.</typeparam>
     /// <typeparam name="TOther">The class of the things it pairs with, as Find takes: Unit, Item, Destructable, Gizmo, a map's gizmo class, or Actor.</typeparam>
@@ -456,23 +455,23 @@ namespace Moonwell
             get { return Pairing.View<THolder, TOther>(this); }
         }
 
-        /// <summary>Whether an other within range may meet the holder, and, asked again before each tick while RecheckAccepts is on (the default), whether a pair that has met goes on; true unless a map says. Refused, a new other does not meet and is asked again at the next tick; a pair parts (OnPart), and its other is asked again from the next tick and meets again once accepted. An error it throws is reported and refuses. Runs with the interaction as the current owner.</summary>
+        /// <summary>Whether an other within range may meet the holder, and, asked again before each tick while RecheckAccepts is on (the default), whether a pair that has met goes on; true unless a map says. Refused, a new other does not meet and is asked again at the next tick; a pair parts (OnPart), and its other is asked again from the next tick and meets again once accepted. An error it throws is reported and refuses.</summary>
         public virtual bool Accepts(TOther other)
         {
             return true;
         }
 
-        /// <summary>Runs when the two meet, with the pair as the current owner; OnTick runs right after, in the same check.</summary>
+        /// <summary>Runs when the two meet; OnTick runs right after, in the same check.</summary>
         public virtual void OnMeet(Pair pair)
         {
         }
 
-        /// <summary>Runs at each tick while the two are in range, unless the pair waits or is paused, with the pair as the current owner.</summary>
+        /// <summary>Runs at each tick while the two are in range, unless the pair waits or is paused.</summary>
         public virtual void OnTick(Pair pair)
         {
         }
 
-        /// <summary>Runs once when the pair ends, for any reason: out of range, a side with no place or ending, Accepts refusing it, Stop, or the interaction ending. The pair is the current owner; what it made ends after.</summary>
+        /// <summary>Runs once when the pair ends, for any reason: out of range, a side with no place or ending, Accepts refusing it, Stop, or the interaction ending. What the pair holds ends after.</summary>
         public virtual void OnPart(Pair pair)
         {
         }
@@ -496,7 +495,7 @@ namespace Moonwell
         }
 
         /// <summary>Runs OnPart for a parting pair.</summary>
-        internal sealed override void RunPart(Owner pair)
+        internal sealed override void RunPart(Scope pair)
         {
             CallPart(Pairing.As<THolder, TOther>(pair));
         }
@@ -509,7 +508,7 @@ namespace Moonwell
         }
 
         /// <summary>Reads a pair, as the Pair it is, into the debug mode's facts.</summary>
-        internal sealed override void ReadPair(Owner owner, PairFacts facts)
+        internal sealed override void ReadPair(Scope owner, PairFacts facts)
         {
             Pair pair = Pairing.As<THolder, TOther>(owner);
             facts.Holder = pair.holder;
@@ -610,7 +609,7 @@ namespace Moonwell
             for (var i = start; i < end; i++)
             {
                 var entry = Raw.At(candidates, i);
-                Owner? found;
+                Scope? found;
                 if (byOther.TryGetValue(entry.Id, out found))
                 {
                     Pair kept = Pairing.As<THolder, TOther>(found);
@@ -742,11 +741,9 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Runs Accepts with the interaction as the current owner; an error it throws is reported and refuses.</summary>
+        /// <summary>Runs Accepts; an error it throws is reported and refuses.</summary>
         private bool CallAccepts(TOther other)
         {
-            var previous = Owner.current;
-            Owner.current = this;
             var failure = Guard.Accept(this, other);
             var accepted = Guard.answer;
             if (failure != null)
@@ -754,25 +751,20 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".Accepts", failure);
             }
 
-            Owner.current = previous;
             return accepted;
         }
 
-        /// <summary>Runs OnMeet with the pair as the current owner, and reports an error it throws.</summary>
+        /// <summary>Runs OnMeet, and reports an error it throws.</summary>
         private void CallMeet(Pair pair)
         {
-            var previous = Owner.current;
-            Owner.current = pair;
             var failure = Guard.Meet(this, pair);
             if (failure != null)
             {
                 Errors.Report(Names.NameOf(this) + ".OnMeet", failure);
             }
-
-            Owner.current = previous;
         }
 
-        /// <summary>Runs OnTick with the pair as the current owner, and reports an error it throws.</summary>
+        /// <summary>Runs OnTick, and reports an error it throws.</summary>
         private void CallTick(Pair pair)
         {
 #if DEBUG
@@ -783,29 +775,21 @@ namespace Moonwell
                 debugStats.StepTicks++;
             }
 #endif
-            var previous = Owner.current;
-            Owner.current = pair;
             var failure = Guard.Tick(this, pair);
             if (failure != null)
             {
                 Errors.Report(Names.NameOf(this) + ".OnTick", failure);
             }
-
-            Owner.current = previous;
         }
 
-        /// <summary>Runs OnPart with the pair as the current owner, and reports an error it throws.</summary>
+        /// <summary>Runs OnPart, and reports an error it throws.</summary>
         private void CallPart(Pair pair)
         {
-            var previous = Owner.current;
-            Owner.current = pair;
             var failure = Guard.Part(this, pair);
             if (failure != null)
             {
                 Errors.Report(Names.NameOf(this) + ".OnPart", failure);
             }
-
-            Owner.current = previous;
         }
 
         /// <summary>
@@ -815,7 +799,7 @@ namespace Moonwell
         /// no place, those are the check before. End parts the pair now, and an other still in range may meet again at once,
         /// in the same check; Stop parts it and keeps the two apart until the other has been out of range.
         /// </summary>
-        public sealed class Pair : Owner
+        public sealed class Pair : Scope
         {
             /// <summary>The interaction the pair is of.</summary>
             internal Interaction interaction = null!;

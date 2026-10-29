@@ -143,7 +143,7 @@ namespace Moonwell.Testing
             Expect.Near(1.0f, Runtime.World.Now(), "Moonwell's time after Ctrl + N while running");
             debug.Ctrl(0, DebugKey.H, shift: true);
             var ran = 0;
-            Timer.After(Step, () => { ran++; });
+            Game.Instance.After(Step, () => { ran++; });
             var before = Runtime.World.Now();
             var printed = world.PrintedTexts.Count;
             debug.Ctrl(0, DebugKey.N);
@@ -252,7 +252,7 @@ namespace Moonwell.Testing
             Expect.Near(0.5f, Runtime.Clock.Speed, "the speed after -speed fast");
             debug.Chat(0, "-speed 4");
             var ran = 0;
-            Timer.Every(0.5f, () => { ran++; });
+            Game.Instance.Every(0.5f, () => { ran++; });
             world.Advance(1.0f);
             Expect.Equal(8, ran, "runs of a 0.5 s timer in 1 second at -speed 4");
         }
@@ -465,7 +465,7 @@ namespace Moonwell.Testing
         {
             var unit = UnitAt(world, 0.0f, 0.0f);
             var debug = FakeDebugWorld.Install(world);
-            Timer.Every(Step, () => { DebugMode.Halt(); });
+            Game.Instance.Every(Step, () => { DebugMode.Halt(); });
             debug.Advance(Step);
             Expect.True(DebugSession.IsOn, "the mode after the first halt from code");
             Expect.True(Runtime.Clock.IsHalted, "the clock after the first halt from code");

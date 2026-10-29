@@ -67,10 +67,10 @@ namespace Moonwell.Testing
         {
             ObjectTypes.Id<Dummy>(ObjectTypes.FourCC("h0df"));
             ObjectTypes.Unit(ObjectTypes.FourCC("h0df"), () => new Dummy());
-            Unit.Create<Dummy>(Player.One, 0f, 0f);
+            Unit.Create<Dummy>(Player.One, 0f, 0f, Game.Instance);
             Expect.True(world.LastFacing == 270f, "the facing of Create<T>");
             world.LastFacing = 0f;
-            Unit.Create(ObjectTypes.FourCC("h0df"), Player.One, 0f, 0f, owner: Game.Instance);
+            Unit.Create(ObjectTypes.FourCC("h0df"), Player.One, 0f, 0f, Game.Instance);
             Expect.True(world.LastFacing == 270f, "the facing of Create with an owner");
         }
 

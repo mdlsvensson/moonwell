@@ -10,16 +10,16 @@ namespace Moonwell.Testing
     public static class ShadowFieldCases
     {
         /// <summary>An owner's count of children and a subclass's own count are two fields.</summary>
-        public static void Owner(FakeWorld world)
+        public static void Scope(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new ShadowOwner();
-            owner.Adopt(new TestOwned("a", log));
-            owner.Adopt(new TestOwned("b", log));
-            Expect.Equal(2, owner.OwnedCount, "the owned count");
+            var owner = new ShadowScope();
+            owner.Adopt(new TestScoped("a", log));
+            owner.Adopt(new TestScoped("b", log));
+            Expect.Equal(2, owner.ChildCount, "the owned count");
             Expect.Equal(7, owner.OwnCount, "its own count");
             owner.End();
-            Expect.Equal(0, owner.OwnedCount, "the owned count after the end");
+            Expect.Equal(0, owner.ChildCount, "the owned count after the end");
             Expect.Equal(7, owner.OwnCount, "its own count after the end");
         }
 

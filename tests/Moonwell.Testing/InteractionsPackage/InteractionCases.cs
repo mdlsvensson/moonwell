@@ -88,9 +88,9 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 500.0f, 0.0f);
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : "?";
-            Expect.Same(aura, a.Interact(aura), "Interact gives the interaction back");
+            Expect.Same(aura, a.Interact(aura, Game.Instance), "Interact gives the interaction back");
             Expect.Same(a, aura.Holder, "its holder");
-            Expect.Same(Runtime.Root, aura.Owner, "it belongs to the current owner, the root");
+            Expect.Same(Game.Instance, aura.Parent, "it belongs to the scope given, the game");
             Steps(world, 16);
             Expect.Equal(0, TestLog.Lines.Count, "b is out of range at the first check");
             world.MoveUnit(b.Handle, 200.0f, 0.0f);
@@ -123,12 +123,12 @@ namespace Moonwell.Testing
             var c = UnitAt(world, 0.0f, 300.5f);
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : unit == c ? "c" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b" }, "at 300 it meets, at 300.5 not");
         }
 
-        /// <summary>A unit Accepts refuses makes no pair and is asked again at the next tick; Accepts runs with the interaction as the current owner, and a pair is asked again before each tick (decision 73).</summary>
+        /// <summary>A unit Accepts refuses makes no pair and is asked again at the next tick, and a pair is asked again before each tick (decision 73).</summary>
         public static void Accepts(FakeWorld world)
         {
             Fresh();
@@ -137,10 +137,9 @@ namespace Moonwell.Testing
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : "?";
             aura.Accepting = unit => false;
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             Expect.Equal(1, aura.Asked, "asked once");
-            Expect.Same(aura, aura.AskedAs, "with the interaction as the current owner");
             Expect.Equal(0, aura.Pairs.Count, "refused: no pair");
             Expect.Equal(0, TestLog.Lines.Count, "and no reaction");
             Steps(world, 16);
@@ -159,7 +158,7 @@ namespace Moonwell.Testing
             Fresh();
             var a = UnitAt(world, 0.0f, 0.0f);
             var aura = new FireAura();
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 32);
             Expect.Equal(0, aura.Asked, "the holder is not asked about");
             Expect.Equal(0, aura.Pairs.Count, "and makes no pair");
@@ -180,8 +179,8 @@ namespace Moonwell.Testing
             first.Tag = unit => unit == b ? "b" : "?";
             var second = new FireAura();
             second.Tag = unit => unit == a ? "a" : "?";
-            a.Interact(first);
-            b.Interact(second);
+            a.Interact(first, Game.Instance);
+            b.Interact(second, Game.Instance);
             Steps(world, 16);
             ExpectLog(new string[] { "meet a", "tick a", "meet b", "tick b" }, "each aura meets the other unit, the second a step before the first");
             Expect.Same(b, first.Pairs[0].Other, "a's aura pairs with b");
@@ -197,7 +196,7 @@ namespace Moonwell.Testing
             var buff = a.Apply(new Inferno());
             var aura = buff.Aura;
             aura.Tag = unit => unit == b ? "b" : "?";
-            Expect.Same(buff, aura.Owner, "the buff's");
+            Expect.Same(buff, aura.Parent, "the buff's");
             Expect.Same(a, aura.Holder, "held by the buff's unit");
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b" }, "it meets b");
@@ -221,7 +220,7 @@ namespace Moonwell.Testing
             var c = UnitAt(world, 200.0f, 0.0f);
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : unit == c ? "c" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b", "meet c", "tick c" }, "it meets b, then c");
             TestLog.Lines.Clear();
@@ -242,7 +241,7 @@ namespace Moonwell.Testing
             var c = UnitAt(world, 200.0f, 0.0f);
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : unit == c ? "c" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             Expect.Equal(2, aura.Pairs.Count, "two pairs");
             TestLog.Lines.Clear();
@@ -262,7 +261,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b" }, "they meet");
             a.Kill();
@@ -284,7 +283,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var c = UnitAt(world, 200.0f, 0.0f);
             var d = UnitAt(world, 250.0f, 0.0f);
-            var well = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            var well = Gizmo.Create(new Well(), 0.0f, 0.0f, Game.Instance);
             var healing = new Healing();
             healing.Tag = unit => unit == b ? "b" : unit == c ? "c" : unit == d ? "d" : "?";
             healing.Meeting = pair =>
@@ -294,7 +293,7 @@ namespace Moonwell.Testing
                     well.End();
                 }
             };
-            Expect.Same(healing, well.Interact(healing), "a gizmo's Interact gives the interaction back");
+            Expect.Same(healing, well.Interact(healing, Game.Instance), "a gizmo's Interact gives the interaction back");
             Expect.Same(well, healing.Holder, "held by the well");
             Steps(world, 1);
             ExpectLog(new string[] { "meet b", "tick b", "meet c", "part c", "part b" }, "no OnTick after the holder ended, nor a meeting with d; newest first");
@@ -314,7 +313,7 @@ namespace Moonwell.Testing
             var c = UnitAt(world, 200.0f, 0.0f);
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : unit == c ? "c" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             aura.Ticking = pair => aura.End();
             Steps(world, 16);
@@ -333,7 +332,7 @@ namespace Moonwell.Testing
             var c = UnitAt(world, 200.0f, 0.0f);
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : unit == c ? "c" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             aura.Ticking = pair =>
             {
@@ -355,7 +354,7 @@ namespace Moonwell.Testing
             Fresh();
             var a = UnitAt(world, 0.0f, 0.0f);
             UnitAt(world, 100.0f, 0.0f);
-            var aura = a.Interact(new FireAura(300.0f, 0.1f));
+            var aura = a.Interact(new FireAura(300.0f, 0.1f), Game.Instance);
             var start = Tracking.StepNow;
             Steps(world, 12);
             Expect.Equal(3, aura.TickSteps.Count, "three checks in 12 steps");
@@ -372,7 +371,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b" }, "they meet");
             aura.Pause();
@@ -399,7 +398,7 @@ namespace Moonwell.Testing
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : unit == c ? "c" : "?";
             aura.Throws = b;
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b", "meet c", "tick c" }, "c meets after b's OnTick threw");
             Expect.True(Logged(world, "FireAura.OnTick failed"), "a logged line names FireAura.OnTick");
@@ -407,7 +406,7 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "meet b", "tick b", "meet c", "tick c", "tick b", "tick c" }, "both tick again");
         }
 
-        /// <summary>An interaction started inside OnMeet first checks at a later step, not the one running, and belongs to the pair, the current owner; a Find in the same OnMeet does not change what the check walks.</summary>
+        /// <summary>An interaction started inside OnMeet first checks at a later step, not the one running, and belongs to the pair, the scope its line names; a Find in the same OnMeet does not change what the check walks.</summary>
         public static void MadeInReaction(FakeWorld world)
         {
             Fresh();
@@ -419,25 +418,25 @@ namespace Moonwell.Testing
             var second = new FireAura(300.0f, Interactions.Step);
             var madeAt = -1;
             var found = -1;
-            Owner? maker = null;
+            Scope? maker = null;
             first.Meeting = pair =>
             {
                 if (madeAt < 0)
                 {
                     madeAt = Tracking.StepNow;
                     maker = pair;
-                    b.Interact(second);
+                    b.Interact(second, pair);
                     found = Find.InRange<Unit>(0.0f, 0.0f, 500.0f).Count;
                 }
             };
-            a.Interact(first);
+            a.Interact(first, Game.Instance);
             Steps(world, 16);
             Expect.True(madeAt >= 0, "made in the first aura's OnMeet");
             Expect.Equal(3, found, "the Find inside OnMeet found the three units");
             ExpectLog(new string[] { "meet b", "tick b", "meet c", "tick c" }, "the check went on to c after the Find");
             Expect.Equal(0, Find.Pending, "and nothing is left on the shared lists");
             Expect.Equal(0, second.TickSteps.Count, "the step that made it did not check it");
-            Expect.Same(maker, second.Owner, "it belongs to the pair");
+            Expect.Same(maker, second.Parent, "it belongs to the pair");
             Steps(world, 1);
             Expect.Equal(2, second.TickSteps.Count, "it checks at the next step, and meets a and c");
             Expect.Equal(madeAt + 1, second.TickSteps[0], "the step after the one that made it");
@@ -452,7 +451,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var c = UnitAt(world, 200.0f, 0.0f);
             Expect.True(new FireAura().view != null, "the view is made with the interaction, so no read makes it");
-            var aura = a.Interact(new FireAura());
+            var aura = a.Interact(new FireAura(), Game.Instance);
             Expect.Equal(0, aura.Pairs.Count, "none before the first check");
             Steps(world, 16);
             var pairs = aura.Pairs;
@@ -481,11 +480,11 @@ namespace Moonwell.Testing
             var a = UnitAt(world, 0.0f, 0.0f);
             var b = UnitAt(world, 100.0f, 0.0f);
 #if DEBUG
-            Expect.Throws<MoonwellException>(() => a.Interact(new FireAura(0.0f, 0.5f)), "a Range of 0");
-            Expect.Throws<MoonwellException>(() => a.Interact(new Healing()), "a unit holding an interaction for wells");
-            Expect.Throws<MoonwellException>(() => new Well().Interact(new Healing()), "a gizmo that was never created");
-            var aura = a.Interact(new FireAura());
-            Expect.Throws<MoonwellException>(() => b.Interact(aura), "an interaction started twice");
+            Expect.Throws<MoonwellException>(() => a.Interact(new FireAura(0.0f, 0.5f), Game.Instance), "a Range of 0");
+            Expect.Throws<MoonwellException>(() => a.Interact(new Healing(), Game.Instance), "a unit holding an interaction for wells");
+            Expect.Throws<MoonwellException>(() => new Well().Interact(new Healing(), Game.Instance), "a gizmo that was never created");
+            var aura = a.Interact(new FireAura(), Game.Instance);
+            Expect.Throws<MoonwellException>(() => b.Interact(aura, Game.Instance), "an interaction started twice");
             Expect.Same(a, aura.Holder, "the first start stands");
 #endif
             Expect.True(b.IsAlive, "b is untouched");
@@ -505,7 +504,7 @@ namespace Moonwell.Testing
             aura.Tag = unit => unit == b ? "b" : "?";
             Expect.True(!aura.HasEnded, "the aura started in OnCreated goes on");
             Expect.Same(a, aura.Holder, "held by the unit");
-            Expect.Same(a, aura.Owner, "and the unit's, the current owner in OnCreated");
+            Expect.Same(a, aura.Parent, "and the unit's, the scope its line in OnCreated names");
             Expect.Equal(2, Tracking.Count, "the unit is tracked once");
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b" }, "it meets b");
@@ -522,7 +521,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var shine = new Shine();
             shine.Tag = unit => unit == b ? "b" : "?";
-            Expect.Same(shine, item.Interact(shine), "Interact gives the interaction back");
+            Expect.Same(shine, item.Interact(shine, Game.Instance), "Interact gives the interaction back");
             Expect.Same(item, shine.Holder, "held by the item");
             Steps(world, 1);
             ExpectLog(new string[] { "meet b" }, "the item meets b");
@@ -542,7 +541,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var shine = new Shine();
             shine.Tag = unit => unit == b ? "b" : "?";
-            Expect.Same(shine, barrel.Interact(shine), "Interact gives the interaction back");
+            Expect.Same(shine, barrel.Interact(shine, Game.Instance), "Interact gives the interaction back");
             Expect.Same(barrel, shine.Holder, "held by the destructable");
             Steps(world, 1);
             ExpectLog(new string[] { "meet b" }, "the destructable meets b");
@@ -561,7 +560,7 @@ namespace Moonwell.Testing
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : unit == c ? "c" : "?";
             aura.Meeting = pair => aura.Pause();
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             ExpectLog(new string[] { "meet b" }, "b met, and the check stopped there");
             aura.Meeting = null;
@@ -584,7 +583,7 @@ namespace Moonwell.Testing
             Expect.Near(0.5f, aura.Tick, "Tick is half a second");
             Expect.Near(2.0f, aura.OwnTick, "its own tick is 2");
             aura.Resume();
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Expect.Same(a, aura.Holder, "Holder is the unit");
             Expect.True(aura.OwnHolder == null, "its own holder is none");
             Expect.True(aura.OwnStarted, "its own started is true");
@@ -622,7 +621,7 @@ namespace Moonwell.Testing
                     found = Find.InRange<Unit>(0.0f, 0.0f, 2000.0f).Count;
                 }
             };
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             ExpectLog(new string[] { "meet s", "tick s", "meet w", "tick w", "meet b", "tick b", "meet e", "tick e", "meet n", "tick n" }, "they meet in the grid's order");
             Expect.Equal(9, found, "the Find inside a reaction found all nine units");
@@ -659,9 +658,9 @@ namespace Moonwell.Testing
         /// <summary>
         /// Each reaction runs guarded, in Lua through one xpcall each with no closure: an Accepts that throws is reported as
         /// FireAura.Accepts and refuses, and the other is asked again at the next tick; an OnMeet that fails on a null (a Lua
-        /// error in Lua) is reported as FireAura.OnMeet and the pair still ticks, with the pair as the current owner; an
-        /// OnPart that throws is reported as FireAura.OnPart and the pair still parts; the current owner is the root again
-        /// after the step, and the check goes on to the next other each time.
+        /// error in Lua) is reported as FireAura.OnMeet and the pair still ticks; an
+        /// OnPart that throws is reported as FireAura.OnPart and the pair still parts; and the check goes on to the next other
+        /// each time.
         /// </summary>
         public static void GuardedReactions(FakeWorld world)
         {
@@ -689,25 +688,21 @@ namespace Moonwell.Testing
                     TestLog.Lines.Add("x " + none!.X);
                 }
             };
-            Owner? tickOwner = null;
-            Owner? metB = null;
+            Scope? metB = null;
             aura.Ticking = pair =>
             {
-                if (pair.Other == b && tickOwner == null)
+                if (pair.Other == b && metB == null)
                 {
-                    tickOwner = Owner.Current;
                     metB = pair;
                 }
             };
             aura.Parting = pair => { throw new System.InvalidOperationException("part"); };
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b" }, "b meets though its OnMeet failed, and c's Accepts threw");
             Expect.True(Logged(world, "FireAura.Accepts failed"), "the Accepts that threw is reported");
             Expect.True(Logged(world, "FireAura.OnMeet failed"), "the OnMeet that failed on a null is reported");
             Expect.True(metB != null, "b ticked");
-            Expect.Same(metB, tickOwner, "OnTick ran with the pair as the current owner");
-            Expect.Same(Runtime.Root, Owner.Current, "the root is the current owner after the step");
             Expect.Equal(2, aura.Asked, "both were asked");
             refuseC = false;
             Steps(world, 16);
@@ -717,7 +712,6 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "meet b", "tick b", "tick b", "meet c", "tick c", "part b", "tick c" }, "b parts though its OnPart threw, and c ticks after");
             Expect.True(Logged(world, "FireAura.OnPart failed"), "the OnPart that threw is reported");
             Expect.Equal(1, aura.Pairs.Count, "b's pair is gone");
-            Expect.Same(Runtime.Root, Owner.Current, "and the root is the current owner");
         }
 
         /// <summary>A check that fails outside a reaction, here the world's read of a destructable, takes what it added off the shared candidates and walk, and its error is reported as Scorch.Check; nothing parts, an interaction due after it in the same step still checks in that step, and the one that failed checks again at its next tick.</summary>
@@ -730,10 +724,10 @@ namespace Moonwell.Testing
             var a = UnitAt(world, 0.0f, 0.0f);
             var b = UnitAt(world, 900.0f, 0.0f);
             var scorch = new Scorch();
-            a.Interact(scorch);
+            a.Interact(scorch, Game.Instance);
             var shine = new Shine();
             shine.Tag = unit => unit == b ? "b" : "?";
-            a.Interact(shine);
+            a.Interact(shine, Game.Instance);
             Steps(world, 1);
             ExpectLog(new string[] { "meet", "tick" }, "the scorch meets the destructable");
             fake.Failing.Add(handle);
@@ -745,7 +739,6 @@ namespace Moonwell.Testing
             Expect.Equal(0, Find.Pending, "no candidate is left");
             Expect.Equal(0, Pairing.Walk.Count, "no pair is left on the walk");
             Expect.Equal(1, scorch.Pairs.Count, "the pair is kept");
-            Expect.Same(Runtime.Root, Owner.Current, "the root is the current owner after the step");
             fake.Failing.Clear();
             Steps(world, 1);
             ExpectLog(new string[] { "meet", "tick", "meet b", "tick" }, "the scorch checks again at its next tick");
@@ -766,14 +759,14 @@ namespace Moonwell.Testing
             world.PlaceDestructable(handle, 80.0f, 0.0f);
             world.PlacedDestructables.Add(handle);
             var barrel = Destructable.Of(handle)!;
-            var well = Gizmo.Create(new Well(), 90.0f, 0.0f);
-            var shadow = Gizmo.Create(new ShadowWell(), 95.0f, 0.0f);
-            var units = a.Interact(new Census<Unit>());
-            var gizmos = a.Interact(new Census<Gizmo>());
-            var wells = a.Interact(new Census<Well>());
-            var items = a.Interact(new Census<Item>());
-            var destructables = a.Interact(new Census<Destructable>());
-            var actors = a.Interact(new Census<Actor>());
+            var well = Gizmo.Create(new Well(), 90.0f, 0.0f, Game.Instance);
+            var shadow = Gizmo.Create(new ShadowWell(), 95.0f, 0.0f, Game.Instance);
+            var units = a.Interact(new Census<Unit>(), Game.Instance);
+            var gizmos = a.Interact(new Census<Gizmo>(), Game.Instance);
+            var wells = a.Interact(new Census<Well>(), Game.Instance);
+            var items = a.Interact(new Census<Item>(), Game.Instance);
+            var destructables = a.Interact(new Census<Destructable>(), Game.Instance);
+            var actors = a.Interact(new Census<Actor>(), Game.Instance);
             Steps(world, 1);
             Expect.Equal(2, units.Met.Count, "Unit takes the two units");
             Expect.Same(plain, units.Met[0], "the plain one first, in the grid's order");
@@ -798,7 +791,7 @@ namespace Moonwell.Testing
             for (var i = 0; i < 50; i++)
             {
                 var holder = UnitAt(world, i * 20.0f - 500.0f, 0.0f);
-                auras.Add(holder.Interact(new FireAura()));
+                auras.Add(holder.Interact(new FireAura(), Game.Instance));
             }
 
             var start = Tracking.StepNow;
@@ -829,7 +822,7 @@ namespace Moonwell.Testing
             }
 
             var late = UnitAt(world, 600.0f, 0.0f);
-            var alone = late.Interact(new FireAura());
+            var alone = late.Interact(new FireAura(), Game.Instance);
             var at = Tracking.StepNow;
             Steps(world, 16);
             Expect.True(alone.TickSteps.Count >= 1, "one started alone later checks within a tick");
@@ -838,7 +831,7 @@ namespace Moonwell.Testing
             var starts = new List<int>();
             for (var i = 0; i < 8; i++)
             {
-                spaced.Add(UnitAt(world, i * 20.0f + 700.0f, 300.0f).Interact(new FireAura()));
+                spaced.Add(UnitAt(world, i * 20.0f + 700.0f, 300.0f).Interact(new FireAura(), Game.Instance));
                 starts.Add(Tracking.StepNow);
                 Steps(world, 1);
             }
@@ -850,7 +843,7 @@ namespace Moonwell.Testing
             }
             Fresh();
             var a = UnitAt(world, 0.0f, 0.0f);
-            var lone = a.Interact(new FireAura());
+            var lone = a.Interact(new FireAura(), Game.Instance);
             var from = Tracking.StepNow;
             Steps(world, 16);
             Expect.True(lone.TickSteps.Count >= 1, "a lone aura after an install checks in its first tick");
@@ -887,7 +880,7 @@ namespace Moonwell.Testing
 
             var aura = new FireAura();
             aura.Tag = unit => names[unit];
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             ExpectLog(new string[]
             {

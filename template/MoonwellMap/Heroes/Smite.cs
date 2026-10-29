@@ -20,10 +20,10 @@ namespace MoonwellMap.Heroes
         public override void OnCast(Cast cast)
         {
             // A unit's name is in each player's own language, so it is read on the owner's machine only.
-            Local.For(cast.Caster.Player, () =>
+            Local.For(cast.Caster.Owner, () =>
             {
                 var target = cast.Target == null ? "nothing" : cast.Target.Name;
-                cast.Caster.Player.Print("Smite, level " + cast.Level + ", at " + target);
+                cast.Caster.Owner.Print("Smite, level " + cast.Level + ", at " + target);
             });
         }
     }

@@ -44,7 +44,7 @@ public class MachineLocalTests
 
                     public static void Run(Player p)
                     {
-                        Timer.Every(1f, [MachineLocal] () => { last = Natives.GetCameraTargetPositionX(); });
+                        Game.Instance.Every(1f, [MachineLocal] () => { last = Natives.GetCameraTargetPositionX(); });
                         Changed += [MachineLocal] () => { last = Natives.GetCameraTargetPositionY(); };
                         Local.For(p, [MachineLocal] () => { last = Natives.GetCameraTargetPositionX(); });
                         Action later = [MachineLocal] () => { };

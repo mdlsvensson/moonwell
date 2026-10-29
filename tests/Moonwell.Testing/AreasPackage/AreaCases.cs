@@ -15,6 +15,17 @@ namespace Moonwell.Testing
             return fake;
         }
 
+        /// <summary>An area added and ended in one instant ends its own first sweep without the never-ran report: no line of the map named its scope.</summary>
+        public static void EndedAsAddedIsQuiet(FakeWorld world)
+        {
+            Fresh();
+            var area = new LogArea(Square(), 1f);
+            Game.Instance.Add(area);
+            area.End();
+            Expect.True(area.HasEnded, "the area has ended");
+            Expect.Equal(0, ScopeCases.NeverRanReports(world), "the reports: " + string.Join(" | ", world.Logged));
+        }
+
         /// <summary>A rect from (0, 0) to (256, 256).</summary>
         private static AreaShape Square()
         {
@@ -275,22 +286,6 @@ namespace Moonwell.Testing
             Expect.True(!area.Has(unit), "refuses the unit");
         }
 
-        /// <summary>Every reaction runs with the area as the current owner.</summary>
-        public static void ReactionOwner(FakeWorld world)
-        {
-            var fake = Fresh();
-            var area = Added(world, new LogArea(Square(), 1f));
-            var unit = UnitAt(world, 10f, 10f);
-            fake.Enter(fake.Regions[0], unit.Handle);
-            Expect.Same(area, area.OwnerSeen, "OnUnitEntered");
-            area.OwnerSeen = null;
-            world.Advance(1f);
-            Expect.Same(area, area.OwnerSeen, "OnUnitStays");
-            area.OwnerSeen = null;
-            fake.Leave(fake.Regions[0], unit.Handle);
-            Expect.Same(area, area.OwnerSeen, "OnUnitLeft");
-        }
-
         /// <summary>A circle area makes the cells of the shape and no rect; a region area makes one rect and no cells; a union makes both; each region is listened to once, and the deaths once for the package.</summary>
         public static void Cells(FakeWorld world)
         {
@@ -399,14 +394,14 @@ namespace Moonwell.Testing
             var c = UnitAt(world, 30f, 30f);
             var d = UnitAt(world, 40f, 40f);
             Expect.True(!AreaTracker.Running, "no timer while no area has a unit");
-            var owned = Game.Instance.OwnedCount;
+            var owned = Game.Instance.ChildCount;
             fake.Enter(fake.Regions[0], a.Handle);
             Expect.True(AreaTracker.Running, "a timer once an area has a unit");
-            Expect.Equal(owned + 2, Game.Instance.OwnedCount, "two timers more, the step and the check");
+            Expect.Equal(owned + 2, Game.Instance.ChildCount, "two timers more, the step and the check");
             fake.Enter(fake.Regions[1], b.Handle);
             fake.Enter(fake.Regions[2], c.Handle);
             fake.Enter(fake.Regions[3], d.Handle);
-            Expect.Equal(owned + 2, Game.Instance.OwnedCount, "still two timers for four areas");
+            Expect.Equal(owned + 2, Game.Instance.ChildCount, "still two timers for four areas");
             world.Advance(2f);
             Expect.Equal(4, half.SinceAtStay.Count, "Tick 0.5 over 2 seconds");
             Expect.Equal(2, one.SinceAtStay.Count, "Tick 1 over 2 seconds");
@@ -419,7 +414,7 @@ namespace Moonwell.Testing
             Expect.True(AreaTracker.Running, "the fourth area still has a unit");
             fake.Leave(fake.Regions[3], d.Handle);
             Expect.True(!AreaTracker.Running, "the timer ends when no area has a unit");
-            Expect.Equal(owned, Game.Instance.OwnedCount, "and is not owned any more");
+            Expect.Equal(owned, Game.Instance.ChildCount, "and is not owned any more");
             world.Advance(2f);
             Expect.Equal(4, half.SinceAtStay.Count, "nothing ran after");
         }
@@ -465,12 +460,12 @@ namespace Moonwell.Testing
                 fake.Leave(fake.Regions[0], a.Handle);
                 fake.Enter(fake.Regions[1], a.Handle);
             };
-            var owned = Game.Instance.OwnedCount;
+            var owned = Game.Instance.ChildCount;
             world.Advance(AreaTracker.Interval);
             ExpectLog(from, new[] { "entered a", "stays a", "left a" }, "the first area stayed once and the unit left it");
             ExpectLog(to, new[] { "entered a" }, "the unit entered the second, which is not due in the step the timer restarted in");
             Expect.True(AreaTracker.Running, "the timer runs again for the second area");
-            Expect.Equal(owned, Game.Instance.OwnedCount, "as one timer, the old one gone");
+            Expect.Equal(owned, Game.Instance.ChildCount, "as one timer, the old one gone");
             world.Advance(AreaTracker.Interval);
             ExpectLog(to, new[] { "entered a", "stays a" }, "the second stays at the new timer's first step");
             world.Advance(AreaTracker.Interval * 2f);
@@ -495,12 +490,12 @@ namespace Moonwell.Testing
                 fake.Enter(fake.Regions[1], a.Handle);
                 fake.Leave(fake.Regions[0], a.Handle);
             };
-            var owned = Game.Instance.OwnedCount;
+            var owned = Game.Instance.ChildCount;
             world.Advance(AreaTracker.Interval);
             ExpectLog(from, new[] { "entered a", "stays a", "left a" }, "the first area stayed once and the unit left it");
             ExpectLog(to, new[] { "entered a" }, "the unit entered the second, which is not due in the step it entered in");
             Expect.True(AreaTracker.Running, "the timer kept running");
-            Expect.Equal(owned, Game.Instance.OwnedCount, "as the same one timer");
+            Expect.Equal(owned, Game.Instance.ChildCount, "as the same one timer");
             world.Advance(AreaTracker.Interval);
             ExpectLog(to, new[] { "entered a", "stays a" }, "the second stays at the next step");
             world.Advance(AreaTracker.Interval * 2f);

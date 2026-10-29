@@ -66,7 +66,7 @@ namespace Moonwell.Testing
             var dart = new Dart();
             dart.Velocity = new Vector3(300.0f, 400.0f, 0.0f);
             dart.Radius = 24.0f;
-            Missile.Create(dart, 512.0f, 512.0f, 100.0f);
+            Missile.Create(dart, 512.0f, 512.0f, 100.0f, Game.Instance);
             DebugMode.Select(dart);
             Expect.Equal("speed 500 · velocity 300, 400, 0 · radius 24", LineStarting(debug, "speed "), "the missile's line");
             Expect.Same(null, LineStarting(debug, "pushed"), "no push line for a missile");
@@ -102,12 +102,12 @@ namespace Moonwell.Testing
             var debug = On(world);
             var first = new Dart();
             first.Speed = 300.0f;
-            Missile.Create(first, 512.0f, 512.0f, 100.0f);
+            Missile.Create(first, 512.0f, 512.0f, 100.0f, Game.Instance);
             var second = new Dart();
             second.Speed = 300.0f;
-            Missile.Create(second, 256.0f, 256.0f, 100.0f);
+            Missile.Create(second, 256.0f, 256.0f, 100.0f, Game.Instance);
             var ended = new Dart();
-            Missile.Create(ended, 768.0f, 768.0f, 100.0f);
+            Missile.Create(ended, 768.0f, 768.0f, 100.0f, Game.Instance);
             ended.End();
             PusheeAt(world, 1024.0f, 1024.0f).Push(400.0f, 0.0f);
             debug.Chat(0, "-stats");
@@ -117,7 +117,7 @@ namespace Moonwell.Testing
             ball.GroundContact = Contact.Slide;
             ball.Gravity = 800.0f;
             ball.Friction = 1000.0f;
-            Missile.Create(ball, 1536.0f, 1536.0f, 16.0f);
+            Missile.Create(ball, 1536.0f, 1536.0f, 16.0f, Game.Instance);
             for (var i = 0; i < 32 && ball.Rested == 0; i++)
             {
                 Steps(world, 1);

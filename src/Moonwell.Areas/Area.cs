@@ -19,10 +19,9 @@ namespace Moonwell
     /// <c>OnUnitStays</c>, runs only while an area with a <c>Tick</c> has a unit inside. Adding an area lists every unit of
     /// every player once, three natives each, to find those already inside: on a map of thousands of units, an area made
     /// at each cast pays that at each cast. Add it in the map's <c>Components</c> or with <c>Game.Instance.Add</c>; ending it
-    /// lets every unit inside leave. What a reaction makes that has an owner (a timer, an interaction) belongs to the area
-    /// (decision 11) and ends when the area ends, so one made in <c>OnUnitLeft</c> while the area ends is ended at once; a
-    /// buff or component added to a unit is the unit's (decision 65). Make it inside <c>Game.Instance.Run</c> to outlive the
-    /// area.
+    /// lets every unit inside leave. A timer or interaction a reaction makes in the area's scope ends when the area ends, so
+    /// one made in <c>OnUnitLeft</c> while the area ends is ended at once; name another scope, such as
+    /// <c>Game.Instance</c>, to outlive the area. A buff or component added to a unit is the unit's (decision 65).
     /// </summary>
     public abstract class Area : GameComponent
     {
@@ -593,11 +592,9 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Asks Accepts with the area as the current owner; a failing Accepts is reported and refuses the unit.</summary>
+        /// <summary>Asks Accepts; a failing Accepts is reported and refuses the unit.</summary>
         private bool CallAccepts(Unit unit)
         {
-            var previous = Owner.current;
-            Owner.current = this;
             var answer = false;
             try
             {
@@ -608,15 +605,12 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".Accepts", error);
             }
 
-            Owner.current = previous;
             return answer;
         }
 
-        /// <summary>Runs OnUnitEntered with the area as the current owner; a failing one is reported.</summary>
+        /// <summary>Runs OnUnitEntered; a failing one is reported.</summary>
         private void CallEntered(Unit unit)
         {
-            var previous = Owner.current;
-            Owner.current = this;
             try
             {
                 OnUnitEntered(unit);
@@ -625,15 +619,11 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnUnitEntered", error);
             }
-
-            Owner.current = previous;
         }
 
-        /// <summary>Runs OnUnitStays with the area as the current owner; a failing one is reported.</summary>
+        /// <summary>Runs OnUnitStays; a failing one is reported.</summary>
         private void CallStays(Unit unit)
         {
-            var previous = Owner.current;
-            Owner.current = this;
             try
             {
                 OnUnitStays(unit);
@@ -642,15 +632,11 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnUnitStays", error);
             }
-
-            Owner.current = previous;
         }
 
-        /// <summary>Runs OnUnitLeft with the area as the current owner; a failing one is reported.</summary>
+        /// <summary>Runs OnUnitLeft; a failing one is reported.</summary>
         private void CallLeft(Unit unit)
         {
-            var previous = Owner.current;
-            Owner.current = this;
             try
             {
                 OnUnitLeft(unit);
@@ -659,8 +645,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnUnitLeft", error);
             }
-
-            Owner.current = previous;
         }
     }
 }

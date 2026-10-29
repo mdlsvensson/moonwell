@@ -21,9 +21,6 @@ namespace Moonwell.Testing
         /// <summary>The things CanHit was asked about, in the order asked.</summary>
         public List<Actor> Asked = new List<Actor>();
 
-        /// <summary>The owner that was current when OnImpact last ran.</summary>
-        public Owner? ImpactedWith;
-
         /// <summary>The answer CanHit gives instead of the default; null for the default.</summary>
         public Func<Actor, bool>? Hit;
 
@@ -67,7 +64,7 @@ namespace Moonwell.Testing
             return base.CanHit(other);
         }
 
-        /// <summary>Records the impact, what it read and the current owner, then runs the action.</summary>
+        /// <summary>Records the impact and what it read, then runs the action.</summary>
         public override void OnImpact(Impact impact)
         {
             TestLog.Lines.Add("shot impact");
@@ -83,7 +80,6 @@ namespace Moonwell.Testing
             Reads.Add(normal.Z);
             Reads.Add(impact.Speed);
             Damages.Add(impact.Damage);
-            ImpactedWith = Owner.Current;
             if (Impacting != null)
             {
                 Impacting(impact);

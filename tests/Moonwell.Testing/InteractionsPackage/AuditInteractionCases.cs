@@ -89,7 +89,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, -700.0f, -800.0f);
             var aura = new FireAura(300.0f, 0.03125f);
             aura.Tag = unit => unit == b ? "b" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 4);
             Expect.Equal(1, aura.Pairs.Count, "a and b have met");
             var pair = aura.Pairs[0];
@@ -114,7 +114,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, -700.0f, -800.0f);
             var aura = new FireAura(300.0f, 0.03125f);
             aura.Tag = unit => unit == b ? "b" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 4);
             aura.Pairs[0].Stop();
             Steps(world, 4);
@@ -139,7 +139,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, -700.0f, -800.0f);
             var aura = new FireAura(300.0f, 0.03125f);
             aura.Tag = unit => unit == b ? "b" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 4);
             TestLog.Lines.Clear();
             world.MoveUnit(a.Handle, 800.0f, 800.0f);
@@ -162,17 +162,17 @@ namespace Moonwell.Testing
             var aura = new GuideFireAura();
             aura.Tag = unit => unit == b ? "b" : "?";
             Expect.True(aura.RecheckAccepts, "Accepts is asked again unless the interaction says not");
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 32);
             ExpectLog(new string[] { "meet b", "burn b", "burn b" }, "b, an enemy, burns");
             Expect.Equal(2, world.Dealt.Count, "twice");
-            b.Player = a.Player;
+            b.Owner = a.Owner;
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "burn b", "burn b", "part b" }, "charmed: the pair parts at the next tick");
             Steps(world, 32);
             Expect.Equal(2, world.Dealt.Count, "and b is burnt no more");
             Expect.Equal(0, aura.Pairs.Count, "no pair");
-            b.Player = Player.Get(1);
+            b.Owner = Player.Get(1);
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "burn b", "burn b", "part b", "meet b", "burn b" }, "an enemy again, b meets again at the next tick");
             Expect.Equal(3, world.Dealt.Count, "and burns");
@@ -189,14 +189,14 @@ namespace Moonwell.Testing
             var aura = new GuideFireAura(false);
             aura.Tag = unit => unit == b ? "b" : "?";
             Expect.True(!aura.RecheckAccepts, "turned off");
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
-            b.Player = a.Player;
+            b.Owner = a.Owner;
             Steps(world, 32);
             ExpectLog(new string[] { "meet b", "burn b", "burn b", "burn b" }, "the pair is kept and burns on");
         }
 
-        /// <summary>A pair that Accepts refuses at a tick parts (OnPart once), and the other is not asked again in that check; it is asked again at the next tick, as any other in range, and meets again once accepted. Accepts runs with the interaction as the current owner, and a paused pair is asked too, as it still parts.</summary>
+        /// <summary>A pair that Accepts refuses at a tick parts (OnPart once), and the other is not asked again in that check; it is asked again at the next tick, as any other in range, and meets again once accepted. A paused pair is asked too, as it still parts.</summary>
         public static void RecheckRefusalPartsAndMeetsAgain(FakeWorld world)
         {
             Fresh();
@@ -206,17 +206,15 @@ namespace Moonwell.Testing
             aura.Tag = unit => unit == b ? "b" : "?";
             var accept = true;
             aura.Accepting = unit => accept;
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             Expect.Equal(1, aura.Asked, "asked before the meeting");
             Steps(world, 16);
             Expect.Equal(2, aura.Asked, "and again before the next tick");
             ExpectLog(new string[] { "meet b", "tick b", "tick b" }, "accepted, it ticks");
-            aura.AskedAs = null;
             accept = false;
             Steps(world, 16);
             Expect.Equal(3, aura.Asked, "refused once in the check, not asked again in it");
-            Expect.Same(aura, aura.AskedAs, "with the interaction as the current owner");
             ExpectLog(new string[] { "meet b", "tick b", "tick b", "part b" }, "the refused pair parts, with no tick");
             Steps(world, 16);
             Expect.Equal(4, aura.Asked, "asked again at the next tick");
@@ -248,7 +246,7 @@ namespace Moonwell.Testing
 
                 return true;
             };
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             throws = true;
             Steps(world, 16);
@@ -257,7 +255,6 @@ namespace Moonwell.Testing
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b", "part b" }, "asked again, it threw again: no meeting");
             Expect.Equal(3, aura.Asked, "asked once at each check");
-            Expect.Same(Runtime.Root, Owner.Current, "the root is the current owner after the step");
         }
 
         /// <summary>OnPart runs once per OnMeet when Accepts, asked again at a tick, ends a pair itself, ends its other, or ends the interaction: each pair parts once, and the check stops when the interaction ends.</summary>
@@ -295,7 +292,7 @@ namespace Moonwell.Testing
 
                 return true;
             };
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b", "meet c", "tick c", "meet d", "tick d" }, "three pairs");
             round = 1;
@@ -383,7 +380,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var shine = new Shine();
             shine.Tag = unit => unit == b ? "b" : "?";
-            barrel.Interact(shine);
+            barrel.Interact(shine, Game.Instance);
             Expect.Equal(2, Tracking.Count, "the barrel and the unit are tracked");
             Expect.Equal(1, KnownDestructables.Live.Count, "no other destructable is taken in");
             Expect.True(!Tracking.Asked(Tracking.DestructableKind), "destructables are not asked for");
@@ -420,7 +417,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var shine = new Shine();
             shine.Tag = unit => unit == b ? "b" : "?";
-            orb.Interact(shine);
+            orb.Interact(shine, Game.Instance);
             Expect.Equal(2, Tracking.Count, "the orb and the unit are tracked");
             Expect.True(!Tracking.Asked(Tracking.ItemKind), "items are not asked for");
             var dropped = world.NewItem(ObjectTypes.FourCC("ofoo"));
@@ -441,8 +438,8 @@ namespace Moonwell.Testing
             Fresh();
             UnitAt(world, 500.0f, 500.0f);
             var a = UnitAt(world, 0.0f, 0.0f);
-            var well = Gizmo.Create(new Well(), 100.0f, 0.0f);
-            var census = a.Interact(new Census<Gizmo>());
+            var well = Gizmo.Create(new Well(), 100.0f, 0.0f, Game.Instance);
+            var census = a.Interact(new Census<Gizmo>(), Game.Instance);
             Expect.Equal(2, Tracking.Count, "the holder and the well are tracked");
             Expect.True(!Tracking.Asked(Tracking.UnitKind), "units are not asked for");
             Steps(world, 1);
@@ -483,7 +480,7 @@ namespace Moonwell.Testing
         {
             Fresh();
             var well = new Well();
-            var beside = Gizmo.Create(new Well(), 20.0f, 10.0f);
+            var beside = Gizmo.Create(new Well(), 20.0f, 10.0f, Game.Instance);
             var found = new List<Well>();
             var cell = -2;
             well.Leaving = () =>
@@ -491,7 +488,7 @@ namespace Moonwell.Testing
                 found = Find.InRange<Well>(10.0f, 10.0f, 50.0f);
                 cell = well.entry!.Cell;
             };
-            Gizmo.Create(well, 10.0f, 10.0f);
+            Gizmo.Create(well, 10.0f, 10.0f, Game.Instance);
             well.End();
             Expect.Equal(1, found.Count, "a Find from OnLeave finds only the gizmo beside it");
             Expect.Same(beside, found[0], "that one");

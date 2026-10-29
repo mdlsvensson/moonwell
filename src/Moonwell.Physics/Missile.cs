@@ -6,10 +6,10 @@ namespace Moonwell
     /// <summary>
     /// A map's own object that flies: a bolt, a shell, a boulder. Every missile moves the same way, once a step: its speed
     /// changes by its Acceleration, gravity pulls it down, and it moves by its velocity. Its settings are declared in the
-    /// constructor and are live after. A unit fires one with <c>unit.Fire(missile, target)</c>; <c>Missile.Create</c> places
-    /// one for code that sets its velocity itself. It belongs to the game unless it is given an owner, and ends when it
-    /// stops on the ground or on a thing it meets (its GroundContact, UnitContact and the rest), when its Duration or
-    /// MaxDistance runs out, when it leaves the world, by End, or with its owner.
+    /// constructor and are live after. A unit fires one with <c>unit.Fire(missile, target, scope)</c>;
+    /// <c>Missile.Create</c> places one for code that sets its velocity itself. It is in the scope Fire or Create
+    /// names, and ends when it stops on the ground or on a thing it meets (its GroundContact, UnitContact and the
+    /// rest), when its Duration or MaxDistance runs out, when it leaves the world, by End, or with its scope.
     /// </summary>
     public abstract class Missile : Gizmo
     {
@@ -668,15 +668,15 @@ namespace Moonwell
             get { return look; }
         }
 
-        /// <summary>Places a missile of the map at a place and height, still unless its velocity is set, for a player, and returns it. It belongs to the owner given, else to the game, not to the current owner, so a missile made in a spell's reaction outlives the cast. The player is Neutral Passive unless given. OnCreated runs with the missile as the current owner. Placed with Gizmo.Create, or with no height, a missile is the same, at its LaunchHeight above the ground.</summary>
-        public static T Create<T>(T missile, float x, float y, float z, Player? player = null, Owner? owner = null)
+        /// <summary>Places a missile of the map at a place and height, still unless its velocity is set, in a scope, which ends it when it ends, and returns it. Its owning player is Neutral Passive unless given. OnCreated runs. Placed with Gizmo.Create, or with no height, a missile is the same, at its LaunchHeight above the ground.</summary>
+        public static T Create<T>(T missile, float x, float y, float z, Scope scope, Player? owner = null)
             where T : Missile
         {
             Dev.Check(missile.entry == null, Names.NameOf(missile) + ".Create: the missile has been created already");
             Physics.EnsureInstalled();
             missile.z = z;
             missile.heightGiven = true;
-            Gizmo.Create(missile, x, y, player, owner);
+            Gizmo.Create(missile, x, y, scope, owner);
             return missile;
         }
 
@@ -712,23 +712,23 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Whether it can hit a thing it touches: asked before a contact with a unit, destructable, item, missile (each of the two is asked about the other) or wall, with the missile as the current owner; false and they pass through each other, and it is not asked again until they part. By default everything but its own Source.</summary>
+        /// <summary>Whether it can hit a thing it touches: asked before a contact with a unit, destructable, item, missile (each of the two is asked about the other) or wall; false and they pass through each other, and it is not asked again until they part. By default everything but its own Source.</summary>
         public virtual bool CanHit(Actor other)
         {
             return other != source;
         }
 
-        /// <summary>Runs at each contact, before the damage and the outcome, with the missile's owner as the current owner, so what it makes outlives a missile that stops there.</summary>
+        /// <summary>Runs at each contact, before the damage and the outcome. A Stop ends the missile right after, so what should outlast it names another scope.</summary>
         public virtual void OnImpact(Impact impact)
         {
         }
 
-        /// <summary>Runs once it lies still on the ground, with the missile as the current owner.</summary>
+        /// <summary>Runs once it lies still on the ground.</summary>
         public virtual void OnRest()
         {
         }
 
-        /// <summary>Runs when its Duration or MaxDistance has run out, just before it ends, with the missile as the current owner.</summary>
+        /// <summary>Runs when its Duration or MaxDistance has run out, just before it ends.</summary>
         public virtual void OnExpire()
         {
         }
@@ -737,12 +737,6 @@ namespace Moonwell
         internal List<GizmoComponent> StartingComponents()
         {
             return Components;
-        }
-
-        /// <summary>A missile given no owner belongs to the game, not to the current owner, so one made in a spell's reaction outlives the cast (decision 59).</summary>
-        internal override Owner DefaultOwner()
-        {
-            return Game.Instance;
         }
 
         /// <summary>Joins the physics pass, makes its effects and starts its contact checks, as Gizmo.Create places it: at the height Missile.Create gave, else at its LaunchHeight above the ground.</summary>

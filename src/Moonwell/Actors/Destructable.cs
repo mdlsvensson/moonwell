@@ -79,7 +79,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the destructable leaves the game, before its components end; HasEnded is still false here. It runs once for each OnCreated: one made for an owner that had already ended, which ends at once, runs neither.</summary>
+        /// <summary>Runs when the destructable leaves the game, before its components end; HasEnded is still false here. It runs once for each OnCreated: one made in a scope that had already ended, which ends at once, runs neither.</summary>
         protected virtual void OnLeave()
         {
         }
@@ -105,7 +105,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the destructable leaves the game. One that never came in, as one made for an owner that had ended, runs neither, as it ran no OnCreated.</summary>
+        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the destructable leaves the game. One that never came in, as one made in a scope that had ended, runs neither, as it ran no OnCreated.</summary>
         protected sealed override void OnEnd()
         {
             if (!entered)
@@ -114,8 +114,6 @@ namespace Moonwell
             }
 
             Hooks.CallEnding(this);
-            var previous = Owner.current;
-            Owner.current = this;
             try
             {
                 OnLeave();
@@ -124,8 +122,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnLeave", error);
             }
-
-            Owner.current = previous;
         }
 
         /// <summary>Removes the destructable from the game unless the game has already, and forgets it.</summary>
