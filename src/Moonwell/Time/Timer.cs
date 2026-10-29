@@ -14,6 +14,9 @@ namespace Moonwell
         /// <summary>The game time the timer is next due.</summary>
         internal float due = 0.0f;
 
+        /// <summary>Whether the scheduler has called the action at least once.</summary>
+        internal bool ran;
+
         /// <summary>
         /// How many intervals after its start a repeating timer is next due; 1 until it first runs. Its due time is worked out
         /// from the start and this count, not added up run by run, so the rounding of a float late in a game does not add up.
@@ -68,6 +71,21 @@ namespace Moonwell
             timer.End();
             return timer;
         }
+
+#if DEBUG
+        /// <summary>
+        /// Reports, in a development build, a timer its scope ended in the instant it was made, before it ran: the line that
+        /// made it named a scope already on its way out, so it does nothing, and nothing else says so. A timer ended by its own
+        /// End is not reported.
+        /// </summary>
+        internal override void Finish()
+        {
+            if (!ran && Parent != null && Parent.ending && start == Runtime.World.Now())
+            {
+                Errors.Report(Names.NameOf(Parent) + ".Timer", new MoonwellException("ended with its scope in the instant it was made, before it ran; name a scope that lasts"));
+            }
+        }
+#endif
 
         /// <summary>Adopts a new timer into its scope, and schedules it unless the scope has already ended.</summary>
         internal static Timer Start(Timer timer, Scope scope)

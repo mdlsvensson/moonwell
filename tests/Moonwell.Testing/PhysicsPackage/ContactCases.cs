@@ -906,6 +906,18 @@ namespace Moonwell.Testing
             Expect.True(well.HasEnded, "the gizmo ended at once");
         }
 
+        /// <summary>After in a missile's OnImpact, ended with the missile by its Stop in that instant, is reported in a development build.</summary>
+        public static void ImpactTimerIsReported(FakeWorld world)
+        {
+            Fresh();
+            StruckAt(world, 500.0f, 500.0f, 1, "target");
+            var bolt = new TimedShot();
+            Missile.Create(bolt, 300.0f, 500.0f, 32.0f, Game.Instance, Player.Two);
+            bolt.VX = 600.0f;
+            UntilEnded(world, bolt, 64);
+            ScopeCases.ExpectNeverRanReported(world, "Moonwell: TimedShot.Timer " + ScopeCases.NeverRan);
+        }
+
         /// <summary>After in a unit's OnStruck is the unit's, not the missile's, and runs after the missile has ended.</summary>
         public static void StruckAfterIsTheUnits(FakeWorld world)
         {

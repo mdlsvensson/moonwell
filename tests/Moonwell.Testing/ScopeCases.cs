@@ -58,6 +58,110 @@ namespace Moonwell.Testing
             Expect.Equal(0, creep.Ran, "which never ran");
         }
 
+        /// <summary>The line a development build reports for a timer its scope ended in the instant it was made, before it ran.</summary>
+        public const string NeverRan = "failed: ended with its scope in the instant it was made, before it ran; name a scope that lasts";
+
+        /// <summary>How many timers that never ran were reported.</summary>
+        public static int NeverRanReports(FakeWorld world)
+        {
+            var count = 0;
+            foreach (var line in world.Logged)
+            {
+                if (line.Contains(NeverRan))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        /// <summary>Checks that a development build reported one timer that never ran, with the line, and a release build none.</summary>
+        public static void ExpectNeverRanReported(FakeWorld world, string line)
+        {
+#if DEBUG
+            Expect.Equal(1, NeverRanReports(world), "the reports of a timer that never ran: " + string.Join(" | ", world.Logged));
+            Expect.True(world.Logged.Contains(line), "the line: " + string.Join(" | ", world.Logged));
+#else
+            Expect.Equal(0, NeverRanReports(world), "a release build reports none");
+#endif
+        }
+
+        /// <summary>A timer whose scope ends in the instant it was made is reported in a development build.</summary>
+        public static void TimerEndedAsMadeIsReported(FakeWorld world)
+        {
+            var scope = new TestScope("scope", new List<string>());
+            scope.After(1.0f, () => { });
+            scope.End();
+            ExpectNeverRanReported(world, "Moonwell: TestScope.Timer " + NeverRan);
+        }
+
+        /// <summary>A timer made in a scope that has ended ends at once and is reported in a development build.</summary>
+        public static void TimerInEndedScopeIsReported(FakeWorld world)
+        {
+            var ended = new TestScope("ended", new List<string>());
+            ended.End();
+            var timer = ended.After(1.0f, () => { });
+            Expect.True(timer.HasEnded, "the timer ended at once");
+            ExpectNeverRanReported(world, "Moonwell: TestScope.Timer " + NeverRan);
+        }
+
+        /// <summary>A timer a scope makes in itself while it ends is reported in a development build.</summary>
+        public static void TimerMadeWhileEndingIsReported(FakeWorld world)
+        {
+            var scope = new EndingTimerScope();
+            scope.End();
+            Expect.True(scope.Made!.HasEnded, "the timer ended with the scope");
+            ExpectNeverRanReported(world, "Moonwell: EndingTimerScope.Timer " + NeverRan);
+        }
+
+        /// <summary>A timer ended by its own End in the instant it was made is not reported.</summary>
+        public static void TimerEndedByItself(FakeWorld world)
+        {
+            var scope = new TestScope("scope", new List<string>());
+            var timer = scope.After(1.0f, () => { });
+            timer.End();
+            Expect.Equal(0, NeverRanReports(world), "the reports");
+        }
+
+        /// <summary>A timer whose scope ends at a later instant, before the timer ran, is not reported.</summary>
+        public static void TimerEndedLater(FakeWorld world)
+        {
+            var scope = new TestScope("scope", new List<string>());
+            scope.After(1.0f, () => { });
+            world.Advance(0.5f);
+            scope.End();
+            Expect.Equal(0, NeverRanReports(world), "the reports");
+        }
+
+        /// <summary>A timer that ran and then ended its scope in the instant it was made is not reported.</summary>
+        public static void TimerThatRan(FakeWorld world)
+        {
+            var scope = new TestScope("scope", new List<string>());
+            var ran = false;
+            Game.Instance.After(1.0f, () =>
+            {
+                scope.After(0.0f, () =>
+                {
+                    ran = true;
+                    scope.End();
+                });
+            });
+            world.Advance(1.05f);
+            Expect.True(ran, "the timer made at 1 s ran in that instant");
+            Expect.Equal(0, NeverRanReports(world), "the reports");
+        }
+
+        /// <summary>Every of 0 is refused and reported once, as a refusal; the timer given back has no parent and is not also reported as never run.</summary>
+        public static void RefusedEveryOnce(FakeWorld world)
+        {
+            var scope = new TestScope("scope", new List<string>());
+            var timer = scope.Every(0.0f, () => { });
+            Expect.True(timer.Parent == null, "the refused timer has no parent");
+            Expect.Equal(1, world.Logged.Count, "one line: " + string.Join(" | ", world.Logged));
+            Expect.True(world.Logged[0].StartsWith("Moonwell: TestScope.Every failed: seconds must be more than 0", System.StringComparison.Ordinal), "the refusal");
+        }
+
         /// <summary>A helper's timers are the scope it is given each time.</summary>
         public static void HelperUsesItsScope(FakeWorld world)
         {

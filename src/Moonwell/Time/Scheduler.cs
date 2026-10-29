@@ -173,6 +173,7 @@ namespace Moonwell
         private static void Run(Timer timer)
         {
             var reactor = timer.Parent!;
+            timer.ran = true;
             try
             {
                 timer.action();

@@ -45,6 +45,14 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "scope.missile-has-no-default", Run = ContactCases.MissileHasNoDefault });
             list.Add(new Case { Name = "scope.interact-ends-with-scope-or-holder", Run = PairCases.InteractEndsWithScopeOrHolder });
             list.Add(new Case { Name = "scope.made-in-ended-scope-ends", Run = ContactCases.MadeInEndedScopeEnds });
+            list.Add(new Case { Name = "scope.timer-ended-as-made-is-reported", Run = ScopeCases.TimerEndedAsMadeIsReported });
+            list.Add(new Case { Name = "scope.timer-in-ended-scope-is-reported", Run = ScopeCases.TimerInEndedScopeIsReported });
+            list.Add(new Case { Name = "scope.timer-made-while-ending-is-reported", Run = ScopeCases.TimerMadeWhileEndingIsReported });
+            list.Add(new Case { Name = "scope.impact-timer-is-reported", Run = ContactCases.ImpactTimerIsReported });
+            list.Add(new Case { Name = "scope.timer-ended-by-itself", Run = ScopeCases.TimerEndedByItself });
+            list.Add(new Case { Name = "scope.timer-ended-later", Run = ScopeCases.TimerEndedLater });
+            list.Add(new Case { Name = "scope.timer-that-ran", Run = ScopeCases.TimerThatRan });
+            list.Add(new Case { Name = "scope.refused-every-once", Run = ScopeCases.RefusedEveryOnce });
         }
 
         /// <summary>Adds the cases for the full audit's doc fixes: OrderedMap and OrderedSet in a foreach, and the guide's forms to write instead.</summary>
