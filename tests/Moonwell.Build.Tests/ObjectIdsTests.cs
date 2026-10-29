@@ -115,6 +115,14 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_pin_with_a_comma_and_a_non_ascii_character_gets_the_comma_message()
+        {
+            var error = Assert.Throws<BuildException>(() => Assign(Obj("Objects.Burn", "ability", pin: "A,é0")));
+
+            Assert.Equal("Objects.Burn has the id \"A,é0\", with a comma, which splits a list field that names the object", error.Message);
+        }
+
+        [Fact]
         public void a_carrier_with_a_space_fails()
         {
             var error = Assert.Throws<BuildException>(() => Assign(Obj("Objects.Burn", "buff", pin: "B001", carrier: "A 01")));
