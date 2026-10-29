@@ -129,8 +129,9 @@ public sealed class Champion : Human.Units.Paladin
   `TooltipLearn` (Tooltip - Learn) and `TooltipLearnExtended` (Tooltip - Learn - Extended). A tooltip shows an
   object's values with World Editor's placeholders: `<A000,Dur1>` an ability's at a level, `<h000,realHP>` a unit's,
   `<I000,uses>` an item's charges. The game rounds a value down to a whole number, so a decimal one takes `,.` (one
-  decimal, `<A000,DataA1,.>`) or `,%` (times 100). The game shows a buff's extended tooltip only up to its first
-  comma, quoted or not, so a comma in it fails the build, and placeholders, which hold one, cannot go in it.
+  decimal, `<A000,DataA1,.>`) or `,%` (times 100). The game shows a map's own buff's extended tooltip only up to its
+  first comma, quoted or not, so a comma in it fails the build, and placeholders, which hold one, cannot go in it. A new
+  buff that keeps a standard text with a comma (Flame Strike's) fails too: set `TooltipExtended`.
 - A field with no name of its own is set by its id: `Set("Htb1", 2, 250f)`.
 - A constructor may compute, but must not call the game: the build fails at such a line. A live member with no declared
   field there (`Life = 300`, `Kill()`, `X`) is error MW0012, which says what to set instead where there is one: a unit

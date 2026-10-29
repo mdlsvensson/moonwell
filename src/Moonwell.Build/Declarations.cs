@@ -176,6 +176,8 @@ namespace Moonwell.Build
                     declared.Add(Construct(type, comparer, project));
                 }
 
+                ObjectFiles.CheckInheritedBuffTooltips(declared, standard, set);
+
                 var named = new SortedDictionary<string, string>(StringComparer.Ordinal);
                 foreach (var one in declared)
                 {

@@ -130,6 +130,33 @@ namespace Moonwell.Build
             }
         }
 
+        /// <summary>
+        /// Fails a new buff that keeps its standard root's extended tooltip when that text holds a comma: the game shows a
+        /// map's own buff's extended tooltip only up to its first comma, inherited or not, where the game's own buff shows
+        /// it whole (game facts, probe of 2026-10-29: a buff based on Flame Strike showed "This unit is in a Flame Strike").
+        /// A text the class sets is checked as it is written.
+        /// </summary>
+        /// <param name="objects">The declared objects.</param>
+        /// <param name="standard">The standard values.</param>
+        /// <param name="set">The map's set of tables: null for the base tables, else <c>melee_v0</c>, <c>custom_v0</c> or <c>custom_v1</c>.</param>
+        /// <exception cref="BuildException">A new buff inherits an extended tooltip with a comma.</exception>
+        public static void CheckInheritedBuffTooltips(IEnumerable<DeclaredObject> objects, StandardData standard, string? set)
+        {
+            foreach (var one in objects)
+            {
+                if (one.Kind != "buff" || one.Replaces || one.Changed.ContainsKey("fube"))
+                {
+                    continue;
+                }
+
+                var inherited = standard.Value(one.StandardRoot, "fube", 0, set);
+                if (inherited != null && inherited.Contains(','))
+                {
+                    throw new BuildException($"{one.ClassName}: fube (the extended tooltip) inherits \"{inherited}\" from {one.StandardRoot}, which holds a comma, and the game shows a map's own buff's extended tooltip only up to its first comma; set TooltipExtended to a text without one");
+                }
+            }
+        }
+
         private static void Add(
             Kind fileKind,
             DeclaredObject one,

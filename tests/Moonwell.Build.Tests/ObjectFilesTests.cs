@@ -588,6 +588,39 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_new_buff_inheriting_a_tooltip_with_a_comma_fails_naming_class_root_and_text()
+        {
+            // Flame Strike's own text: "This unit is in a Flame Strike, and is taking damage over time."
+            var buff = new DeclaredObject(
+                "Objects.Burning", "buff", "BHfs", false, null, "A001",
+                new SortedDictionary<string, object?> { ["fnam"] = "Burning" }, Array.Empty<string>());
+            var inherited = built.Standard.Value("BHfs", "fube", 0, null)!;
+
+            var error = Assert.Throws<BuildException>(
+                () => ObjectFiles.CheckInheritedBuffTooltips(new[] { buff }, built.Standard, null));
+
+            Assert.Contains(',', inherited);
+            Assert.Equal(
+                $"Objects.Burning: fube (the extended tooltip) inherits \"{inherited}\" from BHfs, which holds a comma, and the game shows a map's own buff's extended tooltip only up to its first comma; set TooltipExtended to a text without one",
+                error.Message);
+        }
+
+        [Fact]
+        public void a_buff_that_sets_its_tooltip_or_replaces_the_standard_one_passes_the_inherited_check()
+        {
+            var own = new DeclaredObject(
+                "Objects.Burning", "buff", "BHfs", false, null, "A001",
+                new SortedDictionary<string, object?> { ["fube"] = "Burning." }, Array.Empty<string>());
+            // The game's own buff shows its text whole.
+            var replaced = new DeclaredObject(
+                "Objects.FlameStrike", "buff", "BHfs", true, null, "A002",
+                new SortedDictionary<string, object?>(), Array.Empty<string>());
+
+            Assert.Null(Record.Exception(
+                () => ObjectFiles.CheckInheritedBuffTooltips(new[] { own, replaced }, built.Standard, null)));
+        }
+
+        [Fact]
         public void a_buff_name_with_a_comma_is_written()
         {
             var buff = new DeclaredObject(
