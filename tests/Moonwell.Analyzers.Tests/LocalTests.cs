@@ -141,11 +141,11 @@ public class LocalTests
     [Fact]
     public void fire_is_rejected_inside()
     {
-        Assert.Equal(new[] { "MW0001: unit.Fire(new Bolt(), 0f, 0f)" }, MapCode.Check("""
+        Assert.Equal(new[] { "MW0001: unit.Fire(new Bolt(), 0f, 0f, unit)" }, MapCode.Check("""
             var unit = Unit.Of(u)!;
             Local.For(p, () =>
             {
-                unit.Fire(new Bolt(), 0f, 0f);
+                unit.Fire(new Bolt(), 0f, 0f, unit);
             });
             """, "public class Bolt : Missile { }"));
     }
@@ -226,11 +226,11 @@ public class LocalTests
         var found = MapCode.Check("""
             Local.For(p, () =>
             {
-                Gizmo.Create(new Well(), 0f, 0f);
+                Gizmo.Create(new Well(), 0f, 0f, p);
             });
             """, "public sealed class Well : Gizmo { }");
 
-        Assert.Equal(new[] { "MW0001: Gizmo.Create(new Well(), 0f, 0f)" }, found);
+        Assert.Equal(new[] { "MW0001: Gizmo.Create(new Well(), 0f, 0f, p)" }, found);
     }
 
     [Fact]
@@ -241,7 +241,7 @@ public class LocalTests
             var aura = new FireAura();
             Local.For(p, () =>
             {
-                unit.Interact(aura);
+                unit.Interact(aura, unit);
             });
             """, """
             public sealed class FireAura : Interaction<Unit, Unit>
@@ -253,7 +253,7 @@ public class LocalTests
             }
             """);
 
-        Assert.Equal(new[] { "MW0001: unit.Interact(aura)" }, found);
+        Assert.Equal(new[] { "MW0001: unit.Interact(aura, unit)" }, found);
     }
 
     [Fact]

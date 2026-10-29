@@ -675,31 +675,31 @@ namespace Moonwell.Testing
         {
             var log = new List<string>();
             var owner = new TestScope("owner", log);
-            var made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0f, 0f, 0f, owner);
+            var made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0f, 0f, owner, 0f);
             Expect.Same(owner, made.Parent, "the owner of the unit");
             owner.End();
             Expect.Equal(1, world.RemovedUnits.Count, "the units the game was asked to remove");
             Expect.Same(made.Handle, world.RemovedUnits[0], "the handle removed");
         }
 
-        /// <summary>A unit created inside Run without an owner is not owned by the current owner, and outlives it.</summary>
+        /// <summary>A unit created inside Run is in the scope its line names, not in the one running the code, and outlives that one.</summary>
         public static void NotOwnedByCurrent(FakeWorld world)
         {
             var log = new List<string>();
             var owner = new TestScope("owner", log);
             Unit? made = null;
-            owner.Run(() => { made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0f, 0f, 0f); });
+            owner.Run(() => { made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0f, 0f, Game.Instance, 0f); });
             var kept = made!;
-            Expect.True(kept.Parent == null, "the unit has no owner");
+            Expect.Same(Game.Instance, kept.Parent, "the unit is in the scope its line names, not the one running the code");
             owner.End();
-            Expect.True(!kept.HasEnded, "the unit outlives the owner");
+            Expect.True(!kept.HasEnded, "the unit outlives the scope running the code");
         }
 
         /// <summary>Create of a class gives an object of that class, made from its registered id.</summary>
         public static void CreateGeneric(FakeWorld world)
         {
             ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new TestHero());
-            var made = Unit.Create<TestHero>(Player.Get(0), 0f, 0f, 0f);
+            var made = Unit.Create<TestHero>(Player.Get(0), 0f, 0f, Game.Instance, 0f);
             Expect.Equal(ObjectTypes.FourCC("H001"), made.TypeId, "the type id");
         }
 
@@ -707,10 +707,10 @@ namespace Moonwell.Testing
         public static void CreatePlace(FakeWorld world)
         {
             ObjectTypes.Unit(ObjectTypes.FourCC("H001"), () => new TestHero());
-            var made = Unit.Create<TestHero>(Player.Get(0), 30f, -40f);
+            var made = Unit.Create<TestHero>(Player.Get(0), 30f, -40f, Game.Instance);
             Expect.Near(30f, made.X, "the x of Create<T>");
             Expect.Near(-40f, made.Y, "the y of Create<T>");
-            var plain = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(1), -75f, 120f);
+            var plain = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(1), -75f, 120f, Game.Instance);
             Expect.Near(-75f, plain.X, "the x of Create with a type id");
             Expect.Near(120f, plain.Y, "the y of Create with a type id");
         }

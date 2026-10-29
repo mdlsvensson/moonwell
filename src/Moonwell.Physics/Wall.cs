@@ -96,11 +96,11 @@ namespace Moonwell
 
         /// <summary>
         /// Makes a straight upright wall from (x1, y1) to (x2, y2), as tall as the height above the ground (0, the default,
-        /// for endless), with the bounciness a bounce off it keeps of a missile's own (1 by default). It belongs to the owner
-        /// given, else to the current owner, and ends with it. The ends must differ, and the height and the bounciness must be
+        /// for endless), with the bounciness a bounce off it keeps of a missile's own (1 by default). It is in the scope given, and
+        /// ends with it. The ends must differ, and the height and the bounciness must be
         /// 0 or more.
         /// </summary>
-        public static Wall Create(float x1, float y1, float x2, float y2, float height = 0f, float bounciness = 1f, Scope? scope = null)
+        public static Wall Create(float x1, float y1, float x2, float y2, Scope scope, float height = 0f, float bounciness = 1f)
         {
             Dev.Check(x1 != x2 || y1 != y2, "Wall.Create: the two ends must differ");
             CheckHeight(height);
@@ -113,7 +113,7 @@ namespace Moonwell
             wall.y2 = y2;
             wall.height = height;
             wall.bounciness = bounciness;
-            Gizmo.Create(wall, (x1 + x2) * 0.5f, (y1 + y2) * 0.5f, null, scope);
+            Gizmo.Create(wall, (x1 + x2) * 0.5f, (y1 + y2) * 0.5f, scope);
             return wall;
         }
 

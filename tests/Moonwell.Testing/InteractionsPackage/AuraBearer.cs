@@ -9,7 +9,7 @@ namespace Moonwell.Testing
         /// <summary>Starts the aura on the unit; the unit is the current owner here.</summary>
         protected override void OnCreated()
         {
-            this.Interact(Aura);
+            this.Interact(Aura, this);
         }
     }
 }

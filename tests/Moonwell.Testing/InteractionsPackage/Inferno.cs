@@ -15,7 +15,7 @@ namespace Moonwell.Testing
         /// <summary>Starts the aura on the buff's unit; the buff is the current owner here.</summary>
         protected override void OnAdded()
         {
-            Unit.Interact(Aura);
+            Unit.Interact(Aura, this);
         }
     }
 }

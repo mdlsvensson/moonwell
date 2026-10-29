@@ -839,7 +839,7 @@ namespace Moonwell.Engine
         /// <paramref name="level"/>, it is at the launch's own height above the ground, or with an Arc its radius above the
         /// ground, so its bottom lands on the ground there. The source and its player are the missile's.
         /// </summary>
-        public static void Launch(Unit source, Missile missile, float x, float y, float above, bool level, Scope? scope)
+        public static void Launch(Unit source, Missile missile, float x, float y, float above, bool level, Scope scope)
         {
             Physics.EnsureInstalled();
             var facing = source.Facing;
@@ -859,7 +859,7 @@ namespace Moonwell.Engine
             var dz = missile.followsGround ? above - startAbove : Ground.Height(x, y) + above - startZ;
             Aim(missile, x - startX, y - startY, dz, facing);
             missile.source = source;
-            Missile.Create(missile, startX, startY, startZ, source.Owner, scope);
+            Missile.Create(missile, startX, startY, startZ, scope, source.Owner);
         }
 
         /// <summary>

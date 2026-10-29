@@ -23,8 +23,8 @@ namespace DamageFixture
     {
         public override void OnGameStart()
         {
-            var first = Unit.Create<Guard>(Player.One, 0f, 0f);
-            var second = Unit.Create<Guard>(Player.Two, 100f, 0f);
+            var first = Unit.Create<Guard>(Player.One, 0f, 0f, Game.Instance);
+            var second = Unit.Create<Guard>(Player.Two, 100f, 0f, Game.Instance);
             first.Damage(second, 10f, DamageKind.Fire, tag: "opening");
         }
     }

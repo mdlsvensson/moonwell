@@ -272,8 +272,8 @@ namespace Moonwell
             return KnownItems.TakeIn(handle, null);
         }
 
-        /// <summary>Creates an item of a type at a place; a scope, when given, holds it. Throws a MoonwellException naming the id when the game makes no item of the type.</summary>
-        public static Item Create(int typeId, float x, float y, Scope? scope = null)
+        /// <summary>Creates an item of a type at a place, in a scope, which ends it when it ends. Throws a MoonwellException naming the id when the game makes no item of the type.</summary>
+        public static Item Create(int typeId, float x, float y, Scope scope)
         {
             var handle = Runtime.World.SpawnItem(typeId, x, y);
             if (handle == null)
@@ -282,7 +282,7 @@ namespace Moonwell
             }
 
             var made = KnownItems.TakeIn(handle, scope)!;
-            if (scope != null && made.Parent == null)
+            if (made.Parent == null)
             {
                 scope.Adopt(made);
             }
@@ -290,8 +290,8 @@ namespace Moonwell
             return made;
         }
 
-        /// <summary>Creates an item of a registered class at a place; scope, when given, owns it.</summary>
-        public static T Create<T>(float x, float y, Scope? scope = null)
+        /// <summary>Creates an item of a registered class at a place, in a scope, which ends it when it ends.</summary>
+        public static T Create<T>(float x, float y, Scope scope)
             where T : Item
         {
             return (T)Create(ObjectTypes.IdOf<T>(), x, y, scope);

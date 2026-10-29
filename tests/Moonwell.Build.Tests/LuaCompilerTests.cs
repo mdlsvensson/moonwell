@@ -258,7 +258,7 @@ namespace Moonwell.Build.Tests
             {
                 // The development script names the constant in a comment, the release script has no comments.
                 Assert.Matches(@"player:Print\(""sample: a footman, facing "" \.\. System\.toString\(270\.0( --\[\[Unit\.DefaultFacing\]\])?\), -1\.0\)", script);
-                Assert.Contains("Moonwell.Unit.Create(Moonwell.ObjectTypes.FourCC(\"hfoo\"), player, 0.0, 0.0, 270.0)", script);
+                Assert.Contains("Moonwell.Unit.Create(Moonwell.ObjectTypes.FourCC(\"hfoo\"), player, 0.0, 0.0, Moonwell.Game.Instance, 270.0)", script);
             }
         }
 

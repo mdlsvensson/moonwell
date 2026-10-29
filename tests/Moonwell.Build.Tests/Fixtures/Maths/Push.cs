@@ -8,7 +8,7 @@ namespace MathsFixture
     {
         public override void OnGameStart()
         {
-            var footman = Unit.Create<Human.Units.Footman>(Player.One, 0f, 0f);
+            var footman = Unit.Create<Human.Units.Footman>(Player.One, 0f, 0f, Game.Instance);
             var wall = new Polygon(new Vector2(500f, -500f), new Vector2(600f, -500f), new Vector2(600f, 500f), new Vector2(500f, 500f));
             var start = footman.Position();
             var end = start.Offset(45f, 300f);

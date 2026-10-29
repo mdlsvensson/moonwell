@@ -668,15 +668,15 @@ namespace Moonwell
             get { return look; }
         }
 
-        /// <summary>Places a missile of the map at a place and height, still unless its velocity is set, for a player, and returns it. It belongs to the owner given, else to the game, not to the current owner, so a missile made in a spell's reaction outlives the cast. The owning player is Neutral Passive unless given. OnCreated runs with the missile as the current owner. Placed with Gizmo.Create, or with no height, a missile is the same, at its LaunchHeight above the ground.</summary>
-        public static T Create<T>(T missile, float x, float y, float z, Player? owner = null, Scope? scope = null)
+        /// <summary>Places a missile of the map at a place and height, still unless its velocity is set, in a scope, which ends it when it ends, and returns it. Its owning player is Neutral Passive unless given. OnCreated runs with the missile as the current owner. Placed with Gizmo.Create, or with no height, a missile is the same, at its LaunchHeight above the ground.</summary>
+        public static T Create<T>(T missile, float x, float y, float z, Scope scope, Player? owner = null)
             where T : Missile
         {
             Dev.Check(missile.entry == null, Names.NameOf(missile) + ".Create: the missile has been created already");
             Physics.EnsureInstalled();
             missile.z = z;
             missile.heightGiven = true;
-            Gizmo.Create(missile, x, y, owner, scope);
+            Gizmo.Create(missile, x, y, scope, owner);
             return missile;
         }
 
@@ -737,12 +737,6 @@ namespace Moonwell
         internal List<GizmoComponent> StartingComponents()
         {
             return Components;
-        }
-
-        /// <summary>A missile given no owner belongs to the game, not to the current owner, so one made in a spell's reaction outlives the cast (decision 59).</summary>
-        internal override Scope DefaultScope()
-        {
-            return Game.Instance;
         }
 
         /// <summary>Joins the physics pass, makes its effects and starts its contact checks, as Gizmo.Create places it: at the height Missile.Create gave, else at its LaunchHeight above the ground.</summary>

@@ -56,7 +56,7 @@ namespace Moonwell.Testing
                     pair.Wait(1.0f);
                 }
             };
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             var start = Tracking.StepNow;
             Steps(world, 8);
             Expect.Equal(1, aura.TickSteps.Count, "the tick at the meeting");
@@ -84,7 +84,7 @@ namespace Moonwell.Testing
                 tries.Add(pair.TryCooldown(0.25f));
                 left.Add(pair.Cooldown);
             };
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 10);
             Expect.Equal(10, tries.Count, "a tick at every step");
             Expect.True(tries[0], "true at first");
@@ -108,7 +108,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             var pair = aura.Pairs[0];
             pair.Pause();
@@ -135,7 +135,7 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var aura = new FireAura();
             aura.Tag = unit => unit == b ? "b" : "?";
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             var pair = aura.Pairs[0];
             pair.Stop();
@@ -171,7 +171,7 @@ namespace Moonwell.Testing
                 seen.Add(pair.Data);
             };
             aura.Parting = pair => parted = pair.Data;
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             var met = aura.Pairs[0];
             Expect.Near(0.0f, since[0], "Since is 0 at the meeting");
@@ -211,7 +211,7 @@ namespace Moonwell.Testing
             };
             aura.Ticking = pair => ticking = Scope.Current;
             aura.Parting = pair => parting = Scope.Current;
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             var met = aura.Pairs[0];
             Expect.Same(aura, met.Parent, "the pair is its interaction's");
@@ -233,11 +233,36 @@ namespace Moonwell.Testing
             var a = UnitAt(world, 0.0f, 0.0f);
             UnitAt(world, 100.0f, 0.0f);
             var aura = new TimedAura();
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             var met = aura.Pairs[0];
             Expect.Same(aura, aura.Mine!.Parent, "After in OnMeet is the interaction's");
             Expect.Same(met, aura.Paired!.Parent, "the pair's After is the pair's");
+        }
+
+        /// <summary>An interaction ends with its scope or its holder, whichever ends first, and each pair parts once.</summary>
+        public static void InteractEndsWithScopeOrHolder(FakeWorld world)
+        {
+            Fresh();
+            var u = UnitAt(world, 0.0f, 0.0f);
+            UnitAt(world, 100.0f, 0.0f);
+            var scope = new TestScope("scope", new List<string>());
+            var first = new FireAura();
+            var second = new FireAura();
+            var firstParts = 0;
+            first.Parting = pair => { firstParts++; };
+            u.Interact(first, scope);
+            u.Interact(second, Game.Instance);
+            Steps(world, 16);
+            Expect.Equal(1, first.Pairs.Count, "the first met the other unit");
+            scope.End();
+            Expect.True(first.HasEnded, "the first ended with its scope");
+            Expect.Equal(1, firstParts, "its pair parted once");
+            Expect.True(!second.HasEnded, "the second goes on");
+            u.Remove();
+            Steps(world, 16);
+            Expect.True(second.HasEnded, "the second ended with its holder");
+            Expect.Equal(1, firstParts, "and the first's pair did not part again");
         }
 
         /// <summary>After in an interaction's OnPart is the interaction's, so it runs after the pair has parted.</summary>
@@ -247,7 +272,7 @@ namespace Moonwell.Testing
             var a = UnitAt(world, 0.0f, 0.0f);
             var b = UnitAt(world, 100.0f, 0.0f);
             var aura = new TimedAura();
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             Steps(world, 16);
             world.MoveUnit(b.Handle, 600.0f, 0.0f);
             Steps(world, 16);

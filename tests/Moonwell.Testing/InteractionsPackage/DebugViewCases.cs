@@ -58,7 +58,7 @@ namespace Moonwell.Testing
                     pair.TryCooldown(1.0f);
                 }
             };
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             debug.Advance(0.5f + Step / 2.0f);
             Expect.Equal(2, aura.Pairs.Count, "the aura's pairs at its first check");
             for (var i = 0; i < aura.Pairs.Count; i++)
@@ -78,7 +78,7 @@ namespace Moonwell.Testing
         {
             var debug = On(world);
             var item = ItemAt(world, 100.0f, 0.0f);
-            var well = Gizmo.Create(new Well(), 130.0f, 0.0f);
+            var well = Gizmo.Create(new Well(), 130.0f, 0.0f, Game.Instance);
             debug.CtrlClick(0, 100.0f, 0.0f);
             Expect.Same(well, DebugMode.Selected, "the gizmo is selected, not the item");
             Expect.True(!Tracking.Asked(Tracking.ItemKind), "items are not asked for after the click");
@@ -179,7 +179,7 @@ namespace Moonwell.Testing
             }
 
             var aura = new FireAura(300.0f, 0.5f);
-            a.Interact(aura);
+            a.Interact(aura, Game.Instance);
             debug.Advance(0.5f + Step / 2.0f);
             Expect.Equal(40, aura.Pairs.Count, "the aura's pairs");
             DebugMode.Select(a);
@@ -198,8 +198,8 @@ namespace Moonwell.Testing
             RegisterFootman();
             var debug = On(world);
             FootmanAt(world, 100.0f, 0.0f);
-            var well = Gizmo.Create(new Well(Step), 0.0f, 0.0f);
-            well.Interact(new Healing());
+            var well = Gizmo.Create(new Well(Step), 0.0f, 0.0f, Game.Instance);
+            well.Interact(new Healing(), Game.Instance);
             var ending = false;
             well.Ticking = () =>
             {
@@ -242,24 +242,24 @@ namespace Moonwell.Testing
         {
             RegisterFootman();
             var debug = On(world);
-            var healer = Gizmo.Create(new Well(), -989.0f, -1014.0f);
-            healer.Interact(new Healing());
+            var healer = Gizmo.Create(new Well(), -989.0f, -1014.0f, Game.Instance);
+            healer.Interact(new Healing(), Game.Instance);
             for (var column = 0; column < 15; column += 3)
             {
                 for (var row = 0; row < 15; row += 3)
                 {
                     var x = -1024.0f + 128.0f * column + 10.0f;
                     var y = -1024.0f + 128.0f * row + 10.0f;
-                    FootmanAt(world, x, y).Interact(new FireAura(300.0f, 0.5f));
-                    FootmanAt(world, x + 50.0f, y).Interact(new FireAura(300.0f, 0.5f));
+                    FootmanAt(world, x, y).Interact(new FireAura(300.0f, 0.5f), Game.Instance);
+                    FootmanAt(world, x + 50.0f, y).Interact(new FireAura(300.0f, 0.5f), Game.Instance);
                 }
             }
 
-            var clock = Gizmo.Create(new Well(Step), 778.0f, 778.0f);
+            var clock = Gizmo.Create(new Well(Step), 778.0f, 778.0f, Game.Instance);
             clock.Ticking = () => { debug.ClockSeconds += 0.002f; };
             for (var i = 0; i < 48; i++)
             {
-                Gizmo.Create(new Well(), 779.0f + i, 778.0f);
+                Gizmo.Create(new Well(), 779.0f + i, 778.0f, Game.Instance);
             }
 
             debug.Advance(3.0f + Step / 2.0f);

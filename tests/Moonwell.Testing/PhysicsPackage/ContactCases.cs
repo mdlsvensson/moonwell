@@ -78,7 +78,7 @@ namespace Moonwell.Testing
         /// <summary>Places a shot at a place with a velocity and gives it back.</summary>
         private static Shot ShotAt(Shot shot, float x, float y, float z, float vx, float vy, float vz)
         {
-            Missile.Create(shot, x, y, z);
+            Missile.Create(shot, x, y, z, Game.Instance);
             shot.VX = vx;
             shot.VY = vy;
             shot.VZ = vz;
@@ -212,7 +212,7 @@ namespace Moonwell.Testing
             bolt.Speed = 900.0f;
             bolt.ImpactDamage = 75.0f;
             bolt.DamageKind = DamageKind.Fire;
-            source.Fire(bolt, 400.0f, 500.0f);
+            source.Fire(bolt, 400.0f, 500.0f, Game.Instance);
             var look = bolt.Effect!;
             UntilEnded(world, bolt, 64);
             Expect.True(bolt.HasEnded, "it ended at the footman");
@@ -254,7 +254,7 @@ namespace Moonwell.Testing
             var bolt = new Shot();
             bolt.Speed = 600.0f;
             bolt.Hit = other => other is Unit unit && bolt.Source!.Owner.IsEnemy(unit.Owner);
-            source.Fire(bolt, 600.0f, 500.0f);
+            source.Fire(bolt, 600.0f, 500.0f, Game.Instance);
             UntilEnded(world, bolt, 64);
             Expect.True(bolt.HasEnded, "it stopped at the enemy");
             Expect.Equal(3, bolt.Asked.Count, "asked once for each: " + bolt.Asked.Count);
@@ -266,7 +266,7 @@ namespace Moonwell.Testing
 
             var plain = new Shot();
             plain.Speed = 600.0f;
-            source.Fire(plain, 600.0f, 500.0f);
+            source.Fire(plain, 600.0f, 500.0f, Game.Instance);
             UntilEnded(world, plain, 64);
             Expect.Equal(2, plain.Asked.Count, "the default: asked about the source and the ally");
             Expect.Same(source, plain.Asked[0], "the source");
@@ -289,7 +289,7 @@ namespace Moonwell.Testing
             bolt.Watch();
             bolt.Speed = 600.0f;
             bolt.ImpactDamage = 10.0f;
-            source.Fire(bolt, 600.0f, 500.0f);
+            source.Fire(bolt, 600.0f, 500.0f, Game.Instance);
             TestLog.Lines.Clear();
             UntilEnded(world, bolt, 64);
             var seen = new List<string>();
@@ -318,7 +318,7 @@ namespace Moonwell.Testing
             var second = new Shot();
             second.Speed = 600.0f;
             second.ImpactDamage = 10.0f;
-            other.Fire(second, 600.0f, 800.0f);
+            other.Fire(second, 600.0f, 800.0f, Game.Instance);
             UntilImpacts(world, second, 1, 64);
             Expect.Equal(1, second.Impacts.Count, "it met the reflector");
             Expect.True(!second.HasEnded, "and bounced instead of stopping");
@@ -666,7 +666,7 @@ namespace Moonwell.Testing
             bolt.UnitContact = Contact.None;
             bolt.DestructableContact = Contact.Stop;
             bolt.ImpactDamage = 40.0f;
-            source.Fire(bolt, 700.0f, 500.0f);
+            source.Fire(bolt, 700.0f, 500.0f, Game.Instance);
             UntilEnded(world, bolt, 64);
             Expect.True(bolt.HasEnded, "it stopped");
             Expect.Equal(1, bolt.Impacts.Count, "OnImpact once");
@@ -692,7 +692,7 @@ namespace Moonwell.Testing
             bolt.UnitContact = Contact.None;
             bolt.ItemContact = Contact.Stop;
             bolt.ImpactDamage = 40.0f;
-            source.Fire(bolt, 700.0f, 500.0f);
+            source.Fire(bolt, 700.0f, 500.0f, Game.Instance);
             UntilEnded(world, bolt, 64);
             Expect.True(bolt.HasEnded, "it stopped");
             Expect.Equal(1, bolt.Impacts.Count, "OnImpact once");
@@ -742,7 +742,7 @@ namespace Moonwell.Testing
             bolt.ImpactDamage = 10.0f;
             bolt.Watch();
             bolt.Impacting = impact => bolt.End();
-            source.Fire(bolt, 600.0f, 100.0f);
+            source.Fire(bolt, 600.0f, 100.0f, Game.Instance);
             var look = bolt.Effect!;
             TestLog.Lines.Clear();
             UntilEnded(world, bolt, 64);
@@ -821,7 +821,7 @@ namespace Moonwell.Testing
             shot.ImpactModel = "thud.mdl";
             shot.Speed = 600.0f;
             shot.ImpactDamage = 10.0f;
-            killed.Fire(shot, 600.0f, 900.0f);
+            killed.Fire(shot, 600.0f, 900.0f, Game.Instance);
             var shotLook = shot.Effect!;
             dealt = world.Dealt.Count;
             UntilEnded(world, shot, 64);
@@ -842,7 +842,7 @@ namespace Moonwell.Testing
             var fired = 0;
             var bolt = new Shot();
             bolt.Impacting = impact => owner.After(0.25f, () => fired++);
-            Missile.Create(bolt, 300.0f, 500.0f, 32.0f, Player.Two, owner);
+            Missile.Create(bolt, 300.0f, 500.0f, 32.0f, owner, Player.Two);
             bolt.VX = 600.0f;
             UntilEnded(world, bolt, 64);
             Expect.True(bolt.HasEnded, "it stopped");
@@ -858,7 +858,7 @@ namespace Moonwell.Testing
             Fresh();
             StruckAt(world, 500.0f, 500.0f, 1, "target");
             var bolt = new TimedShot();
-            Missile.Create(bolt, 300.0f, 500.0f, 32.0f, Player.Two, Game.Instance);
+            Missile.Create(bolt, 300.0f, 500.0f, 32.0f, Game.Instance, Player.Two);
             bolt.VX = 600.0f;
             UntilEnded(world, bolt, 64);
             Expect.True(bolt.HasEnded, "the bolt stopped on the unit");
@@ -866,6 +866,48 @@ namespace Moonwell.Testing
             Expect.True(bolt.Made!.HasEnded, "and ended with it");
             Steps(world, 64);
             Expect.Equal(0, bolt.Ran, "never running");
+        }
+
+        /// <summary>A unit, an item, a gizmo, a wall and a missile made in a scope are its children, and end when it ends.</summary>
+        public static void CreateAdopts(FakeWorld world)
+        {
+            Fresh();
+            var scope = new TestScope("scope", new List<string>());
+            var unit = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.One, 100.0f, 100.0f, scope);
+            var item = Item.Create(ObjectTypes.FourCC("ofoo"), 200.0f, 200.0f, scope);
+            var well = Gizmo.Create(new Well(), 300.0f, 300.0f, scope);
+            var wall = Wall.Create(400.0f, 400.0f, 400.0f, 600.0f, scope);
+            var bolt = Missile.Create(new Shot(), 500.0f, 500.0f, 32.0f, scope);
+            Expect.Same(scope, unit.Parent, "the unit's parent");
+            Expect.Same(scope, item.Parent, "the item's parent");
+            Expect.Same(scope, well.Parent, "the gizmo's parent");
+            Expect.Same(scope, wall.Parent, "the wall's parent");
+            Expect.Same(scope, bolt.Parent, "the missile's parent");
+            scope.End();
+            Expect.True(unit.HasEnded && item.HasEnded && well.HasEnded && wall.HasEnded && bolt.HasEnded, "each ended with the scope");
+        }
+
+        /// <summary>A missile fired in a scope is that scope's, not the game's.</summary>
+        public static void MissileHasNoDefault(FakeWorld world)
+        {
+            Fresh();
+            var scope = new TestScope("scope", new List<string>());
+            var source = FootmanAt(world, 300.0f, 500.0f, 1);
+            var target = FootmanAt(world, 900.0f, 500.0f, 2);
+            var bolt = source.Fire(new Shot(), target, scope);
+            Expect.Same(scope, bolt.Parent, "the missile's parent");
+            scope.End();
+            Expect.True(bolt.HasEnded, "it ended with the scope");
+        }
+
+        /// <summary>A gizmo made in a scope that has ended ends at once.</summary>
+        public static void MadeInEndedScopeEnds(FakeWorld world)
+        {
+            Fresh();
+            var ended = new TestScope("ended", new List<string>());
+            ended.End();
+            var well = Gizmo.Create(new Well(), 300.0f, 300.0f, ended);
+            Expect.True(well.HasEnded, "the gizmo ended at once");
         }
 
         /// <summary>After in a unit's OnStruck is the unit's, not the missile's, and runs after the missile has ended.</summary>
@@ -928,7 +970,7 @@ namespace Moonwell.Testing
             var bolt = new Shot();
             bolt.Speed = 600.0f;
             bolt.ImpactDamage = 20.0f;
-            source.Fire(bolt, 700.0f, 500.0f);
+            source.Fire(bolt, 700.0f, 500.0f, Game.Instance);
             Steps(world, 2);
             source.Kill();
             UntilEnded(world, bolt, 64);
@@ -941,7 +983,7 @@ namespace Moonwell.Testing
             var late = new Shot();
             late.Speed = 600.0f;
             late.ImpactDamage = 20.0f;
-            gone.Fire(late, 700.0f, 700.0f);
+            gone.Fire(late, 700.0f, 700.0f, Game.Instance);
             Steps(world, 2);
             gone.Remove();
             UntilEnded(world, late, 64);

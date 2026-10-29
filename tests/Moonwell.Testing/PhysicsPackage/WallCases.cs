@@ -37,7 +37,7 @@ namespace Moonwell.Testing
         {
             var shot = new Shot();
             shot.WallContact = contact;
-            Missile.Create(shot, x, y, z);
+            Missile.Create(shot, x, y, z, Game.Instance);
             shot.VX = vx;
             shot.VY = vy;
             return shot;
@@ -85,7 +85,7 @@ namespace Moonwell.Testing
         {
             Fresh();
             var maker = Scope.Current;
-            var wall = Wall.Create(600.0f, 200.0f, 600.0f, 800.0f);
+            var wall = Wall.Create(600.0f, 200.0f, 600.0f, 800.0f, Game.Instance);
             Expect.Same(maker, wall.Parent, "it belongs to its maker");
             Within(600.0f, wall.X1, 0.0f, "its ends: x1");
             Within(800.0f, wall.Y2, 0.0f, "y2");
@@ -111,7 +111,7 @@ namespace Moonwell.Testing
             var ghost = new Shot();
             ghost.WallContact = Contact.Stop;
             ghost.Hit = other => !(other is Wall);
-            Missile.Create(ghost, 400.0f, 300.0f, 100.0f);
+            Missile.Create(ghost, 400.0f, 300.0f, 100.0f, Game.Instance);
             ghost.VX = 600.0f;
             Steps(world, 24);
             Expect.Equal(0, ghost.Impacts.Count, "one whose CanHit refuses the wall flies through it");
@@ -119,7 +119,7 @@ namespace Moonwell.Testing
 
             var log = new List<string>();
             var keeper = new TestScope("keeper", log);
-            var soft = Wall.Create(600.0f, 1200.0f, 600.0f, 1800.0f, 0.0f, 0.5f, keeper);
+            var soft = Wall.Create(600.0f, 1200.0f, 600.0f, 1800.0f, keeper, 0.0f, 0.5f);
             Expect.Same(keeper, soft.Parent, "a wall given an owner belongs to it");
             Within(0.5f, soft.Bounciness, 0.0f, "its Bounciness");
             var dull = ShotAt(Contact.Bounce, 400.0f, 1500.0f, 100.0f, 600.0f, 0.0f);
@@ -142,7 +142,7 @@ namespace Moonwell.Testing
         public static void Slide(FakeWorld world)
         {
             Fresh();
-            Wall.Create(600.0f, 200.0f, 600.0f, 1800.0f);
+            Wall.Create(600.0f, 200.0f, 600.0f, 1800.0f, Game.Instance);
             var fast = ShotAt(Contact.Slide, 400.0f, 300.0f, 100.0f, 600.0f, 600.0f);
             UntilImpacts(world, fast, 1, 64);
             Expect.Equal(1, fast.Impacts.Count, "the fast ball met the wall");
@@ -166,11 +166,11 @@ namespace Moonwell.Testing
         public static void Checks(FakeWorld world)
         {
             Fresh();
-            var wall = Wall.Create(0.0f, 0.0f, 100.0f, 0.0f, 50.0f);
+            var wall = Wall.Create(0.0f, 0.0f, 100.0f, 0.0f, Game.Instance, 50.0f);
 #if DEBUG
-            Expect.Throws<MoonwellException>(() => Wall.Create(0.0f, 0.0f, 100.0f, 0.0f, -1.0f), "a negative height at Create");
-            Expect.Throws<MoonwellException>(() => Wall.Create(0.0f, 0.0f, 100.0f, 0.0f, 0.0f, -0.5f), "a negative bounciness at Create");
-            Expect.Throws<MoonwellException>(() => Wall.Create(50.0f, 50.0f, 50.0f, 50.0f), "two ends the same");
+            Expect.Throws<MoonwellException>(() => Wall.Create(0.0f, 0.0f, 100.0f, 0.0f, Game.Instance, -1.0f), "a negative height at Create");
+            Expect.Throws<MoonwellException>(() => Wall.Create(0.0f, 0.0f, 100.0f, 0.0f, Game.Instance, 0.0f, -0.5f), "a negative bounciness at Create");
+            Expect.Throws<MoonwellException>(() => Wall.Create(50.0f, 50.0f, 50.0f, 50.0f, Game.Instance), "two ends the same");
             Expect.Throws<MoonwellException>(() => wall.Height = -10.0f, "a negative height set");
             Within(50.0f, wall.Height, 0.0f, "the height kept");
             Expect.Throws<MoonwellException>(() => wall.Bounciness = -1.0f, "a negative bounciness set");
@@ -184,7 +184,7 @@ namespace Moonwell.Testing
         public static void Height(FakeWorld world)
         {
             Fresh();
-            var wall = Wall.Create(600.0f, 200.0f, 600.0f, 800.0f, 100.0f);
+            var wall = Wall.Create(600.0f, 200.0f, 600.0f, 800.0f, Game.Instance, 100.0f);
             Within(100.0f, wall.Height, 0.0f, "its height");
             var high = ShotAt(Contact.Stop, 400.0f, 500.0f, 200.0f, 600.0f, 0.0f);
             var low = ShotAt(Contact.Stop, 400.0f, 600.0f, 50.0f, 600.0f, 0.0f);
@@ -199,7 +199,7 @@ namespace Moonwell.Testing
         public static void Fast(FakeWorld world)
         {
             Fresh();
-            Wall.Create(600.0f, 300.0f, 600.0f, 700.0f);
+            Wall.Create(600.0f, 300.0f, 600.0f, 700.0f, Game.Instance);
             var along = ShotAt(Contact.Stop, 600.0f, 100.0f, 100.0f, 0.0f, 3000.0f);
             var across = ShotAt(Contact.Stop, 100.0f, 520.0f, 100.0f, 3000.0f, 0.0f);
             Steps(world, 16);
@@ -262,7 +262,7 @@ namespace Moonwell.Testing
             }
 
             Terrain.Install(new FakeTerrainWorld(), 16, 16, shift, shift, text);
-            Wall.Create(200.0f + shift, 100.0f + shift, 1400.0f + shift, 1300.0f + shift);
+            Wall.Create(200.0f + shift, 100.0f + shift, 1400.0f + shift, 1300.0f + shift, Game.Instance);
         }
 
         /// <summary>Lays a ball with the given contacts, Gravity 800 and Friction 20 against the slope's wall, its radius from the wall's line, y = x - 100, on the side the ground falls toward the wall from, and gives it back.</summary>
@@ -275,7 +275,7 @@ namespace Moonwell.Testing
             ball.Friction = 20.0f;
             x = 1000.0f + 16.0f * 0.70710678f;
             y = 900.0f - 16.0f * 0.70710678f;
-            Missile.Create(ball, x, y, Physics.GroundHeight(x, y) + 16.0f);
+            Missile.Create(ball, x, y, Physics.GroundHeight(x, y) + 16.0f, Game.Instance);
             return ball;
         }
 
@@ -335,7 +335,7 @@ namespace Moonwell.Testing
         private static void IntoCorner(FakeWorld world, Contact ground, Contact side, string what)
         {
             SlopeWithWall();
-            Wall.Create(300.0f, 200.0f, 600.0f, -100.0f);
+            Wall.Create(300.0f, 200.0f, 600.0f, -100.0f, Game.Instance);
             float x;
             float y;
             var ball = AgainstSlopeWall(ground, side, out x, out y);
@@ -411,8 +411,8 @@ namespace Moonwell.Testing
                         var a = halves[h] * 0.0174532925f;
                         var ca = MathF.Cos(a);
                         var sa = MathF.Sin(a);
-                        Wall.Create(800.0f, 800.0f, 800.0f + 500.0f * ca, 800.0f + 500.0f * sa);
-                        Wall.Create(800.0f, 800.0f, 800.0f + 500.0f * ca, 800.0f - 500.0f * sa);
+                        Wall.Create(800.0f, 800.0f, 800.0f + 500.0f * ca, 800.0f + 500.0f * sa, Game.Instance);
+                        Wall.Create(800.0f, 800.0f, 800.0f + 500.0f * ca, 800.0f - 500.0f * sa, Game.Instance);
                         var x = 800.0f + 150.0f * ca;
                         var y = 800.0f + (o == 0 ? 0.0f : 150.0f * sa - 25.0f / ca);
                         var ball = new Ball();
@@ -420,7 +420,7 @@ namespace Moonwell.Testing
                         ball.WallContact = contacts[c];
                         ball.Gravity = 800.0f;
                         ball.Friction = 20.0f;
-                        Missile.Create(ball, x, y, Physics.GroundHeight(x, y) + 16.0f);
+                        Missile.Create(ball, x, y, Physics.GroundHeight(x, y) + 16.0f, Game.Instance);
                         var settled = 0;
                         var lastX = 0.0f;
                         var lastY = 0.0f;
@@ -465,7 +465,7 @@ namespace Moonwell.Testing
                 {
                     var what = contacts[c] + " with Friction " + frictions[f] + ": ";
                     SlopeOnly();
-                    var wall = Wall.Create(600.0f, 0.0f, 600.0f, 2000.0f);
+                    var wall = Wall.Create(600.0f, 0.0f, 600.0f, 2000.0f, Game.Instance);
                     var ball = Resting(world, contacts[c], frictions[f]);
                     Expect.Equal(1, ball.Rested, what + "it rests against the wall");
                     var restX = ball.X;
@@ -474,7 +474,7 @@ namespace Moonwell.Testing
                     Expect.True(ball.X < restX - 100.0f, what + "the wall ended, it goes on down the slope; at " + ball.X + " from " + restX);
 
                     SlopeOnly();
-                    var moved = Wall.Create(600.0f, 0.0f, 600.0f, 2000.0f);
+                    var moved = Wall.Create(600.0f, 0.0f, 600.0f, 2000.0f, Game.Instance);
                     var other = Resting(world, contacts[c], frictions[f]);
                     Expect.Equal(1, other.Rested, what + "the other rests against the wall");
                     moved.X = moved.X - 300.0f;
@@ -503,7 +503,7 @@ namespace Moonwell.Testing
             {
                 var what = contacts[c] + ": ";
                 SlopeOnly();
-                var wall = Wall.Create(600.0f, 0.0f, 600.0f, 2000.0f);
+                var wall = Wall.Create(600.0f, 0.0f, 600.0f, 2000.0f, Game.Instance);
                 var ball = Resting(world, contacts[c], 200.0f);
                 Expect.Equal(1, ball.Rested, what + "it rests against the wall");
                 for (var i = 0; i < 256; i++)
@@ -549,7 +549,7 @@ namespace Moonwell.Testing
             ball.WallContact = contact;
             ball.Gravity = 800.0f;
             ball.Friction = friction;
-            Missile.Create(ball, 640.0f, 1000.0f, Physics.GroundHeight(640.0f, 1000.0f) + 16.0f);
+            Missile.Create(ball, 640.0f, 1000.0f, Physics.GroundHeight(640.0f, 1000.0f) + 16.0f, Game.Instance);
             for (var i = 0; i < 96 && ball.Rested == 0; i++)
             {
                 Steps(world, 1);
@@ -615,7 +615,7 @@ namespace Moonwell.Testing
             ball.Radius = 0.0f;
             var x = 1000.0f + 0.70710678f + shift;
             var y = 900.0f - 0.70710678f + shift;
-            Missile.Create(ball, x, y, Physics.GroundHeight(x, y));
+            Missile.Create(ball, x, y, Physics.GroundHeight(x, y), Game.Instance);
             var least = 1.0f;
             for (var i = 0; i < 96; i++)
             {
@@ -641,7 +641,7 @@ namespace Moonwell.Testing
         public static void JumpedAlong(FakeWorld world)
         {
             Fresh();
-            Wall.Create(600.0f, 100.0f, 600.0f, 2000.0f);
+            Wall.Create(600.0f, 100.0f, 600.0f, 2000.0f, Game.Instance);
             var shot = ShotAt(Contact.Pass, 400.0f, 200.0f, 100.0f, 600.0f, 0.0f);
             var jumped = false;
             shot.Impacting = impact =>
@@ -664,7 +664,7 @@ namespace Moonwell.Testing
         public static void Push(FakeWorld world)
         {
             Fresh();
-            Wall.Create(650.0f, 100.0f, 650.0f, 1000.0f);
+            Wall.Create(650.0f, 100.0f, 650.0f, 1000.0f, Game.Instance);
             var handle = world.NewUnit(ObjectTypes.FourCC(PusheeId));
             world.MoveUnit(handle, 512.0f, 512.0f);
             var unit = (Pushee)Unit.Of(handle)!;
@@ -686,8 +686,8 @@ namespace Moonwell.Testing
         public static void PushCorner(FakeWorld world)
         {
             Fresh();
-            Wall.Create(711.0f, 421.0f, 976.0f, 607.0f);
-            Wall.Create(976.0f, 607.0f, 748.0f, 933.0f);
+            Wall.Create(711.0f, 421.0f, 976.0f, 607.0f, Game.Instance);
+            Wall.Create(976.0f, 607.0f, 748.0f, 933.0f, Game.Instance);
             var handle = world.NewUnit(ObjectTypes.FourCC(PusheeId));
             world.MoveUnit(handle, 1094.0f, 568.0f);
             var push = new Engine.Pushed(Unit.Of(handle)!, false, 16.0f);
@@ -704,7 +704,7 @@ namespace Moonwell.Testing
         public static void PushOnWall(FakeWorld world)
         {
             Fresh();
-            Wall.Create(300.0f, 512.0f, 700.0f, 512.0f);
+            Wall.Create(300.0f, 512.0f, 700.0f, 512.0f, Game.Instance);
             var north = world.NewUnit(ObjectTypes.FourCC(PusheeId));
             world.MoveUnit(north, 512.0f, 512.0f);
             var northUnit = (Pushee)Unit.Of(north)!;
@@ -727,7 +727,7 @@ namespace Moonwell.Testing
         public static void PushGlancing(FakeWorld world)
         {
             Fresh();
-            Wall.Create(300.0f, 512.0f, 2000.0f, 512.0f);
+            Wall.Create(300.0f, 512.0f, 2000.0f, 512.0f, Game.Instance);
             var units = new List<Pushee>();
             for (var i = 0; i < 40; i++)
             {

@@ -21,7 +21,7 @@ namespace Sample
         public static Unit Footman(Player player)
         {
             player.Print("sample: a footman, facing " + Unit.DefaultFacing);
-            return Unit.Create(ObjectTypes.FourCC("hfoo"), player, 0f, 0f);
+            return Unit.Create(ObjectTypes.FourCC("hfoo"), player, 0f, 0f, Game.Instance);
         }
     }
 }

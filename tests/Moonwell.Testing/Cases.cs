@@ -41,6 +41,10 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "scope.pair-after-is-the-interactions", Run = PairCases.PairAfterIsTheInteractions });
             list.Add(new Case { Name = "scope.part-after-runs", Run = PairCases.PartAfterRuns });
             list.Add(new Case { Name = "scope.helper-uses-its-scope", Run = ScopeCases.HelperUsesItsScope });
+            list.Add(new Case { Name = "scope.create-adopts", Run = ContactCases.CreateAdopts });
+            list.Add(new Case { Name = "scope.missile-has-no-default", Run = ContactCases.MissileHasNoDefault });
+            list.Add(new Case { Name = "scope.interact-ends-with-scope-or-holder", Run = PairCases.InteractEndsWithScopeOrHolder });
+            list.Add(new Case { Name = "scope.made-in-ended-scope-ends", Run = ContactCases.MadeInEndedScopeEnds });
         }
 
         /// <summary>Adds the cases for the full audit's doc fixes: OrderedMap and OrderedSet in a foreach, and the guide's forms to write instead.</summary>
@@ -168,7 +172,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.grid.settings-checked", Run = InteractionsGridCases.SettingsChecked });
             list.Add(new Case { Name = "interactions.gizmo.create", Run = GizmoCases.Create });
             list.Add(new Case { Name = "interactions.gizmo.reaction-owner", Run = GizmoCases.ReactionOwner });
-            list.Add(new Case { Name = "interactions.gizmo.default-owner", Run = GizmoCases.DefaultScope });
             list.Add(new Case { Name = "interactions.gizmo.tick", Run = GizmoCases.Tick });
             list.Add(new Case { Name = "interactions.gizmo.tick-rounding", Run = GizmoCases.TickRounding });
             list.Add(new Case { Name = "interactions.gizmo.no-tick", Run = GizmoCases.NoTick });

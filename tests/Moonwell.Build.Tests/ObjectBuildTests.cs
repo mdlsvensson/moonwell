@@ -862,7 +862,7 @@ namespace Moonwell.Build.Tests
                 Path.Combine(folder, "Spawn.cs"),
                 "using Moonwell;\n\nnamespace Sample\n{\n    public sealed class Spawn : GameComponent\n    {\n"
                 + "        public override void OnUnitDied(Unit dying, Unit? killer)\n        {\n"
-                + "            Unit.Create<Moonwell.Objects.Campaign.Units.IllidanEevi>(Player.Get(0), 0f, 0f, 0f);\n        }\n    }\n}\n");
+                + "            Unit.Create<Moonwell.Objects.Campaign.Units.IllidanEevi>(Player.Get(0), 0f, 0f, Game.Instance, 0f);\n        }\n    }\n}\n");
             ReplaceInFile(Path.Combine(folder, "Map.cs"), "Components.Add(new Hello());", "Components.Add(new Hello());\n            Components.Add(new Spawn());");
         }
 

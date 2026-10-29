@@ -14,12 +14,12 @@ namespace MoonwellMap
             var player = Player.One;
             var x = player.StartX;
             var y = player.StartY;
-            Unit.Create<Champion>(player, x, y);
+            Unit.Create<Champion>(player, x, y, Game.Instance);
 
             var enemy = Player.NeutralAggressive;
             for (var i = 0; i < 3; i++)
             {
-                Unit.Create<Human.Units.Footman>(enemy, x - 200f + i * 200f, y + 600f);
+                Unit.Create<Human.Units.Footman>(enemy, x - 200f + i * 200f, y + 600f, Game.Instance);
             }
         }
     }

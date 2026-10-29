@@ -85,15 +85,15 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Places a gizmo of the map at a place for an owning player, and returns it. It belongs to the owner, or else the current owner (a missile: the game), and ends with it; the owning player is Neutral Passive unless given. OnCreated runs with the gizmo as the current owner.</summary>
-        public static T Create<T>(T gizmo, float x, float y, Player? owner = null, Scope? scope = null)
+        /// <summary>Places a gizmo of the map at a place, in a scope, which ends it when it ends, and returns it; its owning player is Neutral Passive unless given. OnCreated runs with the gizmo as the current owner.</summary>
+        public static T Create<T>(T gizmo, float x, float y, Scope scope, Player? owner = null)
             where T : Gizmo
         {
             Dev.Check(gizmo.entry == null, Names.NameOf(gizmo) + ".Create: the gizmo has been created already");
             Interactions.EnsureInstalled();
             gizmo.player = owner ?? Player.NeutralPassive;
             gizmo.entry = Tracking.Begin(gizmo, Tracking.GizmoKind, x, y);
-            (scope ?? gizmo.DefaultScope()).Adopt(gizmo);
+            scope.Adopt(gizmo);
             if (!gizmo.HasEnded)
             {
                 gizmo.Placed();
@@ -117,8 +117,8 @@ namespace Moonwell
             return gizmo;
         }
 
-        /// <summary>Starts an interaction held by the gizmo, and returns it. It belongs to the owner, or else the current owner, and ends with it, with the gizmo, or by End. Fails in a development build when the gizmo has not been created, when it is not of the interaction's holder class, when its Range is not more than 0, or when it was started before.</summary>
-        public T Interact<T>(T interaction, Scope? scope = null)
+        /// <summary>Starts an interaction held by the gizmo, in a scope, and returns it. It ends with the scope, with the gizmo, or by End. Fails in a development build when the gizmo has not been created, when it is not of the interaction's holder class, when its Range is not more than 0, or when it was started before.</summary>
+        public T Interact<T>(T interaction, Scope scope)
             where T : Interaction
         {
             Dev.Check(entry != null, Names.NameOf(this) + ".Interact: the gizmo has not been created");
@@ -134,12 +134,6 @@ namespace Moonwell
         public void Remove()
         {
             End();
-        }
-
-        /// <summary>The owner Create adopts the gizmo into when it is given none: the current owner. A package's kind of gizmo may choose another, as a missile belongs to the game.</summary>
-        internal virtual Scope DefaultScope()
-        {
-            return Scope.Current;
         }
 
         /// <summary>Runs in Create once the gizmo has its entry and its owner, before its components are added and OnCreated runs; nothing for a plain gizmo. A package's kind of gizmo starts its own part here, as a missile joins the physics pass.</summary>

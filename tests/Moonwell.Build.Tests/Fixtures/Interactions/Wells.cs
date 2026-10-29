@@ -8,8 +8,8 @@ namespace InteractionsFixture
     {
         public override void OnGameStart()
         {
-            Unit.Create<Human.Units.Footman>(Player.One, 100f, 0f);
-            var well = Gizmo.Create(new Well(), 0f, 0f, Player.One);
+            Unit.Create<Human.Units.Footman>(Player.One, 100f, 0f, Game.Instance);
+            var well = Gizmo.Create(new Well(), 0f, 0f, Game.Instance, Player.One);
             After(1f, () =>
             {
                 var near = Find.InRange<Unit>(well.X, well.Y, 500f);
@@ -23,7 +23,7 @@ namespace InteractionsFixture
     {
         protected override void OnCreated()
         {
-            this.Interact(new FireAura());
+            this.Interact(new FireAura(), this);
         }
     }
 

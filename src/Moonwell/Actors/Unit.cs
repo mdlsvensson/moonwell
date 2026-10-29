@@ -838,8 +838,8 @@ namespace Moonwell
         /// <summary>The facing of a unit made without one, in degrees: the game's bj_UNIT_FACING.</summary>
         public const float DefaultFacing = 270.0f;
 
-        /// <summary>Creates a unit of a type for a player at a place and facing (270 degrees without one); a scope, when given, holds it. Throws a MoonwellException naming the id when the game makes no unit of the type.</summary>
-        public static Unit Create(int typeId, Player owner, float x, float y, float facing = DefaultFacing, Scope? scope = null)
+        /// <summary>Creates a unit of a type for its owning player at a place, in a scope, which ends it when it ends, and with a facing (270 degrees without one). Throws a MoonwellException naming the id when the game makes no unit of the type.</summary>
+        public static Unit Create(int typeId, Player owner, float x, float y, Scope scope, float facing = DefaultFacing)
         {
             var handle = Runtime.World.SpawnUnit(owner.Handle, typeId, x, y, facing);
             if (handle == null)
@@ -848,7 +848,7 @@ namespace Moonwell
             }
 
             var made = KnownUnits.TakeIn(handle, scope, true)!;
-            if (scope != null && made.Parent == null)
+            if (made.Parent == null)
             {
                 scope.Adopt(made);
             }
@@ -856,11 +856,11 @@ namespace Moonwell
             return made;
         }
 
-        /// <summary>Creates a unit of a registered class for a player at a place and facing (270 degrees without one); a scope, when given, holds it.</summary>
-        public static T Create<T>(Player owner, float x, float y, float facing = DefaultFacing, Scope? scope = null)
+        /// <summary>Creates a unit of a registered class for its owning player at a place, in a scope, which ends it when it ends, and with a facing (270 degrees without one).</summary>
+        public static T Create<T>(Player owner, float x, float y, Scope scope, float facing = DefaultFacing)
             where T : Unit
         {
-            return (T)Create(ObjectTypes.IdOf<T>(), owner, x, y, facing, scope);
+            return (T)Create(ObjectTypes.IdOf<T>(), owner, x, y, scope, facing);
         }
 
         /// <summary>The ability of the unit with an id: one object per id, made by the registered maker or as a plain Ability, and owned by the unit.</summary>

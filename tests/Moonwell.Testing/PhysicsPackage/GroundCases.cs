@@ -83,7 +83,7 @@ namespace Moonwell.Testing
             ball.VZ = -300.0f;
             var log = new List<string>();
             ball.Log = log;
-            Missile.Create(ball, 64.0f, 64.0f, 300.0f);
+            Missile.Create(ball, 64.0f, 64.0f, 300.0f, Game.Instance);
             var tracer = ball.Add(new Tracer(log));
             var look = ball.Effect!;
             UntilEnded(world, ball, 64);
@@ -132,7 +132,7 @@ namespace Moonwell.Testing
             ball.GroundContact = Contact.Bounce;
             ball.VX = 100.0f;
             ball.VZ = -400.0f;
-            Missile.Create(ball, 64.0f, 64.0f, 100.0f);
+            Missile.Create(ball, 64.0f, 64.0f, 100.0f, Game.Instance);
             for (var i = 0; i < 32 && ball.VZ < 0.0f; i++)
             {
                 Steps(world, 1);
@@ -163,7 +163,7 @@ namespace Moonwell.Testing
             ball.GroundContact = Contact.Bounce;
             ball.Gravity = 800.0f;
             ball.VZ = -400.0f;
-            Missile.Create(ball, 700.0f, 64.0f, Physics.GroundHeight(700.0f, 64.0f) + 100.0f);
+            Missile.Create(ball, 700.0f, 64.0f, Physics.GroundHeight(700.0f, 64.0f) + 100.0f, Game.Instance);
             Steps(world, 64);
             var settled = ball.Impacts;
             Expect.True(settled >= 3, "it bounced; " + settled + " impacts");
@@ -193,7 +193,7 @@ namespace Moonwell.Testing
             var ball = new Ball();
             ball.GroundContact = Contact.Bounce;
             ball.Gravity = 800.0f;
-            Missile.Create(ball, 1000.0f, 64.0f, Physics.GroundHeight(1000.0f, 64.0f) + 16.0f);
+            Missile.Create(ball, 1000.0f, 64.0f, Physics.GroundHeight(1000.0f, 64.0f) + 16.0f, Game.Instance);
             for (var i = 0; i < 64; i++)
             {
                 Steps(world, 1);
@@ -220,7 +220,7 @@ namespace Moonwell.Testing
             var thrown = new Ball();
             thrown.GroundContact = Contact.Bounce;
             thrown.Gravity = 800.0f;
-            Missile.Create(thrown, 64.0f, 64.0f, 16.0f);
+            Missile.Create(thrown, 64.0f, 64.0f, 16.0f, Game.Instance);
             thrown.VX = 300.0f;
             Steps(world, 16);
             Within(200.0f, thrown.VX, 7.0f, "at 200 after half a second");
@@ -245,7 +245,7 @@ namespace Moonwell.Testing
             var gentle = new Ball();
             gentle.GroundContact = Contact.Bounce;
             gentle.Gravity = 800.0f;
-            Missile.Create(gentle, 700.0f, 64.0f, Physics.GroundHeight(700.0f, 64.0f) + 16.0f);
+            Missile.Create(gentle, 700.0f, 64.0f, Physics.GroundHeight(700.0f, 64.0f) + 16.0f, Game.Instance);
             Steps(world, 32);
             Expect.Equal(1, gentle.Rested, "on a slope of 10 degrees it rests, OnRest once");
             Within(700.0f, gentle.X, 1.0f, "where it lay");
@@ -260,11 +260,11 @@ namespace Moonwell.Testing
             var bounce = new Ball();
             bounce.GroundContact = Contact.Bounce;
             bounce.Gravity = 800.0f;
-            Missile.Create(bounce, 1000.0f, 64.0f, Physics.GroundHeight(1000.0f, 64.0f) + 16.0f);
+            Missile.Create(bounce, 1000.0f, 64.0f, Physics.GroundHeight(1000.0f, 64.0f) + 16.0f, Game.Instance);
             var slide = new Ball();
             slide.GroundContact = Contact.Slide;
             slide.Gravity = 800.0f;
-            Missile.Create(slide, 1000.0f, 192.0f, Physics.GroundHeight(1000.0f, 192.0f) + 16.0f);
+            Missile.Create(slide, 1000.0f, 192.0f, Physics.GroundHeight(1000.0f, 192.0f) + 16.0f, Game.Instance);
             Steps(world, 32);
             var bounceBefore = MathF.Sqrt(bounce.VX * bounce.VX + bounce.VZ * bounce.VZ);
             var slideBefore = MathF.Sqrt(slide.VX * slide.VX + slide.VZ * slide.VZ);
@@ -383,7 +383,7 @@ namespace Moonwell.Testing
             var ball = new Ball();
             ball.GroundContact = contact;
             ball.Gravity = gravity;
-            Missile.Create(ball, x, y, Physics.GroundHeight(x, y) + 16.0f);
+            Missile.Create(ball, x, y, Physics.GroundHeight(x, y) + 16.0f, Game.Instance);
             return ball;
         }
 
@@ -431,7 +431,7 @@ namespace Moonwell.Testing
                 seenSpeed = impact.Speed;
                 ball.VZ = 0.0f;
             };
-            Missile.Create(ball, 64.0f, 64.0f, 200.0f);
+            Missile.Create(ball, 64.0f, 64.0f, 200.0f, Game.Instance);
             for (var i = 0; i < 64 && ball.Impacts == 0; i++)
             {
                 Steps(world, 1);
@@ -455,7 +455,7 @@ namespace Moonwell.Testing
             ball.GroundContact = Contact.Slide;
             ball.Gravity = 800.0f;
             ball.Friction = 1000.0f;
-            Missile.Create(ball, 64.0f, 64.0f, 100.0f);
+            Missile.Create(ball, 64.0f, 64.0f, 100.0f, Game.Instance);
             for (var i = 0; i < 320 && ball.Rested == 0; i++)
             {
                 Steps(world, 1);
@@ -488,7 +488,7 @@ namespace Moonwell.Testing
             Along(heights);
             var ball = new Ball();
             ball.VX = 1500.0f;
-            Missile.Create(ball, 124.4f, 64.0f, 60.0f);
+            Missile.Create(ball, 124.4f, 64.0f, 60.0f, Game.Instance);
             UntilEnded(world, ball, 64);
             Expect.True(ball.HasEnded, "it stopped");
             Expect.Equal(1, ball.Impacts, "OnImpact once");
@@ -517,7 +517,7 @@ namespace Moonwell.Testing
             ball.Friction = 1000.0f;
             var log = new List<string>();
             ball.Log = log;
-            Missile.Create(ball, 700.0f, 64.0f, Physics.GroundHeight(700.0f, 64.0f) + 100.0f);
+            Missile.Create(ball, 700.0f, 64.0f, Physics.GroundHeight(700.0f, 64.0f) + 100.0f, Game.Instance);
             var tracer = ball.Add(new Tracer(log));
             for (var i = 0; i < 320 && ball.Rested == 0; i++)
             {
@@ -551,7 +551,7 @@ namespace Moonwell.Testing
             roller.GroundContact = Contact.Slide;
             roller.Gravity = 800.0f;
             roller.Friction = 50.0f;
-            Missile.Create(roller, 1000.0f, 64.0f, Physics.GroundHeight(1000.0f, 64.0f) + 100.0f);
+            Missile.Create(roller, 1000.0f, 64.0f, Physics.GroundHeight(1000.0f, 64.0f) + 100.0f, Game.Instance);
             Steps(world, 96);
             Expect.Equal(0, roller.Rested, "with Friction 50 it does not rest");
             Expect.True(roller.X < 900.0f, "it rolls down the slope; was at " + roller.X);
@@ -567,7 +567,7 @@ namespace Moonwell.Testing
             ball.GroundContact = Contact.Slide;
             ball.Gravity = 800.0f;
             ball.VX = 900.0f;
-            Missile.Create(ball, 64.0f, 64.0f, 16.0f);
+            Missile.Create(ball, 64.0f, 64.0f, 16.0f, Game.Instance);
             var rolledBefore = true;
             var airborne = false;
             for (var i = 0; i < 64 && ball.X < 900.0f; i++)
@@ -601,7 +601,7 @@ namespace Moonwell.Testing
             var ball = new Ball();
             ball.GroundContact = Contact.Bounce;
             ball.VX = 600.0f;
-            Missile.Create(ball, 32.0f, 64.0f, 50.0f);
+            Missile.Create(ball, 32.0f, 64.0f, 50.0f, Game.Instance);
             for (var i = 0; i < 32 && ball.VX > 0.0f; i++)
             {
                 Steps(world, 1);
@@ -629,7 +629,7 @@ namespace Moonwell.Testing
             ball.GroundContact = Contact.Slide;
             ball.Gravity = 800.0f;
             ball.VX = 300.0f;
-            Missile.Create(ball, 32.0f, 64.0f, 16.0f);
+            Missile.Create(ball, 32.0f, 64.0f, 16.0f, Game.Instance);
             var wall = 0;
             for (var i = 1; i <= 64 && wall == 0; i++)
             {
@@ -649,7 +649,7 @@ namespace Moonwell.Testing
             twin.Gravity = 800.0f;
             twin.VX = 300.0f;
             twin.Duration = wall * Interactions.Step;
-            Missile.Create(twin, 32.0f, 64.0f, 16.0f);
+            Missile.Create(twin, 32.0f, 64.0f, 16.0f, Game.Instance);
             Steps(world, wall - 1);
             Expect.True(!twin.HasEnded, "the twin flies until the wall's step");
             Steps(world, 1);
@@ -671,7 +671,7 @@ namespace Moonwell.Testing
             var ball = new Ball();
             ball.GroundContact = Contact.Bounce;
             ball.Gravity = 800.0f;
-            Missile.Create(ball, 32.0f, 64.0f, 16.0f);
+            Missile.Create(ball, 32.0f, 64.0f, 16.0f, Game.Instance);
             ball.VX = 1500.0f;
             for (var i = 0; i < 16 && ball.Impacts == 0; i++)
             {
@@ -694,7 +694,7 @@ namespace Moonwell.Testing
             var ball = new Ball();
             ball.GroundContact = Contact.None;
             ball.VZ = -1000.0f;
-            Missile.Create(ball, 64.0f, 64.0f, 100.0f);
+            Missile.Create(ball, 64.0f, 64.0f, 100.0f, Game.Instance);
             Ground.reads = 0;
             Steps(world, 4);
             Expect.True(ball.Z < -16.0f && !ball.HasEnded, "it passes below the ground");
@@ -712,7 +712,7 @@ namespace Moonwell.Testing
             var ball = new Ball();
             ball.VZ = -100.0f;
             ball.VX = 50.0f;
-            Missile.Create(ball, 64.0f, 64.0f, 1000.0f);
+            Missile.Create(ball, 64.0f, 64.0f, 1000.0f, Game.Instance);
             Ground.reads = 0;
             Steps(world, 64);
             Expect.True(!ball.HasEnded, "still falling");
@@ -721,7 +721,7 @@ namespace Moonwell.Testing
             var follower = new Ball();
             follower.FollowsGround = true;
             follower.VX = 300.0f;
-            Missile.Create(follower, 64.0f, 128.0f, 60.0f);
+            Missile.Create(follower, 64.0f, 128.0f, 60.0f, Game.Instance);
             ball.End();
             Ground.reads = 0;
             Steps(world, 64);
@@ -735,7 +735,7 @@ namespace Moonwell.Testing
             Fresh(2, 2, GridText.Tile(wet, wet, wet, wet));
             var ball = new Ball();
             ball.VZ = -500.0f;
-            Missile.Create(ball, 64.0f, 64.0f, 200.0f);
+            Missile.Create(ball, 64.0f, 64.0f, 200.0f, Game.Instance);
             UntilEnded(world, ball, 64);
             Expect.True(ball.HasEnded, "it stopped");
             Within(-20.0f, ball.Z, 0.5f, "on the water's surface");
@@ -770,7 +770,7 @@ namespace Moonwell.Testing
             for (var k = 0; k < balls.Length; k++)
             {
                 balls[k].VX = 900.0f;
-                Missile.Create(balls[k], 200.0f, 192.0f + k * 256.0f, 330.0f);
+                Missile.Create(balls[k], 200.0f, 192.0f + k * 256.0f, 330.0f, Game.Instance);
             }
 
             var shadow = shaded.Add(new Shadow());

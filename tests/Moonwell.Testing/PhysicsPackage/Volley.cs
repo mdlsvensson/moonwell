@@ -18,7 +18,7 @@ namespace Moonwell.Testing
             Seen = Scope.Current;
             var dart = new Dart();
             dart.Speed = 100.0f;
-            Fired = Unit.Fire(dart, 1000.0f, 0.0f, Given);
+            Fired = Unit.Fire(dart, 1000.0f, 0.0f, Given ?? Game.Instance);
         }
     }
 }

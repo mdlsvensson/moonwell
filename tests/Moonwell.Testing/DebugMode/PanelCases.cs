@@ -93,7 +93,7 @@ namespace Moonwell.Testing
             Expect.True(debug.PanelLines()[1].StartsWith("Footman 2 (unit)"), "the second footman's line: " + debug.PanelLines()[1]);
             DebugMode.Select(first);
             Expect.True(debug.PanelLines()[1].StartsWith("Footman 1 (unit)"), "the first footman's line again: " + debug.PanelLines()[1]);
-            var third = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Two, 0.0f, 0.0f, scope: first);
+            var third = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Two, 0.0f, 0.0f, first);
             world.PlaceUnit(third.Handle, 1000.4f, 1234.6f);
             DebugMode.Select(third);
             Expect.Equal("Footman 3 (unit) at 1,000, 1,235 · Player 2 · in Footman 1", debug.PanelLines()[1], "the third footman's line");

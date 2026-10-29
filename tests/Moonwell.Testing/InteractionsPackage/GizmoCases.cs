@@ -23,12 +23,12 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>A made gizmo belongs to the owner it was given, or else the current owner; it plays for Neutral Passive unless given a player, it has its place, and its OnCreated ran once.</summary>
+        /// <summary>A made gizmo is in the scope it was given; it plays for Neutral Passive unless given a player, it has its place, and its OnCreated ran once.</summary>
         public static void Create(FakeWorld world)
         {
             Fresh();
-            var well = Gizmo.Create(new Well(), 10.0f, 20.0f);
-            Expect.Same(Runtime.Root, well.Parent, "owned by the current owner, the root");
+            var well = Gizmo.Create(new Well(), 10.0f, 20.0f, Game.Instance);
+            Expect.Same(Game.Instance, well.Parent, "in the game's scope, as given");
             Expect.Same(Player.NeutralPassive, well.Owner, "Neutral Passive by default");
             Expect.Equal(1, well.Created, "OnCreated ran once");
             Expect.Near(10.0f, well.X, "X");
@@ -39,32 +39,12 @@ namespace Moonwell.Testing
             Expect.Near(20.0f, position.Y, "Position.Y");
             var log = new List<string>();
             var owner = new TestScope("owner", log);
-            var owned = Gizmo.Create(new Well(), 0.0f, 0.0f, Player.Two, owner);
-            Expect.Same(owner, owned.Parent, "owned by the owner given");
+            var owned = Gizmo.Create(new Well(), 0.0f, 0.0f, owner, Player.Two);
+            Expect.Same(owner, owned.Parent, "in the scope given");
             Expect.Same(Player.Two, owned.Owner, "plays for the player given");
             owned.Owner = Player.Three;
             Expect.Same(Player.Three, owned.Owner, "the player can be changed");
-            var inside = new Well();
-            owner.Run(() => Gizmo.Create(inside, 0.0f, 0.0f));
-            Expect.Same(owner, inside.Parent, "owned by the owner that runs the code");
             Expect.Equal(1, owned.Created, "OnCreated ran once for each");
-            Expect.Equal(1, inside.Created, "and for the one made inside Run");
-        }
-
-        /// <summary>A plain gizmo given no owner is adopted by the current scope: the one running code, else the root.</summary>
-        public static void DefaultScope(FakeWorld world)
-        {
-            Fresh();
-            var log = new List<string>();
-            var owner = new TestScope("owner", log);
-            var inside = new Well();
-            owner.Run(() => Gizmo.Create(inside, 0.0f, 0.0f));
-            Expect.Same(owner, inside.Parent, "inside Run: the owner running the code");
-            var outside = Gizmo.Create(new Well(), 0.0f, 0.0f);
-            Expect.Same(Runtime.Root, outside.Parent, "outside Run: the root");
-            owner.End();
-            Expect.True(inside.HasEnded, "it ends with that owner");
-            Expect.True(!outside.HasEnded, "the root's is left");
         }
 
         /// <summary>OnCreated and OnLeave run with the gizmo as the current owner.</summary>
@@ -76,7 +56,7 @@ namespace Moonwell.Testing
             var well = new Well();
             well.Creating = () => { created = Scope.Current; };
             well.Leaving = () => { left = Scope.Current; };
-            Gizmo.Create(well, 0.0f, 0.0f);
+            Gizmo.Create(well, 0.0f, 0.0f, Game.Instance);
             Expect.Same(well, created, "Scope.Current inside OnCreated");
             well.Remove();
             Expect.Same(well, left, "Scope.Current inside OnLeave");
@@ -87,7 +67,7 @@ namespace Moonwell.Testing
         public static void Tick(FakeWorld world)
         {
             Fresh();
-            var well = Gizmo.Create(new Well(0.1f), 0.0f, 0.0f);
+            var well = Gizmo.Create(new Well(0.1f), 0.0f, 0.0f, Game.Instance);
             var start = Tracking.StepNow;
             Steps(world, 3);
             Expect.Equal(0, well.TickSteps.Count, "no tick before step 4");
@@ -106,8 +86,8 @@ namespace Moonwell.Testing
         public static void TickRounding(FakeWorld world)
         {
             Fresh();
-            var fast = Gizmo.Create(new Well(0.01f), 0.0f, 0.0f);
-            var slow = Gizmo.Create(new Well(0.11f), 0.0f, 0.0f);
+            var fast = Gizmo.Create(new Well(0.01f), 0.0f, 0.0f, Game.Instance);
+            var slow = Gizmo.Create(new Well(0.11f), 0.0f, 0.0f, Game.Instance);
             Steps(world, 8);
             Expect.Equal(8, fast.TickSteps.Count, "0.01 second runs at every step");
             Expect.Equal(2, slow.TickSteps.Count, "0.11 second is 4 steps, so 2 ticks in 8");
@@ -122,13 +102,13 @@ namespace Moonwell.Testing
         public static void NoTick(FakeWorld world)
         {
             Fresh();
-            var plain = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            var plain = Gizmo.Create(new Well(), 0.0f, 0.0f, Game.Instance);
             Steps(world, 8);
             Expect.Equal(0, plain.TickSteps.Count, "no tick");
             Expect.Near(0.0f, plain.Tick, "Tick is 0");
             var late = new Well();
             late.Creating = () => late.SetTick(0.1f);
-            Gizmo.Create(late, 0.0f, 0.0f);
+            Gizmo.Create(late, 0.0f, 0.0f, Game.Instance);
             Steps(world, 8);
             Expect.Equal(2, late.TickSteps.Count, "a tick set in OnCreated runs from then on");
             late.SetTick(0.0f);
@@ -143,7 +123,7 @@ namespace Moonwell.Testing
         public static void Move(FakeWorld world)
         {
             Fresh();
-            var well = Gizmo.Create(new Well(), 10.0f, 10.0f);
+            var well = Gizmo.Create(new Well(), 10.0f, 10.0f, Game.Instance);
             Expect.Equal(36, well.entry!.Cell, "the cell of (10, 10)");
             well.X = 300.0f;
             Expect.Equal(37, well.entry!.Cell, "setting X changes the cell at once");
@@ -169,7 +149,7 @@ namespace Moonwell.Testing
             Fresh();
             var log = new List<string>();
             var owner = new TestScope("owner", log);
-            var well = Gizmo.Create(new Well(0.1f), 10.0f, 10.0f, null, owner);
+            var well = Gizmo.Create(new Well(0.1f), 10.0f, 10.0f, owner);
             var entry = well.entry!;
             Expect.Equal(36, entry.Cell, "in the grid");
             owner.End();
@@ -181,11 +161,11 @@ namespace Moonwell.Testing
             well.Remove();
             well.End();
             Expect.Equal(1, well.Left, "ending again does nothing");
-            var removed = Gizmo.Create(new Well(), 10.0f, 10.0f);
+            var removed = Gizmo.Create(new Well(), 10.0f, 10.0f, Game.Instance);
             removed.Remove();
             Expect.True(removed.HasEnded, "Remove ends it");
             Expect.Equal(1, removed.Left, "OnLeave ran");
-            var late = Gizmo.Create(new Well(), 10.0f, 10.0f, null, owner);
+            var late = Gizmo.Create(new Well(), 10.0f, 10.0f, owner);
             Expect.True(late.HasEnded, "a gizmo made for an owner that has ended ends at once");
             Expect.Equal(-1, late.entry!.Cell, "and is not in the grid");
         }
@@ -197,7 +177,7 @@ namespace Moonwell.Testing
             var cell = -2;
             var well = new Well();
             well.Leaving = () => { cell = well.entry!.Cell; };
-            Gizmo.Create(well, 10.0f, 10.0f);
+            Gizmo.Create(well, 10.0f, 10.0f, Game.Instance);
             well.End();
             Expect.Equal(36, cell, "in its cell inside OnLeave");
             Expect.Equal(-1, well.entry!.Cell, "out of it after");
@@ -208,15 +188,15 @@ namespace Moonwell.Testing
         {
             Fresh();
             Expect.True(!Tracking.Running, "no timer before the first gizmo");
-            var first = Gizmo.Create(new Well(0.1f), 0.0f, 0.0f);
-            var second = Gizmo.Create(new Well(0.1f), 0.0f, 0.0f);
+            var first = Gizmo.Create(new Well(0.1f), 0.0f, 0.0f, Game.Instance);
+            var second = Gizmo.Create(new Well(0.1f), 0.0f, 0.0f, Game.Instance);
             Expect.True(Tracking.Running, "the timer runs with a gizmo");
             first.End();
             Expect.True(Tracking.Running, "and with the other");
             second.End();
             Expect.True(!Tracking.Running, "it ends with the last");
             world.Advance(1.0f);
-            var third = Gizmo.Create(new Well(0.1f), 0.0f, 0.0f);
+            var third = Gizmo.Create(new Well(0.1f), 0.0f, 0.0f, Game.Instance);
             Expect.True(Tracking.Running, "it starts again with the next");
             Steps(world, 8);
             Expect.Equal(2, third.TickSteps.Count, "and the next gizmo ticks");
@@ -230,7 +210,7 @@ namespace Moonwell.Testing
             Fresh();
             var well = new Well(0.01f);
             well.Ticking = () => well.End();
-            Gizmo.Create(well, 0.0f, 0.0f);
+            Gizmo.Create(well, 0.0f, 0.0f, Game.Instance);
             Steps(world, 2);
             Expect.True(well.HasEnded, "it ended in its tick");
             Expect.Equal(1, well.TickSteps.Count, "it ticked once");
@@ -248,10 +228,10 @@ namespace Moonwell.Testing
             {
                 if (made.entry == null)
                 {
-                    Gizmo.Create(made, 0.0f, 0.0f);
+                    Gizmo.Create(made, 0.0f, 0.0f, Game.Instance);
                 }
             };
-            Gizmo.Create(maker, 0.0f, 0.0f);
+            Gizmo.Create(maker, 0.0f, 0.0f, Game.Instance);
             var start = Tracking.StepNow;
             Steps(world, 6);
             Expect.Equal(1, maker.TickSteps.Count, "the maker ticked once");
@@ -265,8 +245,8 @@ namespace Moonwell.Testing
         public static void LongTick(FakeWorld world)
         {
             Fresh();
-            var exact = Gizmo.Create(new Well(8.0f), 0.0f, 0.0f);
-            var longer = Gizmo.Create(new Well(10.0f), 0.0f, 0.0f);
+            var exact = Gizmo.Create(new Well(8.0f), 0.0f, 0.0f, Game.Instance);
+            var longer = Gizmo.Create(new Well(10.0f), 0.0f, 0.0f, Game.Instance);
             var start = Tracking.StepNow;
             Steps(world, 256);
             Expect.Equal(1, exact.TickSteps.Count, "256 steps is one tick");
@@ -300,17 +280,17 @@ namespace Moonwell.Testing
             first.Ticking = () => log.Add("1");
             second.Ticking = () => log.Add("2");
             third.Ticking = () => log.Add("3");
-            Gizmo.Create(first, 0.0f, 0.0f);
-            Gizmo.Create(second, 0.0f, 0.0f);
-            Gizmo.Create(third, 0.0f, 0.0f);
-            var holder = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            Gizmo.Create(first, 0.0f, 0.0f, Game.Instance);
+            Gizmo.Create(second, 0.0f, 0.0f, Game.Instance);
+            Gizmo.Create(third, 0.0f, 0.0f, Game.Instance);
+            var holder = Gizmo.Create(new Well(), 0.0f, 0.0f, Game.Instance);
             var aura = new Healing();
-            holder.Interact(aura);
+            holder.Interact(aura, Game.Instance);
             var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"));
             world.MoveUnit(handle, 100.0f, 0.0f);
             Unit.Of(handle);
             aura.Meeting = pair => log.Add("check");
-            var longer = Gizmo.Create(new Well(300.0f * Interactions.Step), 0.0f, 0.0f);
+            var longer = Gizmo.Create(new Well(300.0f * Interactions.Step), 0.0f, 0.0f, Game.Instance);
             var start = Tracking.StepNow;
             Steps(world, 1);
             Expect.Equal(string.Join(",", new[] { "1", "2", "3", "check" }), string.Join(",", log), "the gizmos tick in order, then the interaction checks");
@@ -319,7 +299,7 @@ namespace Moonwell.Testing
             {
                 log.Add("2");
                 third.End();
-                made = Gizmo.Create(new Well(Interactions.Step), 0.0f, 0.0f);
+                made = Gizmo.Create(new Well(Interactions.Step), 0.0f, 0.0f, Game.Instance);
                 made.Ticking = () => log.Add("m");
                 second.Ticking = () => log.Add("2");
             };
@@ -350,8 +330,8 @@ namespace Moonwell.Testing
             Fresh();
             var first = new Well(0.1f);
             first.Throws = true;
-            Gizmo.Create(first, 0.0f, 0.0f);
-            var second = Gizmo.Create(new Well(0.1f), 0.0f, 0.0f);
+            Gizmo.Create(first, 0.0f, 0.0f, Game.Instance);
+            var second = Gizmo.Create(new Well(0.1f), 0.0f, 0.0f, Game.Instance);
             Steps(world, 8);
             Expect.Equal(2, first.TickSteps.Count, "the one that threw ticks again");
             Expect.Equal(2, second.TickSteps.Count, "the next one ticked each time");
@@ -365,7 +345,7 @@ namespace Moonwell.Testing
             Scope? seen = null;
             var well = new Well(0.01f);
             well.Ticking = () => { seen = Scope.Current; };
-            Gizmo.Create(well, 0.0f, 0.0f);
+            Gizmo.Create(well, 0.0f, 0.0f, Game.Instance);
             Steps(world, 1);
             Expect.Same(well, seen, "Scope.Current inside OnTick");
             Expect.True(Scope.Current == Runtime.Root, "and the root after");
@@ -378,7 +358,7 @@ namespace Moonwell.Testing
             var well = new Well();
             well.Creating = () => { throw new InvalidOperationException("boom"); };
             well.Leaving = () => { throw new InvalidOperationException("boom"); };
-            Gizmo.Create(well, 10.0f, 10.0f);
+            Gizmo.Create(well, 10.0f, 10.0f, Game.Instance);
             Expect.Equal(36, well.entry!.Cell, "a gizmo whose OnCreated throws is in the grid");
             well.End();
             Expect.True(well.HasEnded, "and ends");
@@ -392,7 +372,7 @@ namespace Moonwell.Testing
         {
             Fresh();
             var log = new List<string>();
-            var fitted = Gizmo.Create(new Fitted(log), 0.0f, 0.0f);
+            var fitted = Gizmo.Create(new Fitted(log), 0.0f, 0.0f, Game.Instance);
             Expect.Equal("a added 1,b added 2,c added 3,created 3", string.Join(",", log), "added in order before OnCreated");
             Expect.Equal(3, fitted.ComponentCount, "three components");
             var first = fitted.Get<Part>();
@@ -414,7 +394,7 @@ namespace Moonwell.Testing
             var other = new List<string>();
             var ended = new TestScope("owner", other);
             ended.End();
-            var late = Gizmo.Create(new Fitted(log), 0.0f, 0.0f, null, ended);
+            var late = Gizmo.Create(new Fitted(log), 0.0f, 0.0f, ended);
             Expect.True(late.HasEnded, "a gizmo made for an owner that has ended ends at once");
             Expect.Equal(0, late.ComponentCount, "and starts no components");
         }
@@ -424,7 +404,7 @@ namespace Moonwell.Testing
         {
             Fresh();
             var log = new List<string>();
-            var well = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            var well = Gizmo.Create(new Well(), 0.0f, 0.0f, Game.Instance);
             var part = well.Add(new Part("x", log));
             Expect.Equal("x added 1", string.Join(",", log), "OnAdded ran");
             Expect.Same(part, well.Get<Part>(), "Get finds it");
@@ -441,7 +421,7 @@ namespace Moonwell.Testing
             var log = new List<string>();
             var well = new Well(Interactions.Step);
             well.Ticking = () => log.Add("tick");
-            Gizmo.Create(well, 0.0f, 0.0f);
+            Gizmo.Create(well, 0.0f, 0.0f, Game.Instance);
             Steps(world, 1);
             Expect.Equal("tick", string.Join(",", log), "no hook, only the tick");
             Tracking.BeforeGizmos = () => log.Add("before");
@@ -478,13 +458,13 @@ namespace Moonwell.Testing
             Tracking.Awake = 0;
             Expect.True(!Tracking.Running, "it stops at 0");
             Tracking.Awake = 2;
-            var well = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            var well = Gizmo.Create(new Well(), 0.0f, 0.0f, Game.Instance);
             well.End();
             Expect.True(Tracking.Running, "the last gizmo ending leaves it running while Awake is above 0");
             Tracking.Awake = 0;
             Expect.True(!Tracking.Running, "and it stops when Awake does, with nothing tracked");
             Tracking.Awake = 1;
-            var held = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            var held = Gizmo.Create(new Well(), 0.0f, 0.0f, Game.Instance);
             Tracking.Awake = 0;
             Expect.True(Tracking.Running, "Awake at 0 does not stop it while a gizmo is tracked");
             held.End();
@@ -513,7 +493,7 @@ namespace Moonwell.Testing
         public static void ShadowedFields(FakeWorld world)
         {
             Fresh();
-            var well = Gizmo.Create(new ShadowWell(), 0.0f, 0.0f);
+            var well = Gizmo.Create(new ShadowWell(), 0.0f, 0.0f, Game.Instance);
             Expect.Same(Player.NeutralPassive, well.Owner, "it plays for Neutral Passive");
             Expect.True(well.OwnPlayer == null, "its own player is none");
             Expect.Near(0.0f, well.Z, "Z is 0");

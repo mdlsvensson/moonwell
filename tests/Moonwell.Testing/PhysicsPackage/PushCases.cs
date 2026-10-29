@@ -49,7 +49,7 @@ namespace Moonwell.Testing
             var first = PusheeAt(world, 300.0f, 500.0f);
             var second = PusheeAt(world, 300.0f, 900.0f);
             var dart = new Dart();
-            Missile.Create(dart, 300.0f, 1300.0f, 100.0f);
+            Missile.Create(dart, 300.0f, 1300.0f, 100.0f, Game.Instance);
             dart.VX = 600.0f;
             first.Push(600.0f, 0.0f);
             second.Push(600.0f, 0.0f);
@@ -496,7 +496,7 @@ namespace Moonwell.Testing
             Expect.Equal(1, Find.InRange<Unit>(100.0f, 100.0f, 10.0f).Count, "found where it stands");
             var ticks = 0;
             var missed = 0;
-            var seeker = Gizmo.Create(new PushSeeker(), 1500.0f, 1500.0f);
+            var seeker = Gizmo.Create(new PushSeeker(), 1500.0f, 1500.0f, Game.Instance);
             seeker.Ticked = () =>
             {
                 if (unit.X > 300.0f)

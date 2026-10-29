@@ -93,7 +93,7 @@ namespace Moonwell.Testing
         public static void CreateOfClass(FakeWorld world)
         {
             ObjectTypes.Item(ObjectTypes.FourCC("I002"), () => new TestOrb());
-            var orb = Item.Create<TestOrb>(5.0f, 6.0f);
+            var orb = Item.Create<TestOrb>(5.0f, 6.0f, Game.Instance);
             Expect.True(orb.Has<OrbGlow>(), "the orb has its starting component");
             Expect.Near(5.0f, orb.X, "the orb's x");
             Expect.Near(6.0f, orb.Y, "the orb's y");
@@ -214,7 +214,7 @@ namespace Moonwell.Testing
         /// <summary>An item is created at its place; X and Y read it, and MoveTo moves it.</summary>
         public static void Position(FakeWorld world)
         {
-            var item = Item.Create(ObjectTypes.FourCC("ofoo"), 100.5f, -50.0f);
+            var item = Item.Create(ObjectTypes.FourCC("ofoo"), 100.5f, -50.0f, Game.Instance);
             Expect.Near(100.5f, item.X, "x at creation");
             Expect.Near(-50.0f, item.Y, "y at creation");
 
@@ -380,7 +380,7 @@ namespace Moonwell.Testing
             ObjectTypes.Item(ObjectTypes.FourCC("I001"), () => new CarrierWatch());
             var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             unit.PlaceAt(70.0f, 80.0f);
-            var watch = (CarrierWatch)Item.Create(ObjectTypes.FourCC("I001"), 5.0f, 6.0f);
+            var watch = (CarrierWatch)Item.Create(ObjectTypes.FourCC("I001"), 5.0f, 6.0f, Game.Instance);
             unit.Give(watch);
 
             unit.Kill();
@@ -397,7 +397,7 @@ namespace Moonwell.Testing
         {
             var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             unit.PlaceAt(100.0f, 200.0f);
-            var item = Item.Create(ObjectTypes.FourCC("ofoo"), 5.0f, 6.0f);
+            var item = Item.Create(ObjectTypes.FourCC("ofoo"), 5.0f, 6.0f, Game.Instance);
 
             unit.Give(item);
             unit.PlaceAt(300.0f, 400.0f);
@@ -443,7 +443,7 @@ namespace Moonwell.Testing
             world.SetInventorySize(handle, 1);
             var unit = Unit.Of(handle)!;
             Expect.True(unit.Give(Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!), "the first item fits");
-            var watch = (CarrierWatch)Item.Create(ObjectTypes.FourCC("I001"), 9.0f, 8.0f);
+            var watch = (CarrierWatch)Item.Create(ObjectTypes.FourCC("I001"), 9.0f, 8.0f, Game.Instance);
             world.InventoryCalls.Clear();
 
             Expect.True(!unit.Give(watch), "the full inventory answers false");
@@ -540,7 +540,7 @@ namespace Moonwell.Testing
             Expect.True(!swept.IsCarried, "swept: not carried");
             ExpectNoCalls(world, swept, calls, "swept");
 
-            var removed = Item.Create(ObjectTypes.FourCC("ofoo"), 5.0f, 6.0f);
+            var removed = Item.Create(ObjectTypes.FourCC("ofoo"), 5.0f, 6.0f, Game.Instance);
             removed.Charges = 7;
             Expect.Equal(7, removed.Charges, "removed: charges read");
             Expect.Near(5.0f, removed.X, "removed: x read");

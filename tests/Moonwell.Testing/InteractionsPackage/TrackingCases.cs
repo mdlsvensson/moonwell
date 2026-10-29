@@ -71,7 +71,7 @@ namespace Moonwell.Testing
             var item = ItemAt(world, 20.0f, 20.0f);
             var fake = Fresh();
             var later = UnitAt(world, 30.0f, 30.0f);
-            var well = Gizmo.Create(new Well(0.1f), 0.0f, 0.0f);
+            var well = Gizmo.Create(new Well(0.1f), 0.0f, 0.0f, Game.Instance);
             Steps(world, 40);
             Expect.Equal(0, fake.Reads, "no unit, item or destructable was read");
             Expect.True(Tracking.EntryOf(unit) == null, "a unit from before is not tracked");
@@ -311,7 +311,7 @@ namespace Moonwell.Testing
             world.MoveItem(known.Handle, -500.0f, -500.0f);
             Steps(world, 4);
             Expect.Equal(2 * 8 + 2, first.Cell, "an item that moved is in the cell of its place within 4 steps");
-            var made = Item.Create(ObjectTypes.FourCC("ofoo"), 700.0f, 700.0f);
+            var made = Item.Create(ObjectTypes.FourCC("ofoo"), 700.0f, 700.0f, Game.Instance);
             Expect.True(Tracking.EntryOf(made) != null, "an item made later comes in through the hook");
         }
 
@@ -444,7 +444,7 @@ namespace Moonwell.Testing
                 readsAfterSecond = fake.Reads;
                 well.Ticking = null;
             };
-            Gizmo.Create(well, 0.0f, 0.0f);
+            Gizmo.Create(well, 0.0f, 0.0f, Game.Instance);
             Steps(world, 1);
             Expect.Equal(1, readsAfterFirst, "the first ask read the unit");
             Expect.Equal(1, readsAfterSecond, "the second read nothing");
@@ -476,7 +476,7 @@ namespace Moonwell.Testing
                 step = entry.ReadStep;
                 well.Ticking = null;
             };
-            Gizmo.Create(well, 0.0f, 0.0f);
+            Gizmo.Create(well, 0.0f, 0.0f, Game.Instance);
             Steps(world, 1);
             Expect.Equal(0, stale, "a unit read earlier in the step is still where it was read");
             Expect.Equal(1, near, "after Moved a Find in the same step finds it at its new place");
@@ -487,7 +487,7 @@ namespace Moonwell.Testing
             Expect.Equal(7, entry.Cell, "and the cell is the new place's");
             Steps(world, 1);
             Expect.Near(1000.0f, entry.X, "the next step reads the unit where the game has it");
-            var plain = Gizmo.Create(new Well(), 0.0f, 0.0f);
+            var plain = Gizmo.Create(new Well(), 0.0f, 0.0f, Game.Instance);
             Tracking.Moved(plain, 50.0f, 50.0f);
             Expect.Near(50.0f, plain.X, "a gizmo has its place set");
             var gone = UnitAt(world, 30.0f, 30.0f);
@@ -519,7 +519,7 @@ namespace Moonwell.Testing
         public static void GizmoPlace(FakeWorld world)
         {
             var fake = Fresh();
-            var well = Gizmo.Create(new Well(), 10.0f, 10.0f);
+            var well = Gizmo.Create(new Well(), 10.0f, 10.0f, Game.Instance);
             var entry = Tracked(well);
             Tracking.ReadNow(entry);
             Expect.True(entry.HasPlace, "a gizmo has a place");
@@ -536,7 +536,7 @@ namespace Moonwell.Testing
             FirstUse(new FakeInteractionWorld(), () =>
             {
                 Expect.Equal(1, Find.InRange<Item>(0.0f, 0.0f, 100.0f).Count, "the first Find finds the item");
-                var well = Gizmo.Create(new Well(Interactions.Step), 0.0f, 0.0f);
+                var well = Gizmo.Create(new Well(Interactions.Step), 0.0f, 0.0f, Game.Instance);
                 Steps(world, 4);
                 Expect.Equal(4, well.TickSteps.Count, "four ticks in four steps");
                 Expect.True(Tracking.Asked(Tracking.ItemKind), "items are asked for");
@@ -562,10 +562,10 @@ namespace Moonwell.Testing
         public static void InstallAgain(FakeWorld world)
         {
             Fresh();
-            Gizmo.Create(new Well(Interactions.Step), 0.0f, 0.0f);
+            Gizmo.Create(new Well(Interactions.Step), 0.0f, 0.0f, Game.Instance);
             Expect.True(Tracking.Running, "the first install's cycle runs");
             Fresh();
-            var well = Gizmo.Create(new Well(Interactions.Step), 0.0f, 0.0f);
+            var well = Gizmo.Create(new Well(Interactions.Step), 0.0f, 0.0f, Game.Instance);
             Steps(world, 4);
             Expect.Equal(4, well.TickSteps.Count, "four ticks in four steps");
         }
@@ -646,8 +646,8 @@ namespace Moonwell.Testing
             var other = UnitAt(world, 200.0f, 0.0f);
             Tracking.Need(Tracking.UnitKind);
             fake.FailingUnits.Add(failing.Handle);
-            var well = Gizmo.Create(new Well(), 100.0f, 0.0f);
-            var healing = well.Interact(new Healing());
+            var well = Gizmo.Create(new Well(), 100.0f, 0.0f, Game.Instance);
+            var healing = well.Interact(new Healing(), Game.Instance);
             healing.Tag = unit => unit == other ? "other" : "?";
             TestLog.Lines.Clear();
             Steps(world, 1);

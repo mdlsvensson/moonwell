@@ -168,8 +168,8 @@ namespace Moonwell
         /// <summary>Runs OnPart for a pair that is parting, guarded.</summary>
         internal abstract void RunPart(Scope pair);
 
-        /// <summary>Starts the interaction on a holder of a kind, for an owner or else the current one, with its first check within a tick: Interact's work. Fails in a development build when it was started before, when the holder is not of the holder class, or when Range is not more than 0. The holder is tracked on its own, without asking for its whole kind (Tracking.TrackHolder); the kinds of the others are asked for. A holder that has ended, or an owner that has, ends it at once.</summary>
-        internal void Begin(Actor holder, int kind, Scope? scope)
+        /// <summary>Starts the interaction on a holder of a kind, in a scope, with its first check within a tick: Interact's work. Fails in a development build when it was started before, when the holder is not of the holder class, or when Range is not more than 0. The holder is tracked on its own, without asking for its whole kind (Tracking.TrackHolder); the kinds of the others are asked for. A holder that has ended, or a scope that has, ends it at once.</summary>
+        internal void Begin(Actor holder, int kind, Scope scope)
         {
             Dev.Check(!started, Names.NameOf(this) + ".Interact: the interaction has been started already");
             Dev.Check(HeldBy(holder), Names.NameOf(this) + ".Interact: a " + Names.NameOf(holder) + " cannot hold it");
@@ -178,7 +178,7 @@ namespace Moonwell
             Interactions.EnsureInstalled();
             NeedOthers();
             BindHolder(holder);
-            (scope ?? Scope.Current).Adopt(this);
+            scope.Adopt(this);
             if (HasEnded)
             {
                 return;
