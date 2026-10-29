@@ -12,7 +12,7 @@ namespace Moonwell.Testing
             Duration = 1.0f;
         }
 
-        /// <summary>Starts the aura on the buff's unit; the buff is the current owner here.</summary>
+        /// <summary>Starts the aura on the buff's unit, in the buff's scope.</summary>
         protected override void OnAdded()
         {
             Unit.Interact(Aura, this);

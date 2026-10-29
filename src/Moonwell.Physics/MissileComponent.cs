@@ -7,12 +7,12 @@ namespace Moonwell
         [LocalSafe]
         public Missile Missile => (Missile)Actor;
 
-        /// <summary>Runs at each contact of the missile, after the missile's own OnImpact, with the missile's owner as the current owner.</summary>
+        /// <summary>Runs at each contact of the missile, after the missile's own OnImpact.</summary>
         public virtual void OnImpact(Impact impact)
         {
         }
 
-        /// <summary>Runs once the missile lies still on the ground, after the missile's own OnRest, with the missile as the current owner.</summary>
+        /// <summary>Runs once the missile lies still on the ground, after the missile's own OnRest.</summary>
         public virtual void OnRest()
         {
         }

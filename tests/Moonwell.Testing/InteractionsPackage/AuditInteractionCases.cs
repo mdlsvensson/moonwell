@@ -196,7 +196,7 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "meet b", "burn b", "burn b", "burn b" }, "the pair is kept and burns on");
         }
 
-        /// <summary>A pair that Accepts refuses at a tick parts (OnPart once), and the other is not asked again in that check; it is asked again at the next tick, as any other in range, and meets again once accepted. Accepts runs with the interaction as the current owner, and a paused pair is asked too, as it still parts.</summary>
+        /// <summary>A pair that Accepts refuses at a tick parts (OnPart once), and the other is not asked again in that check; it is asked again at the next tick, as any other in range, and meets again once accepted. A paused pair is asked too, as it still parts.</summary>
         public static void RecheckRefusalPartsAndMeetsAgain(FakeWorld world)
         {
             Fresh();
@@ -212,11 +212,9 @@ namespace Moonwell.Testing
             Steps(world, 16);
             Expect.Equal(2, aura.Asked, "and again before the next tick");
             ExpectLog(new string[] { "meet b", "tick b", "tick b" }, "accepted, it ticks");
-            aura.AskedAs = null;
             accept = false;
             Steps(world, 16);
             Expect.Equal(3, aura.Asked, "refused once in the check, not asked again in it");
-            Expect.Same(aura, aura.AskedAs, "with the interaction as the current owner");
             ExpectLog(new string[] { "meet b", "tick b", "tick b", "part b" }, "the refused pair parts, with no tick");
             Steps(world, 16);
             Expect.Equal(4, aura.Asked, "asked again at the next tick");
@@ -257,7 +255,6 @@ namespace Moonwell.Testing
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b", "part b" }, "asked again, it threw again: no meeting");
             Expect.Equal(3, aura.Asked, "asked once at each check");
-            Expect.Same(Runtime.Root, Scope.Current, "the root is the current owner after the step");
         }
 
         /// <summary>OnPart runs once per OnMeet when Accepts, asked again at a tick, ends a pair itself, ends its other, or ends the interaction: each pair parts once, and the check stops when the interaction ends.</summary>

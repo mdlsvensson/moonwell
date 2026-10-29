@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Moonwell.Testing
 {
-    /// <summary>Cases that check owners, the order their children end in, and the current owner.</summary>
+    /// <summary>Cases that check scopes and the order their children end in.</summary>
     public static class OwnershipCases
     {
         /// <summary>An owned object that adopts a new child into its owner while it ends.</summary>
@@ -191,19 +191,6 @@ namespace Moonwell.Testing
             ExpectLog(log, new string[] { "end owner", "end b", "end a" }, "log after a child's end throws");
             Expect.Equal(1, world.Logged.Count, "logged lines after the throwing end");
             Expect.Equal("Moonwell: ThrowingScoped.OnEnd failed: boom", world.Logged[0], "the logged line");
-        }
-
-        /// <summary>Run makes its owner the current owner while it runs, and restores the root after, even when it throws.</summary>
-        public static void RunSetsCurrent(FakeWorld world)
-        {
-            var log = new List<string>();
-            var owner = new TestScope("owner", log);
-            Scope? seen = null;
-            owner.Run(() => { seen = Scope.Current; });
-            Expect.Same(owner, seen, "Scope.Current inside Run");
-            Expect.Same(Runtime.Root, Scope.Current, "Scope.Current after Run");
-            Expect.Throws<InvalidOperationException>(() => owner.Run(() => { throw new InvalidOperationException("boom"); }), "Run whose action throws");
-            Expect.Same(Runtime.Root, Scope.Current, "Scope.Current after Run threw");
         }
 
         /// <summary>A child adopted from an owner's Finish, after its children have ended, ends at once.</summary>

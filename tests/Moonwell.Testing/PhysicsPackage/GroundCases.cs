@@ -102,8 +102,6 @@ namespace Moonwell.Testing
             Within(1.0f, ball.Read[6], 0.001f, "the normal: up");
             Expect.True(ball.Read[7] > 300.0f, "the speed it closed at, faster than it started; was " + ball.Read[7]);
             Expect.True(ball.Last!.Contact == Contact.Stop, "the outcome is the setting's");
-            Expect.Same(Game.Instance, ball.ImpactedWith, "OnImpact runs with the missile's owner, the game");
-            Expect.Same(Game.Instance, tracer.ImpactedWith, "so does the component's");
             Expect.True(!ball.EndedInImpact, "before it ends");
             Expect.Equal(2, log.Count, "two reactions");
             Expect.Equal("ball.impact", log[0], "the missile's first");
@@ -526,8 +524,6 @@ namespace Moonwell.Testing
 
             Expect.Equal(1, ball.Rested, "it rests, and OnRest runs");
             Expect.True(ball.Impacts >= 1, "it met the ground first");
-            Expect.Same(ball, ball.RestedWith, "OnRest runs with the missile");
-            Expect.Same(ball, tracer.RestedWith, "so does the component's");
             Expect.Equal("tracer.rest", log[log.Count - 1], "the component's after the missile's");
             Expect.Equal("ball.rest", log[log.Count - 2], "the missile's first");
             Within(Physics.GroundHeight(ball.X, ball.Y) + 16.0f, ball.Z, 1.0f, "it lies on the ground");

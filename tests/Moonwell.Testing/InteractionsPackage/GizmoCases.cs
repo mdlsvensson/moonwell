@@ -47,22 +47,6 @@ namespace Moonwell.Testing
             Expect.Equal(1, owned.Created, "OnCreated ran once for each");
         }
 
-        /// <summary>OnCreated and OnLeave run with the gizmo as the current owner.</summary>
-        public static void ReactionOwner(FakeWorld world)
-        {
-            Fresh();
-            Scope? created = null;
-            Scope? left = null;
-            var well = new Well();
-            well.Creating = () => { created = Scope.Current; };
-            well.Leaving = () => { left = Scope.Current; };
-            Gizmo.Create(well, 0.0f, 0.0f, Game.Instance);
-            Expect.Same(well, created, "Scope.Current inside OnCreated");
-            well.Remove();
-            Expect.Same(well, left, "Scope.Current inside OnLeave");
-            Expect.True(Scope.Current == Runtime.Root, "and the root after");
-        }
-
         /// <summary>A tick of 0.1 second with a step of 1/32 second runs OnTick at steps 4, 8 and 12 as the game moves on.</summary>
         public static void Tick(FakeWorld world)
         {
@@ -336,19 +320,6 @@ namespace Moonwell.Testing
             Expect.Equal(2, first.TickSteps.Count, "the one that threw ticks again");
             Expect.Equal(2, second.TickSteps.Count, "the next one ticked each time");
             Expect.True(Logged(world, "Well.OnTick failed"), "a logged line names Well.OnTick");
-        }
-
-        /// <summary>OnTick runs with the gizmo as the current owner, so what it makes is the gizmo's.</summary>
-        public static void TickOwner(FakeWorld world)
-        {
-            Fresh();
-            Scope? seen = null;
-            var well = new Well(0.01f);
-            well.Ticking = () => { seen = Scope.Current; };
-            Gizmo.Create(well, 0.0f, 0.0f, Game.Instance);
-            Steps(world, 1);
-            Expect.Same(well, seen, "Scope.Current inside OnTick");
-            Expect.True(Scope.Current == Runtime.Root, "and the root after");
         }
 
         /// <summary>A throwing OnCreated or OnLeave is reported, and the gizmo still comes in and leaves.</summary>

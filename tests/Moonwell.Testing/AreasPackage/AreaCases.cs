@@ -275,22 +275,6 @@ namespace Moonwell.Testing
             Expect.True(!area.Has(unit), "refuses the unit");
         }
 
-        /// <summary>Every reaction runs with the area as the current owner.</summary>
-        public static void ReactionOwner(FakeWorld world)
-        {
-            var fake = Fresh();
-            var area = Added(world, new LogArea(Square(), 1f));
-            var unit = UnitAt(world, 10f, 10f);
-            fake.Enter(fake.Regions[0], unit.Handle);
-            Expect.Same(area, area.OwnerSeen, "OnUnitEntered");
-            area.OwnerSeen = null;
-            world.Advance(1f);
-            Expect.Same(area, area.OwnerSeen, "OnUnitStays");
-            area.OwnerSeen = null;
-            fake.Leave(fake.Regions[0], unit.Handle);
-            Expect.Same(area, area.OwnerSeen, "OnUnitLeft");
-        }
-
         /// <summary>A circle area makes the cells of the shape and no rect; a region area makes one rect and no cells; a union makes both; each region is listened to once, and the deaths once for the package.</summary>
         public static void Cells(FakeWorld world)
         {

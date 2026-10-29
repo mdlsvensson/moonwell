@@ -668,7 +668,7 @@ namespace Moonwell
             get { return look; }
         }
 
-        /// <summary>Places a missile of the map at a place and height, still unless its velocity is set, in a scope, which ends it when it ends, and returns it. Its owning player is Neutral Passive unless given. OnCreated runs with the missile as the current owner. Placed with Gizmo.Create, or with no height, a missile is the same, at its LaunchHeight above the ground.</summary>
+        /// <summary>Places a missile of the map at a place and height, still unless its velocity is set, in a scope, which ends it when it ends, and returns it. Its owning player is Neutral Passive unless given. OnCreated runs. Placed with Gizmo.Create, or with no height, a missile is the same, at its LaunchHeight above the ground.</summary>
         public static T Create<T>(T missile, float x, float y, float z, Scope scope, Player? owner = null)
             where T : Missile
         {
@@ -712,23 +712,23 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Whether it can hit a thing it touches: asked before a contact with a unit, destructable, item, missile (each of the two is asked about the other) or wall, with the missile as the current owner; false and they pass through each other, and it is not asked again until they part. By default everything but its own Source.</summary>
+        /// <summary>Whether it can hit a thing it touches: asked before a contact with a unit, destructable, item, missile (each of the two is asked about the other) or wall; false and they pass through each other, and it is not asked again until they part. By default everything but its own Source.</summary>
         public virtual bool CanHit(Actor other)
         {
             return other != source;
         }
 
-        /// <summary>Runs at each contact, before the damage and the outcome, with the missile's owner as the current owner, so what it makes outlives a missile that stops there.</summary>
+        /// <summary>Runs at each contact, before the damage and the outcome. A Stop ends the missile right after, so what should outlast it names another scope.</summary>
         public virtual void OnImpact(Impact impact)
         {
         }
 
-        /// <summary>Runs once it lies still on the ground, with the missile as the current owner.</summary>
+        /// <summary>Runs once it lies still on the ground.</summary>
         public virtual void OnRest()
         {
         }
 
-        /// <summary>Runs when its Duration or MaxDistance has run out, just before it ends, with the missile as the current owner.</summary>
+        /// <summary>Runs when its Duration or MaxDistance has run out, just before it ends.</summary>
         public virtual void OnExpire()
         {
         }

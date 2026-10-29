@@ -160,11 +160,9 @@ namespace Moonwell
             return hit != null && hit.Stage == Stage.Lethal && !hit.Kills;
         }
 
-        /// <summary>Calls the reaction in a slot with the object as the current owner; a failing reaction is reported.</summary>
+        /// <summary>Calls the reaction in a slot; a failing reaction is reported.</summary>
         private static void Call(Scope obj, Hit? hit, Burst? burst, int slot)
         {
-            var previous = Scope.current;
-            Scope.current = obj;
             var running = burst != null ? burst.Hits[0] : hit!;
             Running.Add(running);
             try
@@ -193,7 +191,6 @@ namespace Moonwell
             }
 
             Running.RemoveAt(Running.Count - 1);
-            Scope.current = previous;
         }
 
         /// <summary>The bits of the reaction methods an object's class writes, worked out once per class. Only methods the class writes count: in Lua an interface's empty defaults are not there.</summary>

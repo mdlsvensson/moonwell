@@ -695,11 +695,9 @@ namespace Moonwell.Engine
             return true;
         }
 
-        /// <summary>Runs OnImpact on a missile, then on its components in the order they were added, each with the missile's owner as the current owner and each reporting an error it throws; none runs once the missile has ended.</summary>
+        /// <summary>Runs OnImpact on a missile, then on its components in the order they were added, each reporting an error it throws; none runs once the missile has ended.</summary>
         internal static void Impacted(Missile missile, Impact impact)
         {
-            var previous = Scope.current;
-            Scope.current = missile.Parent ?? Game.Instance;
             try
             {
                 missile.OnImpact(impact);
@@ -729,10 +727,9 @@ namespace Moonwell.Engine
             }
 
             missile.EndDispatch();
-            Scope.current = previous;
         }
 
-        /// <summary>Lays a missile still on the ground, with no velocity, and runs OnRest on it, then on its components in the order they were added, each with the missile as the current owner and each reporting an error it throws; none runs once the missile has ended.</summary>
+        /// <summary>Lays a missile still on the ground, with no velocity, and runs OnRest on it, then on its components in the order they were added, each reporting an error it throws; none runs once the missile has ended.</summary>
         internal static void Rest(Missile missile)
         {
             missile.resting = true;
@@ -745,8 +742,6 @@ namespace Moonwell.Engine
             missile.restZ = missile.z;
             missile.groundGone = false;
             Contacts.Pause(missile);
-            var previous = Scope.current;
-            Scope.current = missile;
             try
             {
                 missile.OnRest();
@@ -776,7 +771,6 @@ namespace Moonwell.Engine
             }
 
             missile.EndDispatch();
-            Scope.current = previous;
         }
 
         /// <summary>Plays a missile's ImpactModel once (an effect made and destroyed at once, which plays its death) and its ImpactSound at a point; nothing for an empty one.</summary>
@@ -814,11 +808,9 @@ namespace Moonwell.Engine
             return next;
         }
 
-        /// <summary>Runs OnExpire with the missile as the current owner, reporting an error it throws, and ends the missile.</summary>
+        /// <summary>Runs OnExpire, reporting an error it throws, and ends the missile.</summary>
         private static void Expire(Missile missile)
         {
-            var previous = Scope.current;
-            Scope.current = missile;
             try
             {
                 missile.OnExpire();
@@ -828,7 +820,6 @@ namespace Moonwell.Engine
                 Errors.Report(Names.NameOf(missile) + ".OnExpire", error);
             }
 
-            Scope.current = previous;
             missile.End();
         }
 

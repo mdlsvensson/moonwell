@@ -52,8 +52,6 @@ namespace Moonwell
                 return;
             }
 
-            var previous = Scope.current;
-            Scope.current = this;
             try
             {
                 OnRemoved();
@@ -63,7 +61,6 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".OnRemoved", error);
             }
 
-            Scope.current = previous;
             actor!.Detach(this);
         }
     }

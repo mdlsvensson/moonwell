@@ -142,8 +142,6 @@ namespace Moonwell
             component.Mask = Hooks.MaskOf(component, component.Table);
             Events.Need(component.Mask);
             component.added = true;
-            var previous = Scope.current;
-            Scope.current = component;
             try
             {
                 component.CallAdded();
@@ -153,7 +151,6 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(component) + ".OnAdded", error);
             }
 
-            Scope.current = previous;
             return component;
         }
 

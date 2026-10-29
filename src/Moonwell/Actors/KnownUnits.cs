@@ -76,8 +76,6 @@ namespace Moonwell
 
             if (!made.HasEnded && !illusion)
             {
-                var previous = Scope.current;
-                Scope.current = made;
                 try
                 {
                     made.CallEnter();
@@ -86,8 +84,6 @@ namespace Moonwell
                 {
                     Errors.Report(Names.NameOf(made) + ".OnCreated", error);
                 }
-
-                Scope.current = previous;
             }
 
             if (entering && Events.Wants(Hook.OnUnitCreated) && !made.HasEnded)
@@ -193,8 +189,6 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Scope.current;
-                Scope.current = component;
                 try
                 {
                     component.OnUnitCreated(unit);
@@ -203,8 +197,6 @@ namespace Moonwell
                 {
                     Errors.Report(Names.NameOf(component) + ".OnUnitCreated", error);
                 }
-
-                Scope.current = previous;
             }
 
             actor.EndDispatch();

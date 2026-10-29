@@ -1018,8 +1018,6 @@ namespace Moonwell
             }
 
             Hooks.CallEnding(this);
-            var previous = Scope.current;
-            Scope.current = this;
             try
             {
                 OnLeave();
@@ -1028,8 +1026,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnLeave", error);
             }
-
-            Scope.current = previous;
         }
 
         /// <summary>Removes the unit from the game unless the game has already, and forgets it.</summary>

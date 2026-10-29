@@ -8,9 +8,6 @@ namespace Moonwell.Testing
         /// <summary>How many times OnExpire ran.</summary>
         public int Expired;
 
-        /// <summary>The owner that was current when OnExpire last ran.</summary>
-        public Scope? ExpiredWith;
-
         /// <summary>An action OnExpire runs after it has counted; null for none.</summary>
         public Action? Expiring;
 
@@ -21,11 +18,10 @@ namespace Moonwell.Testing
             UnitContact = Contact.None;
         }
 
-        /// <summary>Counts the expiry, keeps the current owner, and runs the action.</summary>
+        /// <summary>Counts the expiry, and runs the action.</summary>
         public override void OnExpire()
         {
             Expired++;
-            ExpiredWith = Scope.Current;
             if (Expiring != null)
             {
                 Expiring();

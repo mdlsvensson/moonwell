@@ -1015,11 +1015,9 @@ namespace Moonwell.Engine
             return true;
         }
 
-        /// <summary>Asks the missile's CanHit about a thing, with the missile as the current owner; an error it throws is reported and refuses.</summary>
+        /// <summary>Asks the missile's CanHit about a thing; an error it throws is reported and refuses.</summary>
         private static bool Asks(Missile missile, Actor other)
         {
-            var previous = Scope.current;
-            Scope.current = missile;
             bool answer;
             try
             {
@@ -1031,15 +1029,12 @@ namespace Moonwell.Engine
                 answer = false;
             }
 
-            Scope.current = previous;
             return answer;
         }
 
-        /// <summary>Runs OnStruck on a struck unit's class, then its components and buffs in the order they were added, with the missile's owner as the current owner; only where the class writes it, not on what has ended, and none once the missile has ended. Each is guarded.</summary>
+        /// <summary>Runs OnStruck on a struck unit's class, then its components and buffs in the order they were added; only where the class writes it, not on what has ended, and none once the missile has ended. Each is guarded.</summary>
         private static void Struck(Missile missile, Unit unit, Impact impact)
         {
-            var previous = Scope.current;
-            Scope.current = missile.Parent ?? Game.Instance;
             if (!unit.HasEnded && (MaskOf(unit) & StruckBit) != 0)
             {
                 Call(unit, impact);
@@ -1056,7 +1051,6 @@ namespace Moonwell.Engine
             }
 
             unit.EndDispatch();
-            Scope.current = previous;
         }
 
         /// <summary>Calls OnStruck on an object that writes it, reporting an error it throws.</summary>

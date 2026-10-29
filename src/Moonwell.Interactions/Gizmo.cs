@@ -85,7 +85,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Places a gizmo of the map at a place, in a scope, which ends it when it ends, and returns it; its owning player is Neutral Passive unless given. OnCreated runs with the gizmo as the current owner.</summary>
+        /// <summary>Places a gizmo of the map at a place, in a scope, which ends it when it ends, and returns it; its owning player is Neutral Passive unless given.</summary>
         public static T Create<T>(T gizmo, float x, float y, Scope scope, Player? owner = null)
             where T : Gizmo
         {
@@ -151,12 +151,12 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs once, when the gizmo has been placed, with the gizmo as the current owner.</summary>
+        /// <summary>Runs once, when the gizmo has been placed.</summary>
         protected virtual void OnCreated()
         {
         }
 
-        /// <summary>Runs when the gizmo ends, with the gizmo as the current owner. It has no place here: a Find from it does not see it, the interactions it held have ended and the pairs it was the other of have parted. It leaves its cell after; a unit, item or destructable has left the grid before its OnLeave. HasEnded is still false here.</summary>
+        /// <summary>Runs when the gizmo ends. It has no place here: a Find from it does not see it, the interactions it held have ended and the pairs it was the other of have parted. It leaves its cell after; a unit, item or destructable has left the grid before its OnLeave. HasEnded is still false here.</summary>
         protected virtual void OnLeave()
         {
         }
@@ -174,8 +174,6 @@ namespace Moonwell
                 due.Cancel();
             }
 
-            var previous = Scope.current;
-            Scope.current = this;
             try
             {
                 OnLeave();
@@ -185,32 +183,25 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".OnLeave", error);
             }
 
-            Scope.current = previous;
             if (entry != null)
             {
                 Tracking.Release(entry);
             }
         }
 
-        /// <summary>Runs OnTick with the gizmo as the current owner, and reports an error it throws. The cycle calls it, since a map overrides the hook.</summary>
+        /// <summary>Runs OnTick, and reports an error it throws. The cycle calls it, since a map overrides the hook.</summary>
         internal void CallTick()
         {
-            var previous = Scope.current;
-            Scope.current = this;
             var failure = Guard.Tick(this);
             if (failure != null)
             {
                 Errors.Report(Names.NameOf(this) + ".OnTick", failure);
             }
-
-            Scope.current = previous;
         }
 
-        /// <summary>Runs OnCreated with the gizmo as the current owner, and reports an error it throws.</summary>
+        /// <summary>Runs OnCreated, and reports an error it throws.</summary>
         private void CallCreated()
         {
-            var previous = Scope.current;
-            Scope.current = this;
             try
             {
                 OnCreated();
@@ -219,8 +210,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnCreated", error);
             }
-
-            Scope.current = previous;
         }
 
         /// <summary>Sets the gizmo's place, and its cell with it.</summary>

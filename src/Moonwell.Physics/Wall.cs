@@ -6,7 +6,7 @@ namespace Moonwell
     /// A straight upright wall of the map's own, from one end to the other, as tall as its Height above the ground (or
     /// endless). Missiles whose WallContact is not None meet it, and a pushed unit is stopped by it, or slides along it, as
     /// at a tree. It is invisible: the map shows it however it likes. The package never moves it; setting its X or Y moves
-    /// it whole. It belongs to its maker (the current owner at Create) unless given an owner, and ends with it or by End.
+    /// it whole. It is in the scope Create names, and ends with it or by End.
     /// </summary>
     public sealed class Wall : Gizmo
     {

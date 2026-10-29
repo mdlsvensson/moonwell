@@ -421,8 +421,7 @@ namespace Moonwell
     /// constructor sets Range, and Tick unless a check at every step is wanted. At each tick the interaction checks what is
     /// within Range: a new other is asked about with Accepts and, if accepted, meets (OnMeet, then OnTick); an other still
     /// in range is asked again, unless RecheckAccepts is off, and ticks (OnTick); one refused, gone out of range or with
-    /// no place parts (OnPart). Reactions run guarded, the pair's with the pair as the current owner and Accepts with the
-    /// interaction.
+    /// no place parts (OnPart). Reactions run guarded.
     /// </summary>
     /// <typeparam name="THolder">The class of the holder: Unit, Item, Destructable, Gizmo, a map's class of one of them, or Actor.</typeparam>
     /// <typeparam name="TOther">The class of the things it pairs with, as Find takes: Unit, Item, Destructable, Gizmo, a map's gizmo class, or Actor.</typeparam>
@@ -456,23 +455,23 @@ namespace Moonwell
             get { return Pairing.View<THolder, TOther>(this); }
         }
 
-        /// <summary>Whether an other within range may meet the holder, and, asked again before each tick while RecheckAccepts is on (the default), whether a pair that has met goes on; true unless a map says. Refused, a new other does not meet and is asked again at the next tick; a pair parts (OnPart), and its other is asked again from the next tick and meets again once accepted. An error it throws is reported and refuses. Runs with the interaction as the current owner.</summary>
+        /// <summary>Whether an other within range may meet the holder, and, asked again before each tick while RecheckAccepts is on (the default), whether a pair that has met goes on; true unless a map says. Refused, a new other does not meet and is asked again at the next tick; a pair parts (OnPart), and its other is asked again from the next tick and meets again once accepted. An error it throws is reported and refuses.</summary>
         public virtual bool Accepts(TOther other)
         {
             return true;
         }
 
-        /// <summary>Runs when the two meet, with the pair as the current owner; OnTick runs right after, in the same check.</summary>
+        /// <summary>Runs when the two meet; OnTick runs right after, in the same check.</summary>
         public virtual void OnMeet(Pair pair)
         {
         }
 
-        /// <summary>Runs at each tick while the two are in range, unless the pair waits or is paused, with the pair as the current owner.</summary>
+        /// <summary>Runs at each tick while the two are in range, unless the pair waits or is paused.</summary>
         public virtual void OnTick(Pair pair)
         {
         }
 
-        /// <summary>Runs once when the pair ends, for any reason: out of range, a side with no place or ending, Accepts refusing it, Stop, or the interaction ending. The pair is the current owner; what it made ends after.</summary>
+        /// <summary>Runs once when the pair ends, for any reason: out of range, a side with no place or ending, Accepts refusing it, Stop, or the interaction ending. What the pair holds ends after.</summary>
         public virtual void OnPart(Pair pair)
         {
         }
@@ -742,11 +741,9 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Runs Accepts with the interaction as the current owner; an error it throws is reported and refuses.</summary>
+        /// <summary>Runs Accepts; an error it throws is reported and refuses.</summary>
         private bool CallAccepts(TOther other)
         {
-            var previous = Scope.current;
-            Scope.current = this;
             var failure = Guard.Accept(this, other);
             var accepted = Guard.answer;
             if (failure != null)
@@ -754,25 +751,20 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".Accepts", failure);
             }
 
-            Scope.current = previous;
             return accepted;
         }
 
-        /// <summary>Runs OnMeet with the pair as the current owner, and reports an error it throws.</summary>
+        /// <summary>Runs OnMeet, and reports an error it throws.</summary>
         private void CallMeet(Pair pair)
         {
-            var previous = Scope.current;
-            Scope.current = pair;
             var failure = Guard.Meet(this, pair);
             if (failure != null)
             {
                 Errors.Report(Names.NameOf(this) + ".OnMeet", failure);
             }
-
-            Scope.current = previous;
         }
 
-        /// <summary>Runs OnTick with the pair as the current owner, and reports an error it throws.</summary>
+        /// <summary>Runs OnTick, and reports an error it throws.</summary>
         private void CallTick(Pair pair)
         {
 #if DEBUG
@@ -783,29 +775,21 @@ namespace Moonwell
                 debugStats.StepTicks++;
             }
 #endif
-            var previous = Scope.current;
-            Scope.current = pair;
             var failure = Guard.Tick(this, pair);
             if (failure != null)
             {
                 Errors.Report(Names.NameOf(this) + ".OnTick", failure);
             }
-
-            Scope.current = previous;
         }
 
-        /// <summary>Runs OnPart with the pair as the current owner, and reports an error it throws.</summary>
+        /// <summary>Runs OnPart, and reports an error it throws.</summary>
         private void CallPart(Pair pair)
         {
-            var previous = Scope.current;
-            Scope.current = pair;
             var failure = Guard.Part(this, pair);
             if (failure != null)
             {
                 Errors.Report(Names.NameOf(this) + ".OnPart", failure);
             }
-
-            Scope.current = previous;
         }
 
         /// <summary>

@@ -196,8 +196,6 @@ namespace Moonwell
                 return;
             }
 
-            var previous = Scope.current;
-            Scope.current = this;
             try
             {
                 OnApply();
@@ -206,8 +204,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnApply", error);
             }
-
-            Scope.current = previous;
         }
 
         /// <summary>Runs OnTick as a reaction of the buff.</summary>
@@ -218,8 +214,6 @@ namespace Moonwell
                 return;
             }
 
-            var previous = Scope.current;
-            Scope.current = this;
             try
             {
                 OnTick();
@@ -228,8 +222,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnTick", error);
             }
-
-            Scope.current = previous;
         }
 
         /// <summary>Runs OnExpire as a reaction of the buff.</summary>
@@ -240,8 +232,6 @@ namespace Moonwell
                 return;
             }
 
-            var previous = Scope.current;
-            Scope.current = this;
             try
             {
                 OnExpire();
@@ -250,8 +240,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(this) + ".OnExpire", error);
             }
-
-            Scope.current = previous;
         }
     }
 }

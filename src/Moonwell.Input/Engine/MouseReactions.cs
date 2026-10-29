@@ -183,11 +183,9 @@ namespace Moonwell.Engine
             watchers.Masks = masksFound;
         }
 
-        /// <summary>Calls one reaction with the component as the current owner; a failing reaction is reported.</summary>
+        /// <summary>Calls one reaction; a failing reaction is reported.</summary>
         private static void Call(Scope obj, Mouse mouse, int bit, MouseButton button)
         {
-            var previous = Scope.current;
-            Scope.current = obj;
             try
             {
                 switch (bit)
@@ -201,8 +199,6 @@ namespace Moonwell.Engine
             {
                 Errors.Report(Names.NameOf(obj) + "." + MethodName(bit), error);
             }
-
-            Scope.current = previous;
         }
 
         /// <summary>The bits of the reaction methods an object's class writes, worked out once per class. Only methods the class writes count: in Lua an interface's empty defaults are not there.</summary>

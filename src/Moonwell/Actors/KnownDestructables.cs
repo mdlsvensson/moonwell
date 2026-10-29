@@ -69,8 +69,6 @@ namespace Moonwell
             if (!made.HasEnded)
             {
                 made.entered = true;
-                var previous = Scope.current;
-                Scope.current = made;
                 try
                 {
                     made.CallEnter();
@@ -79,8 +77,6 @@ namespace Moonwell
                 {
                     Errors.Report(Names.NameOf(made) + ".OnCreated", error);
                 }
-
-                Scope.current = previous;
             }
 
             if (!made.HasEnded)

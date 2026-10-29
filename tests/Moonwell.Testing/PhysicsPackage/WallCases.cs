@@ -79,14 +79,13 @@ namespace Moonwell.Testing
         /// normal out of the side it came from and the speed into it; the speed into it is reversed and halved (its
         /// Bounciness 0.5 times the wall's 1) and the speed along it kept. One whose CanHit refuses the wall flies through it,
         /// asked once. A wall of Bounciness 0.5 keeps a quarter. The wall
-        /// belongs to the owner current at Create, or the one given, and ends with it; a ball then flies through where it was.
+        /// belongs to the scope given at Create, and ends with it; a ball then flies through where it was.
         /// </summary>
         public static void Bounce(FakeWorld world)
         {
             Fresh();
-            var maker = Scope.Current;
             var wall = Wall.Create(600.0f, 200.0f, 600.0f, 800.0f, Game.Instance);
-            Expect.Same(maker, wall.Parent, "it belongs to its maker");
+            Expect.Same(Game.Instance, wall.Parent, "it belongs to the scope given");
             Within(600.0f, wall.X1, 0.0f, "its ends: x1");
             Within(800.0f, wall.Y2, 0.0f, "y2");
             Within(0.0f, wall.Height, 0.0f, "endless");

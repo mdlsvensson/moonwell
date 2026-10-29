@@ -193,7 +193,7 @@ namespace Moonwell.Testing
             Expect.Same(token, parted, "Data in OnPart");
         }
 
-        /// <summary>A pair belongs to its interaction; its reactions run with it as the current owner, so a timer made in OnMeet is the pair's and ends when it parts.</summary>
+        /// <summary>A pair belongs to its interaction, and a timer made with the pair's After in OnMeet is the pair's and ends when it parts.</summary>
         public static void PairOwns(FakeWorld world)
         {
             Fresh();
@@ -201,29 +201,16 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var aura = new FireAura();
             Timer? made = null;
-            Scope? meeting = null;
-            Scope? ticking = null;
-            Scope? parting = null;
-            aura.Meeting = pair =>
-            {
-                meeting = Scope.Current;
-                made = pair.After(100.0f, () => { });
-            };
-            aura.Ticking = pair => ticking = Scope.Current;
-            aura.Parting = pair => parting = Scope.Current;
+            aura.Meeting = pair => { made = pair.After(100.0f, () => { }); };
             a.Interact(aura, Game.Instance);
             Steps(world, 16);
             var met = aura.Pairs[0];
             Expect.Same(aura, met.Parent, "the pair is its interaction's");
-            Expect.Same(met, meeting, "OnMeet runs with the pair as the current owner");
-            Expect.Same(met, ticking, "and OnTick");
             Expect.Same(met, made!.Parent, "the timer is the pair's");
             Expect.True(!made!.HasEnded, "and runs");
             world.MoveUnit(b.Handle, 600.0f, 0.0f);
             Steps(world, 16);
-            Expect.Same(met, parting, "OnPart runs with the pair as the current owner");
             Expect.True(made!.HasEnded, "the timer ended with the pair");
-            Expect.True(Scope.Current == Runtime.Root, "and the root is current after");
         }
 
         /// <summary>After in an interaction's OnMeet is the interaction's; the pair's After is the pair's.</summary>

@@ -5,9 +5,6 @@ namespace Moonwell
     /// <summary>Something that holds what is made in it, and ends it, newest first, when it ends.</summary>
     public abstract class Scope : Scoped
     {
-        /// <summary>The owner that running code makes new objects for; null outside Run.</summary>
-        internal static Scope? current;
-
         // The instance fields are internal, not private, as a map's subclass may name a field of its own the same:
         // CSharp.lua gives a subclass's field a name of its own only when it sees the base's field of that name,
         // and it does not see a private one, so in Lua the two would be one field (PrivateFieldTests).
@@ -20,16 +17,6 @@ namespace Moonwell
 
         /// <summary>How many children are linked to this scope.</summary>
         internal int count;
-
-        /// <summary>The owner running code makes new objects for: the one set by Run, else the root.</summary>
-        [LocalSafe]
-        public static Scope Current
-        {
-            get
-            {
-                return current ?? Runtime.Root;
-            }
-        }
 
         /// <summary>How many children this scope holds that have not ended.</summary>
         [LocalSafe]
@@ -62,21 +49,6 @@ namespace Moonwell
             }
 
             return Timer.Start(new Timer(Runtime.World.Now(), seconds, true, action), this);
-        }
-
-        /// <summary>Runs an action with this owner as the current owner, and restores the previous one after, even when it throws.</summary>
-        public void Run(Action action)
-        {
-            var previous = current;
-            current = this;
-            try
-            {
-                action();
-            }
-            finally
-            {
-                current = previous;
-            }
         }
 
         /// <summary>Takes a child under this scope; a child adopted by an ended scope ends at once. A child that already has a parent, or has ended, is left as it is, and the error is reported, in every build: linked twice, it would break the scopes' lists (decision 74).</summary>

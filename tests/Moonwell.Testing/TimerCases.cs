@@ -123,28 +123,14 @@ namespace Moonwell.Testing
             Expect.True(timer.HasEnded, "the timer has ended with its owner");
         }
 
-        /// <summary>Inside the callback, Scope.Current is the timer's owner.</summary>
-        public static void CurrentInCallback(FakeWorld world)
-        {
-            var log = new List<string>();
-            var owner = new TestScope("owner", log);
-            Scope? seen = null;
-            owner.After(1f, () => { seen = Scope.Current; });
-            world.Advance(1f);
-            Expect.Same(owner, seen, "Scope.Current inside the callback");
-        }
-
         /// <summary>A timer that throws is reported, and a timer due at the same time still runs.</summary>
         public static void ErrorIsolated(FakeWorld world)
         {
             var log = new List<string>();
             var owner = new TestScope("owner", log);
             var second = 0;
-            owner.Run(() =>
-            {
-                owner.After(1f, () => { throw new InvalidOperationException("boom"); });
-                owner.After(1f, () => { second++; });
-            });
+            owner.After(1f, () => { throw new InvalidOperationException("boom"); });
+            owner.After(1f, () => { second++; });
             world.Advance(1f);
             Expect.Equal(1, second, "runs of the timer after the one that threw");
             var reported = false;

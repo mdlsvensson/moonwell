@@ -122,7 +122,7 @@ namespace Moonwell
 
             faded = 0.0f;
             fadeFrom = Level(volume);
-            fader = Runtime.Root.Every(FadeStep, () => Fade());
+            fader = Game.Instance.Every(FadeStep, () => Fade());
         }
 
         /// <summary>Moves a missile's sounds to a place; the pass calls it with the missile's effects, every step it moves.</summary>

@@ -171,7 +171,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.grid.reset", Run = InteractionsGridCases.Reset });
             list.Add(new Case { Name = "interactions.grid.settings-checked", Run = InteractionsGridCases.SettingsChecked });
             list.Add(new Case { Name = "interactions.gizmo.create", Run = GizmoCases.Create });
-            list.Add(new Case { Name = "interactions.gizmo.reaction-owner", Run = GizmoCases.ReactionOwner });
             list.Add(new Case { Name = "interactions.gizmo.tick", Run = GizmoCases.Tick });
             list.Add(new Case { Name = "interactions.gizmo.tick-rounding", Run = GizmoCases.TickRounding });
             list.Add(new Case { Name = "interactions.gizmo.no-tick", Run = GizmoCases.NoTick });
@@ -184,7 +183,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.gizmo.long-tick", Run = GizmoCases.LongTick });
             list.Add(new Case { Name = "interactions.gizmo.cycle-lists", Run = GizmoCases.CycleLists });
             list.Add(new Case { Name = "interactions.gizmo.throwing-tick", Run = GizmoCases.ThrowingTick });
-            list.Add(new Case { Name = "interactions.gizmo.tick-owner", Run = GizmoCases.TickOwner });
             list.Add(new Case { Name = "interactions.gizmo.throwing-reactions", Run = GizmoCases.ThrowingReactions });
             list.Add(new Case { Name = "interactions.gizmo.shadowed-fields", Run = GizmoCases.ShadowedFields });
             list.Add(new Case { Name = "interactions.gizmo.components", Run = GizmoCases.Components });
@@ -454,7 +452,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "areas.area.end-inside-enter", Run = AreaCases.EndInsideEnter });
             list.Add(new Case { Name = "areas.area.remove-inside-left", Run = AreaCases.RemoveInsideLeft });
             list.Add(new Case { Name = "areas.area.throwing", Run = AreaCases.Throwing });
-            list.Add(new Case { Name = "areas.area.reaction-owner", Run = AreaCases.ReactionOwner });
             list.Add(new Case { Name = "areas.area.cells", Run = AreaCases.Cells });
             list.Add(new Case { Name = "areas.area.no-shape", Run = AreaCases.NoShape });
             list.Add(new Case { Name = "areas.area.region-before-install", Run = AreaCases.RegionBeforeInstall });
@@ -703,7 +700,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "ownership.child-ends-alone", Run = OwnershipCases.ChildEndsAlone });
             list.Add(new Case { Name = "ownership.adopt-while-ending", Run = OwnershipCases.AdoptWhileEnding });
             list.Add(new Case { Name = "ownership.error-does-not-stop", Run = OwnershipCases.ErrorDoesNotStop });
-            list.Add(new Case { Name = "ownership.run-sets-current", Run = OwnershipCases.RunSetsCurrent });
             list.Add(new Case { Name = "ownership.adopt-in-finish", Run = OwnershipCases.AdoptInFinish });
             list.Add(new Case { Name = "timers.after", Run = TimerCases.After });
             list.Add(new Case { Name = "timers.every", Run = TimerCases.Every });
@@ -713,7 +709,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "timers.many-in-due-order", Run = TimerCases.ManyInDueOrder });
             list.Add(new Case { Name = "timers.end-cancels", Run = TimerCases.EndCancels });
             list.Add(new Case { Name = "timers.owned", Run = TimerCases.OwnerAdopts });
-            list.Add(new Case { Name = "timers.current-in-callback", Run = TimerCases.CurrentInCallback });
             list.Add(new Case { Name = "timers.error-isolated", Run = TimerCases.ErrorIsolated });
             list.Add(new Case { Name = "timers.remaining", Run = TimerCases.Remaining });
             list.Add(new Case { Name = "hooks.overrides", Run = HookCases.Overrides });
@@ -732,7 +727,6 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "actors.remove", Run = ActorCases.RemoveOne });
             list.Add(new Case { Name = "actors.remove-all", Run = ActorCases.RemoveAllOf });
             list.Add(new Case { Name = "actors.remove-of-class", Run = ActorCases.RemoveOf });
-            list.Add(new Case { Name = "actors.current-in-onadded", Run = ActorCases.CurrentInOnAdded });
             list.Add(new Case { Name = "actors.end-removes-last-first", Run = ActorCases.EndRemovesLastFirst });
             list.Add(new Case { Name = "actors.add-to-ended", Run = ActorCases.AddToEnded });
             list.Add(new Case { Name = "actors.component-owns-timer", Run = ActorCases.ComponentOwnsTimer });

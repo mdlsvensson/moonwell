@@ -682,17 +682,15 @@ namespace Moonwell.Testing
             Expect.Same(made.Handle, world.RemovedUnits[0], "the handle removed");
         }
 
-        /// <summary>A unit created inside Run is in the scope its line names, not in the one running the code, and outlives that one.</summary>
+        /// <summary>A unit is in the scope its Create line names, and outlives another scope that ends.</summary>
         public static void NotOwnedByCurrent(FakeWorld world)
         {
             var log = new List<string>();
             var owner = new TestScope("owner", log);
-            Unit? made = null;
-            owner.Run(() => { made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0f, 0f, Game.Instance, 0f); });
-            var kept = made!;
-            Expect.Same(Game.Instance, kept.Parent, "the unit is in the scope its line names, not the one running the code");
+            var kept = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0f, 0f, Game.Instance, 0f);
+            Expect.Same(Game.Instance, kept.Parent, "the unit is in the scope its line names");
             owner.End();
-            Expect.True(!kept.HasEnded, "the unit outlives the scope running the code");
+            Expect.True(!kept.HasEnded, "the unit outlives another scope");
         }
 
         /// <summary>Create of a class gives an object of that class, made from its registered id.</summary>

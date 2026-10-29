@@ -169,12 +169,10 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Calls a timer's action with its owner as the current owner, and reports an error it throws.</summary>
+        /// <summary>Calls a timer's action, and reports an error it throws.</summary>
         private static void Run(Timer timer)
         {
             var reactor = timer.Parent!;
-            var previous = Scope.current;
-            Scope.current = reactor;
             try
             {
                 timer.action();
@@ -183,8 +181,6 @@ namespace Moonwell
             {
                 Errors.Report(Names.NameOf(reactor) + ".Timer", error);
             }
-
-            Scope.current = previous;
         }
 
         /// <summary>

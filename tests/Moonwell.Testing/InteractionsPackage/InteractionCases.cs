@@ -90,7 +90,7 @@ namespace Moonwell.Testing
             aura.Tag = unit => unit == b ? "b" : "?";
             Expect.Same(aura, a.Interact(aura, Game.Instance), "Interact gives the interaction back");
             Expect.Same(a, aura.Holder, "its holder");
-            Expect.Same(Runtime.Root, aura.Parent, "it belongs to the current owner, the root");
+            Expect.Same(Game.Instance, aura.Parent, "it belongs to the scope given, the game");
             Steps(world, 16);
             Expect.Equal(0, TestLog.Lines.Count, "b is out of range at the first check");
             world.MoveUnit(b.Handle, 200.0f, 0.0f);
@@ -128,7 +128,7 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "meet b", "tick b" }, "at 300 it meets, at 300.5 not");
         }
 
-        /// <summary>A unit Accepts refuses makes no pair and is asked again at the next tick; Accepts runs with the interaction as the current owner, and a pair is asked again before each tick (decision 73).</summary>
+        /// <summary>A unit Accepts refuses makes no pair and is asked again at the next tick, and a pair is asked again before each tick (decision 73).</summary>
         public static void Accepts(FakeWorld world)
         {
             Fresh();
@@ -140,7 +140,6 @@ namespace Moonwell.Testing
             a.Interact(aura, Game.Instance);
             Steps(world, 16);
             Expect.Equal(1, aura.Asked, "asked once");
-            Expect.Same(aura, aura.AskedAs, "with the interaction as the current owner");
             Expect.Equal(0, aura.Pairs.Count, "refused: no pair");
             Expect.Equal(0, TestLog.Lines.Count, "and no reaction");
             Steps(world, 16);
@@ -505,7 +504,7 @@ namespace Moonwell.Testing
             aura.Tag = unit => unit == b ? "b" : "?";
             Expect.True(!aura.HasEnded, "the aura started in OnCreated goes on");
             Expect.Same(a, aura.Holder, "held by the unit");
-            Expect.Same(a, aura.Parent, "and the unit's, the current owner in OnCreated");
+            Expect.Same(a, aura.Parent, "and the unit's, the scope its line in OnCreated names");
             Expect.Equal(2, Tracking.Count, "the unit is tracked once");
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b" }, "it meets b");
@@ -659,9 +658,9 @@ namespace Moonwell.Testing
         /// <summary>
         /// Each reaction runs guarded, in Lua through one xpcall each with no closure: an Accepts that throws is reported as
         /// FireAura.Accepts and refuses, and the other is asked again at the next tick; an OnMeet that fails on a null (a Lua
-        /// error in Lua) is reported as FireAura.OnMeet and the pair still ticks, with the pair as the current owner; an
-        /// OnPart that throws is reported as FireAura.OnPart and the pair still parts; the current owner is the root again
-        /// after the step, and the check goes on to the next other each time.
+        /// error in Lua) is reported as FireAura.OnMeet and the pair still ticks; an
+        /// OnPart that throws is reported as FireAura.OnPart and the pair still parts; and the check goes on to the next other
+        /// each time.
         /// </summary>
         public static void GuardedReactions(FakeWorld world)
         {
@@ -689,13 +688,11 @@ namespace Moonwell.Testing
                     TestLog.Lines.Add("x " + none!.X);
                 }
             };
-            Scope? tickOwner = null;
             Scope? metB = null;
             aura.Ticking = pair =>
             {
-                if (pair.Other == b && tickOwner == null)
+                if (pair.Other == b && metB == null)
                 {
-                    tickOwner = Scope.Current;
                     metB = pair;
                 }
             };
@@ -706,8 +703,6 @@ namespace Moonwell.Testing
             Expect.True(Logged(world, "FireAura.Accepts failed"), "the Accepts that threw is reported");
             Expect.True(Logged(world, "FireAura.OnMeet failed"), "the OnMeet that failed on a null is reported");
             Expect.True(metB != null, "b ticked");
-            Expect.Same(metB, tickOwner, "OnTick ran with the pair as the current owner");
-            Expect.Same(Runtime.Root, Scope.Current, "the root is the current owner after the step");
             Expect.Equal(2, aura.Asked, "both were asked");
             refuseC = false;
             Steps(world, 16);
@@ -717,7 +712,6 @@ namespace Moonwell.Testing
             ExpectLog(new string[] { "meet b", "tick b", "tick b", "meet c", "tick c", "part b", "tick c" }, "b parts though its OnPart threw, and c ticks after");
             Expect.True(Logged(world, "FireAura.OnPart failed"), "the OnPart that threw is reported");
             Expect.Equal(1, aura.Pairs.Count, "b's pair is gone");
-            Expect.Same(Runtime.Root, Scope.Current, "and the root is the current owner");
         }
 
         /// <summary>A check that fails outside a reaction, here the world's read of a destructable, takes what it added off the shared candidates and walk, and its error is reported as Scorch.Check; nothing parts, an interaction due after it in the same step still checks in that step, and the one that failed checks again at its next tick.</summary>
@@ -745,7 +739,6 @@ namespace Moonwell.Testing
             Expect.Equal(0, Find.Pending, "no candidate is left");
             Expect.Equal(0, Pairing.Walk.Count, "no pair is left on the walk");
             Expect.Equal(1, scorch.Pairs.Count, "the pair is kept");
-            Expect.Same(Runtime.Root, Scope.Current, "the root is the current owner after the step");
             fake.Failing.Clear();
             Steps(world, 1);
             ExpectLog(new string[] { "meet", "tick", "meet b", "tick" }, "the scorch checks again at its next tick");

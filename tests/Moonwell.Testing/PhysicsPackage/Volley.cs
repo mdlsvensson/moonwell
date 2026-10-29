@@ -9,13 +9,9 @@ namespace Moonwell.Testing
         /// <summary>The dart fired; null before OnApply.</summary>
         public Dart? Fired;
 
-        /// <summary>The owner that was current inside OnApply.</summary>
-        public Scope? Seen;
-
         /// <summary>Fires the dart.</summary>
         public override void OnApply()
         {
-            Seen = Scope.Current;
             var dart = new Dart();
             dart.Speed = 100.0f;
             Fired = Unit.Fire(dart, 1000.0f, 0.0f, Given ?? Game.Instance);

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Moonwell.Testing
 {
-    /// <summary>A unit the push cases make: it writes "unit pushed", "unit slammed" and "unit grounded" to the test log, and records the slams, the comings down, the pushers and the owner current at each reaction. It starts with a PushWatch.</summary>
+    /// <summary>A unit the push cases make: it writes "unit pushed", "unit slammed" and "unit grounded" to the test log, and records the slams, the comings down and the pushers. It starts with a PushWatch.</summary>
     public class Pushee : Unit, IPushTarget
     {
         /// <summary>The slams, in the order they came.</summary>
@@ -23,9 +23,6 @@ namespace Moonwell.Testing
         /// <summary>Run at the end of OnSlammed; null for nothing.</summary>
         public System.Action<Slam>? Slamming;
 
-        /// <summary>The owner current at the last reaction.</summary>
-        public Scope? RanWith;
-
         /// <summary>Makes a unit with its component.</summary>
         public Pushee()
         {
@@ -37,7 +34,6 @@ namespace Moonwell.Testing
         {
             TestLog.Lines.Add("unit pushed");
             Pushers.Add(pusher);
-            RanWith = Scope.Current;
         }
 
         /// <summary>Logs the slam and what it read.</summary>
@@ -47,7 +43,6 @@ namespace Moonwell.Testing
             Slams.Add(slam);
             SlamSpeeds.Add(slam.Speed);
             SlamPushers.Add(slam.Pusher);
-            RanWith = Scope.Current;
             if (Slamming != null)
             {
                 Slamming(slam);
@@ -59,7 +54,6 @@ namespace Moonwell.Testing
         {
             TestLog.Lines.Add("unit grounded");
             Landings.Add(speed);
-            RanWith = Scope.Current;
         }
     }
 }

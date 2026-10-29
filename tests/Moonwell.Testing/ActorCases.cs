@@ -45,20 +45,16 @@ namespace Moonwell.Testing
             }
         }
 
-        /// <summary>A component that counts its adds and keeps the current owner it saw in OnAdded.</summary>
+        /// <summary>A component that counts its adds.</summary>
         private sealed class Probe : GameComponent
         {
             /// <summary>How many times OnAdded ran.</summary>
             public int Adds;
 
-            /// <summary>The current owner seen inside OnAdded.</summary>
-            public Scope? Seen;
-
-            /// <summary>Counts the add and keeps the current owner.</summary>
+            /// <summary>Counts the add.</summary>
             protected override void OnAdded()
             {
                 Adds++;
-                Seen = Scope.Current;
             }
         }
 
@@ -207,15 +203,6 @@ namespace Moonwell.Testing
             Expect.Equal(2, actor.ComponentCount, "the components left");
             actor.Remove<A>();
             Expect.True(!actor.Remove<A>(), "no A is left to remove");
-        }
-
-        /// <summary>Inside OnAdded, Scope.Current is the component.</summary>
-        public static void CurrentInOnAdded(FakeWorld world)
-        {
-            var actor = new TestActor();
-            var probe = actor.Add(new Probe());
-            Expect.Equal(1, probe.Adds, "OnAdded ran once");
-            Expect.Same(probe, probe.Seen, "Scope.Current inside OnAdded");
         }
 
         /// <summary>When the actor ends, its components end newest first, and each logs its removal.</summary>

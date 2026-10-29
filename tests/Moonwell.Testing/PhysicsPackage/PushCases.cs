@@ -184,7 +184,6 @@ namespace Moonwell.Testing
             Expect.Equal(0, unit.Slams.Count, "no OnSlammed");
             Expect.Equal(1, unit.Pushers.Count, "OnPushed once");
             Expect.True(unit.Pushers[0] == null, "with no pusher");
-            Expect.Same(unit, unit.RanWith, "the reactions run with the unit as the current owner");
             Expect.True(!Tracking.Running, "the cycle's timer stops once no unit is pushed");
             var x = unit.X;
             Steps(world, 4);

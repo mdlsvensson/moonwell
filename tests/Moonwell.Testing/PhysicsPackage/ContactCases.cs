@@ -193,7 +193,7 @@ namespace Moonwell.Testing
 
         /// <summary>
         /// A bolt of 900 a second fired level at an enemy footman, with the default UnitContact, Stop: OnImpact runs once,
-        /// with the missile's owner current, met at the footman's surface with the normal out of it and the speed it closed
+        /// met at the footman's surface with the normal out of it and the speed it closed
         /// at; 75 fire damage is dealt from the source with the missile as the damage's tag; it ends, its effect moved to the
         /// point of contact and removed once, its ImpactModel and ImpactSound played. Its source, which it starts inside, is
         /// not hit.
@@ -229,7 +229,6 @@ namespace Moonwell.Testing
             Within(0.0f, Read(bolt, 0, 6), 0.0001f, "z");
             Within(900.0f, Read(bolt, 0, 7), 0.01f, "the speed it closed at");
             Within(75.0f, bolt.Damages[0], 0.0f, "the impact carried ImpactDamage");
-            Expect.Same(Game.Instance, bolt.ImpactedWith, "OnImpact ran with the missile's owner, the game, current");
             Expect.Equal(1, world.Dealt.Count, "damage dealt once");
             Expect.Equal("75 attack:False ranged:False 0 8 0", world.Dealt[0], "75 fire, spells");
             Expect.Same(bolt, target.Tags[0], "with the missile as the tag");
@@ -302,7 +301,6 @@ namespace Moonwell.Testing
             }
 
             Expect.Equal("shot impact|watch impact|unit struck|buff struck|unit damaged", string.Join("|", seen), "the order");
-            Expect.Same(Game.Instance, target.StruckWith, "OnStruck ran with the missile's owner current");
             Expect.Equal(0, world.Printed.Count, "nothing was reported: the component that writes no OnStruck was not called");
 
             var other = FootmanAt(world, 100.0f, 800.0f, 0);
@@ -832,7 +830,7 @@ namespace Moonwell.Testing
             Expect.Equal(1, RemovedTimes(fake, shotLook), "its effect removed once");
         }
 
-        /// <summary>OnImpact and OnStruck run with the missile's owner current, so a timer made in OnImpact of a missile that stops outlives it.</summary>
+        /// <summary>A timer made in a missile's OnImpact in a scope that outlives the missile, here the scope it was fired in, outlives the missile that stops.</summary>
         public static void Ownership(FakeWorld world)
         {
             Fresh();
@@ -846,8 +844,6 @@ namespace Moonwell.Testing
             bolt.VX = 600.0f;
             UntilEnded(world, bolt, 64);
             Expect.True(bolt.HasEnded, "it stopped");
-            Expect.Same(owner, bolt.ImpactedWith, "OnImpact ran with the missile's owner current");
-            Expect.Same(owner, target.StruckWith, "OnStruck too");
             Steps(world, 10);
             Expect.Equal(1, fired, "the timer made in OnImpact outlived the missile");
         }

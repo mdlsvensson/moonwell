@@ -1,6 +1,6 @@
 namespace Moonwell
 {
-    /// <summary>The game: the actor of the components that react to the map as a whole, and the root of the owners.</summary>
+    /// <summary>The game: the actor of the components that react to the map as a whole, and the scope of what lasts the whole game.</summary>
     public sealed class Game : Actor
     {
         /// <summary>The game of this runtime; set by Runtime.Reset.</summary>

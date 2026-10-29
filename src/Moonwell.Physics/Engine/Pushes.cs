@@ -11,7 +11,7 @@ namespace Moonwell.Engine
     /// fly, the item trick, which also sees trees and buildings; on a bridge's deck, the deck's area instead, its edge a
     /// rail; blocked, it slides along the edge
     /// on the free axis, losing the speed into it, or stops, and OnSlammed runs. The reactions run on the unit's class,
-    /// then its components and buffs in the order they were added, each guarded, with the unit as the current owner; a
+    /// then its components and buffs in the order they were added, each guarded; a
     /// method a class does not write is not called (in Lua an interface's empty defaults are not there).
     /// </summary>
     internal static class Pushes
@@ -730,13 +730,11 @@ namespace Moonwell.Engine
             push.unit.FlyHeight = to;
         }
 
-        /// <summary>Runs a reaction on the unit's class, then its components and buffs in the order they were added, with the unit as the current owner; only where the class writes it, and not on what has ended. A failing one is reported and the rest run; once one has killed, hidden, loaded or removed the unit, none after it runs.</summary>
+        /// <summary>Runs a reaction on the unit's class, then its components and buffs in the order they were added; only where the class writes it, and not on what has ended. A failing one is reported and the rest run; once one has killed, hidden, loaded or removed the unit, none after it runs.</summary>
         private static void React(Pushed push, int bit, Unit? pusher, Slam? slam, float speed)
         {
             var unit = push.unit;
             reacted = true;
-            var previous = Scope.current;
-            Scope.current = unit;
             if (!unit.HasEnded && (MaskOf(unit) & bit) != 0)
             {
                 Call(unit, bit, pusher, slam, speed);
@@ -758,7 +756,6 @@ namespace Moonwell.Engine
             }
 
             unit.EndDispatch();
-            Scope.current = previous;
         }
 
         /// <summary>Calls a reaction on an object that writes it, reporting an error it throws.</summary>
