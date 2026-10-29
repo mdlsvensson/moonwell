@@ -93,6 +93,30 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void A_maps_own_object_files_are_staged_as_they_are()
+        {
+            // World Editor's save with edits on every tab, as the map's source and nothing declared: the build writes back
+            // the records War3Net read, so World Editor's own bytes stay (the end marker after each modification, which World Editor sets
+            // to the object's id, bytes after the two tables, a text that is not valid UTF-8).
+            var fixture = TestFolders.Fixture("WorldEditorHeavy");
+            foreach (var extension in Extensions)
+            {
+                File.Copy(Path.Combine(fixture, "war3map." + extension), Path.Combine(folder, "map", "war3map." + extension));
+                File.Copy(Path.Combine(fixture, "war3mapSkin." + extension), Path.Combine(folder, "map", "war3mapSkin." + extension));
+            }
+
+            var staged = WriteObjects(Array.Empty<DeclaredObject>(), new Dictionary<string, string>(), new Dictionary<string, string>());
+
+            var names = Extensions.SelectMany(extension => new[] { "war3map." + extension, "war3mapSkin." + extension }).ToList();
+            Assert.Equal(14, names.Count);
+            foreach (var name in names)
+            {
+                Assert.True(File.Exists(Path.Combine(staged, name)), name + " is not staged");
+                Assert.Equal(File.ReadAllBytes(Path.Combine(fixture, name)), File.ReadAllBytes(Path.Combine(staged, name)));
+            }
+        }
+
+        [Fact]
         public void Staged_object_files_keep_their_bytes()
         {
             var staged = StageFixtureObjects(out _, out _);

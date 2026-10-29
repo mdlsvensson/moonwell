@@ -99,7 +99,7 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_pin_with_a_character_outside_ascii_fails()
         {
-            // The object file would hold "?001", and the Lua another id still.
+            // Å is one byte in a Latin-1 rawcode and would be written as itself, but is no ASCII sign (a character above 0xFF Rawcodes.From refuses); the Lua would show another id.
             var error = Assert.Throws<BuildException>(() => Assign(Obj("Objects.Arthas", "hero", pin: "Å001")));
 
             Assert.Equal("Objects.Arthas has the id \"Å001\", with a character that is not an ASCII letter, digit or sign", error.Message);
