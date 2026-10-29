@@ -31,12 +31,12 @@ namespace Moonwell.Build.Tests
         public void missing_id_fails_naming_a_free_one()
         {
             var error = Assert.Throws<BuildException>(() => Assign(
+                new HashSet<string> { "H000" },
                 new HashSet<string> { "H001" },
-                new HashSet<string> { "H002" },
                 Obj("Objects.Arthas", "hero"),
-                Obj("Objects.Other", "hero", pin: "H003")));
+                Obj("Objects.Other", "hero", pin: "H002")));
 
-            Assert.Equal("Objects.Arthas has no object id; add [ObjectId(\"H004\")] to it", error.Message);
+            Assert.Equal("Objects.Arthas has no object id; add [ObjectId(\"H003\")] to it", error.Message);
         }
 
         [Fact]
@@ -48,9 +48,9 @@ namespace Moonwell.Build.Tests
                 Obj("Objects.Burn", "buff")));
 
             Assert.Equal(
-                "Objects.Burn has no object id; add [ObjectId(\"B001\", Carrier = \"A001\")] to it\n"
-                + "Objects.Footman has no object id; add [ObjectId(\"h001\")] to it\n"
-                + "Objects.Grunt has no object id; add [ObjectId(\"h002\")] to it",
+                "Objects.Burn has no object id; add [ObjectId(\"B000\", Carrier = \"A000\")] to it\n"
+                + "Objects.Footman has no object id; add [ObjectId(\"h000\")] to it\n"
+                + "Objects.Grunt has no object id; add [ObjectId(\"h001\")] to it",
                 error.Message);
         }
 
@@ -58,10 +58,10 @@ namespace Moonwell.Build.Tests
         public void buff_without_carrier_fails_naming_a_free_ability_id()
         {
             var error = Assert.Throws<BuildException>(() => Assign(
-                Obj("Objects.Bolt", "ability", pin: "A001"),
+                Obj("Objects.Bolt", "ability", pin: "A000"),
                 Obj("Objects.Burn", "buff", pin: "B001")));
 
-            Assert.Equal("Objects.Burn has no carrier id; add Carrier = \"A002\" to its [ObjectId]", error.Message);
+            Assert.Equal("Objects.Burn has no carrier id; add Carrier = \"A001\" to its [ObjectId]", error.Message);
         }
 
         [Fact]
@@ -99,10 +99,27 @@ namespace Moonwell.Build.Tests
         [Fact]
         public void a_pin_with_a_character_outside_ascii_fails()
         {
-            // The object file would hold "?001", and the Lua another id still.
+            // Å is one byte in a Latin-1 rawcode and would be written as itself, but is no ASCII sign (a character above 0xFF Rawcodes.From refuses); the Lua would show another id.
             var error = Assert.Throws<BuildException>(() => Assign(Obj("Objects.Arthas", "hero", pin: "Å001")));
 
             Assert.Equal("Objects.Arthas has the id \"Å001\", with a character that is not an ASCII letter, digit or sign", error.Message);
+        }
+
+        [Fact]
+        public void a_pin_with_a_comma_fails()
+        {
+            // The game splits a unit's ability list at the comma, so an ability with a comma in its id works when added by code but not in the list.
+            var error = Assert.Throws<BuildException>(() => Assign(Obj("Objects.Burn", "ability", pin: "A0,0")));
+
+            Assert.Equal("Objects.Burn has the id \"A0,0\", with a comma, which splits a list field that names the object", error.Message);
+        }
+
+        [Fact]
+        public void a_pin_with_a_comma_and_a_non_ascii_character_gets_the_comma_message()
+        {
+            var error = Assert.Throws<BuildException>(() => Assign(Obj("Objects.Burn", "ability", pin: "A,é0")));
+
+            Assert.Equal("Objects.Burn has the id \"A,é0\", with a comma, which splits a list field that names the object", error.Message);
         }
 
         [Fact]
@@ -171,7 +188,7 @@ namespace Moonwell.Build.Tests
         {
             var error = Assert.Throws<BuildException>(() => Assign(Obj("Objects.Slow", "buff", root: "Bslo", replaces: true)));
 
-            Assert.Equal("Objects.Slow has no carrier id; add [ObjectId(Carrier = \"A001\")] to it", error.Message);
+            Assert.Equal("Objects.Slow has no carrier id; add [ObjectId(Carrier = \"A000\")] to it", error.Message);
         }
 
         [Fact]

@@ -134,7 +134,8 @@ public sealed class Champion : Human.Units.Paladin
 - A class with no `[ObjectId]` is error MW0013, and the build names a free id to use. A buff also gives the id of its
   carrier, the hidden ability the build makes to show its icon, so no class of the map declares that id:
   `[ObjectId("B001", Carrier = "A002")]`, or `[ObjectId(Carrier = "A002")]` with `[Replaces]`. An id is four ASCII
-  characters, and only a hero's starts with an upper-case letter (MW0014).
+  characters, none of them a comma (the game splits a list field that names the object at a comma), and only a hero's
+  starts with an upper-case letter (MW0014).
 - `[Replaces]` makes the class the game's object itself: every unit of that type is made as the class.
 - `Unit.Create<Champion>(player, x, y)` makes one in the game, facing 270 degrees unless a facing follows;
   `Item.Create<EmberBlade>(x, y)` makes an item.

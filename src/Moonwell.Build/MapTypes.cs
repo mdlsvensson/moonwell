@@ -1,4 +1,6 @@
 using System.Globalization;
+using Moonwell.GameData;
+using Moonwell.MapFiles;
 using War3Net.Build.Script;
 
 namespace Moonwell.Build
@@ -28,8 +30,9 @@ namespace Moonwell.Build
             }
 
             var types = new List<MapType>();
-            foreach (var (kind, extension) in ObjectKinds.All.Where(one => one.Kind is "unit" or "item" or "destructable"))
+            foreach (var fileKind in new[] { Kind.Unit, Kind.Item, Kind.Destructable })
             {
+                var kind = Kinds.Key(fileKind);
                 var fields = new Dictionary<string, StandardData.ObjectField>(StringComparer.Ordinal);
                 foreach (var field in standard.Fields(kind))
                 {
@@ -39,28 +42,29 @@ namespace Moonwell.Build
                 // An object is in the main file and in the skin file, each with the fields it keeps there.
                 var objects = new Dictionary<string, (string Root, SortedDictionary<string, object?> Changed)>(StringComparer.Ordinal);
                 var order = new List<string>();
-                foreach (var name in new[] { ObjectKinds.MainName(extension), ObjectKinds.SkinName(extension) })
+                foreach (var name in new[] { Kinds.MainName(fileKind), Kinds.SkinName(fileKind) })
                 {
-                    var table = ObjectTable.Read(Path.Combine(mapFolder, name), kind);
-                    foreach (var entry in table.Originals.Concat(table.News))
+                    var table = SourceObjectFile.Read(Path.Combine(mapFolder, name), fileKind);
+                    foreach (var entry in table.Entries)
                     {
-                        if (!objects.TryGetValue(entry.Id, out var one))
+                        var entryId = SourceObjectFile.IdOf(entry);
+                        if (!objects.TryGetValue(entryId, out var one))
                         {
-                            objects[entry.Id] = one = (entry.OldId, new SortedDictionary<string, object?>(StringComparer.Ordinal));
-                            order.Add(entry.Id);
+                            objects[entryId] = one = (entry.BaseId, new SortedDictionary<string, object?>(StringComparer.Ordinal));
+                            order.Add(entryId);
                         }
 
-                        // A unit's, an item's or a destructable's fields have no levels: the files hold level 0 for each (ObjectTable).
-                        foreach (var modification in entry.Modifications)
+                        // A unit's, an item's or a destructable's fields have no levels: the files hold level 0 for each.
+                        foreach (var modification in entry.Mods)
                         {
-                            one.Changed[modification.Field] = ValueOf(fields.GetValueOrDefault(modification.Field), modification.Value, texts);
+                            one.Changed[modification.Field] = ValueOf(fields.GetValueOrDefault(modification.Field), SourceObjectFile.ValueOf(modification), texts);
                         }
                     }
                 }
 
                 foreach (var id in order)
                 {
-                    var kindOf = kind == "unit" && char.IsUpper(id[0]) ? "hero" : kind;
+                    var kindOf = kind == "unit" && MapFiles.ObjectIds.IsHeroId(id) ? "hero" : kind;
                     types.Add(new MapType(id, kindOf, objects[id].Root, objects[id].Changed));
                 }
             }

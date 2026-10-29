@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Moonwell.GameData\Moonwell.GameData.csproj" />
+    <ProjectReference Include="..\Moonwell.MapFiles\Moonwell.MapFiles.csproj" />
   </ItemGroup>
 
   <ItemGroup>

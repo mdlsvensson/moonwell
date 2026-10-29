@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using Moonwell.MapFiles;
 using War3Net.Build.Extensions;
 using Xunit;
 
@@ -80,7 +81,7 @@ namespace Moonwell.Build.Tests
             using var reader = new BinaryReader(File.OpenRead(Path.Combine(copy, "build", "Sample", "war3mapSkin.w3a")), Encoding.UTF8);
             var bolt = Assert.Single(reader.ReadAbilityObjectData().NewAbilities);
             var tooltips = bolt.Modifications
-                .Where(one => one.Id == ObjectTable.IdOf("atp1"))
+                .Where(one => one.Id == Rawcodes.IdOf("atp1"))
                 .OrderBy(one => one.Level)
                 .Select(one => (string)one.Value)
                 .ToList();

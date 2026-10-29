@@ -36,7 +36,7 @@ internal static class LuaScript
         }
 
         var project = MapProject.Find(folder);
-        var map = War3Net.Build.Map.Open(project.MapFolder, MapFiles.All & ~MapFiles.Triggers & ~MapFiles.CustomTextTriggers);
+        var map = War3Net.Build.Map.Open(project.MapFolder, War3Net.Build.MapFiles.All & ~War3Net.Build.MapFiles.Triggers & ~War3Net.Build.MapFiles.CustomTextTriggers);
 
         // The libraries the script is linked with are read from beside the project's assembly, as a map build reads them from
         // beside the map's: here the ones this test was built with.

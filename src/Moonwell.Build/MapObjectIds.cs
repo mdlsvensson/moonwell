@@ -1,3 +1,5 @@
+using Moonwell.MapFiles;
+
 namespace Moonwell.Build
 {
     /// <summary>The object ids the source map's object files already define.</summary>
@@ -10,14 +12,14 @@ namespace Moonwell.Build
         public static IReadOnlySet<string> Defined(MapProject project)
         {
             var ids = new HashSet<string>(StringComparer.Ordinal);
-            foreach (var (kind, extension) in ObjectKinds.All)
+            foreach (var kind in Kinds.All)
             {
-                foreach (var name in new[] { ObjectKinds.MainName(extension), ObjectKinds.SkinName(extension) })
+                foreach (var name in new[] { Kinds.MainName(kind), Kinds.SkinName(kind) })
                 {
-                    var table = ObjectTable.Read(Path.Combine(project.MapFolder, name), kind);
-                    foreach (var entry in table.Originals.Concat(table.News))
+                    var table = SourceObjectFile.Read(Path.Combine(project.MapFolder, name), kind);
+                    foreach (var entry in table.Entries)
                     {
-                        ids.Add(entry.Id);
+                        ids.Add(SourceObjectFile.IdOf(entry));
                     }
                 }
             }

@@ -3,6 +3,9 @@ using War3Net.Build.Info;
 
 namespace Moonwell.Build
 {
+    // War3Net's file flags, not the Moonwell.MapFiles namespace the name would otherwise find first.
+    using MapFiles = War3Net.Build.MapFiles;
+
     /// <summary>Opens the World Editor map the build compiles the script into.</summary>
     public static class SourceMap
     {

@@ -1,4 +1,7 @@
 using System.Globalization;
+using Moonwell.GameData;
+using Moonwell.MapFiles;
+using War3Net.Build.Object;
 
 namespace Moonwell.Build
 {
@@ -34,13 +37,14 @@ namespace Moonwell.Build
             var resolver = new Resolver(ids, standardClassIds, standard);
 
             Directory.CreateDirectory(stagedFolder);
-            foreach (var (kind, extension) in ObjectKinds.All)
+            foreach (var fileKind in Kinds.All)
             {
+                var kind = Kinds.Key(fileKind);
                 var ofKind = written.Where(one => FileKindOf(one.Kind) == kind).ToList();
-                var mainName = ObjectKinds.MainName(extension);
-                var skinName = ObjectKinds.SkinName(extension);
-                var main = ObjectTable.Read(Path.Combine(project.MapFolder, mainName), kind);
-                var skin = ObjectTable.Read(Path.Combine(project.MapFolder, skinName), kind);
+                var mainName = Kinds.MainName(fileKind);
+                var skinName = Kinds.SkinName(fileKind);
+                var main = SourceObjectFile.Read(Path.Combine(project.MapFolder, mainName), fileKind);
+                var skin = SourceObjectFile.Read(Path.Combine(project.MapFolder, skinName), fileKind);
 
                 var declared = new Dictionary<string, DeclaredObject>(StringComparer.Ordinal);
                 foreach (var one in ofKind)
@@ -61,17 +65,17 @@ namespace Moonwell.Build
 
                 foreach (var one in ofKind)
                 {
-                    Add(one, IdOf(one, ids), fields, resolver, main, skin);
+                    Add(fileKind, one, IdOf(one, ids), fields, resolver, main, skin);
                 }
 
                 if (main.Existed || !main.IsEmpty)
                 {
-                    main.Write(Path.Combine(stagedFolder, mainName), kind);
+                    main.Write(Path.Combine(stagedFolder, mainName));
                 }
 
                 if (skin.Existed || !skin.IsEmpty)
                 {
-                    skin.Write(Path.Combine(stagedFolder, skinName), kind);
+                    skin.Write(Path.Combine(stagedFolder, skinName));
                 }
             }
         }
@@ -87,47 +91,58 @@ namespace Moonwell.Build
         }
 
         // A new object of the source map that a declared object takes the id of is replaced; a different base is worth a word.
-        private static void RemoveDeclared(ObjectTable table, string name, Dictionary<string, DeclaredObject> declared, HashSet<string> warned, TextWriter log)
+        private static void RemoveDeclared(SourceObjectFile table, string name, Dictionary<string, DeclaredObject> declared, HashSet<string> warned, TextWriter log)
         {
-            table.Originals.RemoveAll(entry => declared.ContainsKey(entry.Id));
-            foreach (var entry in table.News)
+            foreach (var entry in table.File.Original.Where(entry => declared.ContainsKey(SourceObjectFile.IdOf(entry))).ToList())
             {
-                if (declared.TryGetValue(entry.Id, out var one) && entry.OldId != one.StandardRoot && warned.Add(entry.Id))
+                table.File.Remove(entry);
+            }
+
+            foreach (var entry in table.File.Custom)
+            {
+                var id = SourceObjectFile.IdOf(entry);
+                if (declared.TryGetValue(id, out var one) && entry.BaseId != one.StandardRoot && warned.Add(id))
                 {
-                    log.WriteLine($@"warning: map\{name}'s {entry.Id} (based on {entry.OldId}) is replaced by {one.ClassName} (based on {one.StandardRoot})");
+                    log.WriteLine($@"warning: map\{name}'s {id} (based on {entry.BaseId}) is replaced by {one.ClassName} (based on {one.StandardRoot})");
                 }
             }
 
-            table.News.RemoveAll(entry => declared.ContainsKey(entry.Id));
+            foreach (var entry in table.File.Custom.Where(entry => declared.ContainsKey(SourceObjectFile.IdOf(entry))).ToList())
+            {
+                table.File.Remove(entry);
+            }
         }
 
         // What is left is the source map's, and no class declares it. A standard object World Editor changed is not worth a word.
-        private static void WarnKept(ObjectTable main, ObjectTable skin, string mainName, string skinName, IReadOnlySet<string> standardIds, TextWriter log)
+        private static void WarnKept(SourceObjectFile main, SourceObjectFile skin, string mainName, string skinName, IReadOnlySet<string> standardIds, TextWriter log)
         {
             var warned = new HashSet<string>(StringComparer.Ordinal);
             foreach (var (table, name) in new[] { (main, mainName), (skin, skinName) })
             {
-                foreach (var entry in table.Originals.Concat(table.News))
+                foreach (var entry in table.Entries)
                 {
-                    if (!(entry.NewId.Length == 0 && standardIds.Contains(entry.OldId)) && warned.Add(entry.Id))
+                    var id = SourceObjectFile.IdOf(entry);
+                    if (!(entry.Id.Length == 0 && standardIds.Contains(entry.BaseId)) && warned.Add(id))
                     {
-                        log.WriteLine($@"warning: map\{name} keeps {entry.Id}, which no class declares");
+                        log.WriteLine($@"warning: map\{name} keeps {id}, which no class declares");
                     }
                 }
             }
         }
 
         private static void Add(
+            Kind fileKind,
             DeclaredObject one,
             string id,
             Dictionary<string, StandardData.ObjectField> fields,
             Resolver resolver,
-            ObjectTable main,
-            ObjectTable skin)
+            SourceObjectFile main,
+            SourceObjectFile skin)
         {
-            var newId = one.Replaces ? string.Empty : id;
-            var mainEntry = new ObjectTable.Entry(one.StandardRoot, newId, main.NewUnknown(), new List<ObjectTable.Modification>());
-            var skinEntry = new ObjectTable.Entry(one.StandardRoot, newId, skin.NewUnknown(), new List<ObjectTable.Modification>());
+            // A change to a standard object is in the original table; a new object is in the custom table, based on its standard root.
+            var mainEntry = one.Replaces ? main.File.AddOriginal(one.StandardRoot) : main.File.AddCustom(one.StandardRoot, id);
+            var skinEntry = one.Replaces ? skin.File.AddOriginal(one.StandardRoot) : skin.File.AddCustom(one.StandardRoot, id);
+            var hasLevels = Kinds.HasLevels(fileKind);
 
             foreach (var key in OrderedKeys(one))
             {
@@ -140,11 +155,35 @@ namespace Moonwell.Build
                 }
 
                 var (type, value) = StoredValues.Of(one.ClassName, field, one.Changed[key]!, name => resolver.IdOf(one.ClassName, fieldId, name));
-                (field.Skin ? skinEntry : mainEntry).Modifications.Add(new ObjectTable.Modification(fieldId, type, value, level, field.Pointer));
-            }
 
-            (one.Replaces ? main.Originals : main.News).Add(mainEntry);
-            (one.Replaces ? skin.Originals : skin.News).Add(skinEntry);
+                // A unit's, item's, destructable's or buff's modification has no level and no pointer in the file. Set changes a
+                // modification of the same field and level instead of adding another; the declared keys (a field and a level) never collide.
+                try
+                {
+                    (field.Skin ? skinEntry : mainEntry).Set(fieldId, hasLevels ? level : 0, hasLevels ? field.Pointer : 0, FieldValueOf(type, value));
+                }
+                catch (ArgumentException failure) when (failure.ParamName == "Value")
+                {
+                    // An object file stores a text NUL-terminated as UTF-8: no NUL, no half of a surrogate pair.
+                    var reason = value is string text && text.Contains('\0')
+                        ? "a NUL character, which an object file cannot store"
+                        : "text that is not valid Unicode (half of a surrogate pair)";
+                    throw new BuildException($"{one.ClassName}: {fieldId} holds {reason}");
+                }
+            }
+        }
+
+        // The type and value StoredValues gives, as Moonwell.MapFiles holds them.
+        private static FieldValue FieldValueOf(ObjectDataType type, object value)
+        {
+            return type switch
+            {
+                ObjectDataType.Int => new FieldValue.Int((int)value),
+                ObjectDataType.Real => new FieldValue.Real((float)value),
+                ObjectDataType.Unreal => new FieldValue.Unreal((float)value),
+                ObjectDataType.String => new FieldValue.Text((string)value),
+                _ => throw new InvalidOperationException($"no stored value of type {type}"),
+            };
         }
 
         // By field, then by level as a number.
