@@ -68,7 +68,7 @@ public class ClockTests
     public void the_clock_says_what_to_write()
     {
         Assert.Equal(
-            "'DateTime.Now' gives a different answer on each machine; use it only inside Local.For or a [MachineLocal] method; it is this machine's clock: time game logic with Timer.After or Timer.Every",
+            "'DateTime.Now' gives a different answer on each machine; use it only inside Local.For or a [MachineLocal] method; it is this machine's clock: time game logic with After or Every on a scope",
             MapCode.Message("var now = DateTime.Now.Second;"));
     }
 

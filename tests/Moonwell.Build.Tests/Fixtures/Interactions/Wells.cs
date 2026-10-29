@@ -10,7 +10,7 @@ namespace InteractionsFixture
         {
             Unit.Create<Human.Units.Footman>(Player.One, 100f, 0f);
             var well = Gizmo.Create(new Well(), 0f, 0f, Player.One);
-            Timer.After(1f, () =>
+            After(1f, () =>
             {
                 var near = Find.InRange<Unit>(well.X, well.Y, 500f);
                 Game.Print("near the well: " + near.Count);

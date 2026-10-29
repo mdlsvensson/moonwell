@@ -135,7 +135,7 @@ namespace Moonwell.Engine
             AddParts(made, shape);
             World.Listen(made, area.HearEnter, area.HearLeave);
             areas.Add(area);
-            Timer.After(0f, area.Sweep, area);
+            area.After(0f, area.Sweep);
         }
 
         /// <summary>Stops an area: it is no longer stepped, and its region and triggers are destroyed.</summary>
@@ -157,7 +157,7 @@ namespace Moonwell.Engine
                 activeAreas++;
                 if (activeAreas == 1)
                 {
-                    check = Timer.Every(CheckInterval, Check, game);
+                    check = game.Every(CheckInterval, Check);
                 }
             }
             else
@@ -181,7 +181,7 @@ namespace Moonwell.Engine
                 if (stayingAreas == 1)
                 {
                     Steps = 0;
-                    step = Timer.Every(Interval, Step, game);
+                    step = game.Every(Interval, Step);
                 }
             }
             else

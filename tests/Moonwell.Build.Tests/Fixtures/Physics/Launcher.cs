@@ -10,7 +10,7 @@ namespace PhysicsFixture
         {
             var caster = Unit.Create<Human.Units.Footman>(Player.One, 0f, 0f);
             var target = Unit.Create<Human.Units.Footman>(Player.Two, 400f, 0f);
-            Timer.After(0.1f, () =>
+            After(0.1f, () =>
             {
                 caster.Fire(new Firebolt(), target);
                 target.Knockback(caster.AngleTo(target), 300f, 0.5f);

@@ -841,7 +841,7 @@ namespace Moonwell.Testing
             var target = StruckAt(world, 500.0f, 500.0f, 1, "target");
             var fired = 0;
             var bolt = new Shot();
-            bolt.Impacting = impact => Timer.After(0.25f, () => fired++);
+            bolt.Impacting = impact => owner.After(0.25f, () => fired++);
             Missile.Create(bolt, 300.0f, 500.0f, 32.0f, Player.Two, owner);
             bolt.VX = 600.0f;
             UntilEnded(world, bolt, 64);
@@ -850,6 +850,39 @@ namespace Moonwell.Testing
             Expect.Same(owner, target.StruckWith, "OnStruck too");
             Steps(world, 10);
             Expect.Equal(1, fired, "the timer made in OnImpact outlived the missile");
+        }
+
+        /// <summary>After in a missile's OnImpact is the missile's: a Stop ends the missile, and the timer with it, before it runs.</summary>
+        public static void ImpactAfterIsTheMissiles(FakeWorld world)
+        {
+            Fresh();
+            StruckAt(world, 500.0f, 500.0f, 1, "target");
+            var bolt = new TimedShot();
+            Missile.Create(bolt, 300.0f, 500.0f, 32.0f, Player.Two, Game.Instance);
+            bolt.VX = 600.0f;
+            UntilEnded(world, bolt, 64);
+            Expect.True(bolt.HasEnded, "the bolt stopped on the unit");
+            Expect.Same(bolt, bolt.Made!.Parent, "the timer OnImpact made with After is the missile's");
+            Expect.True(bolt.Made!.HasEnded, "and ended with it");
+            Steps(world, 64);
+            Expect.Equal(0, bolt.Ran, "never running");
+        }
+
+        /// <summary>After in a unit's OnStruck is the unit's, not the missile's, and runs after the missile has ended.</summary>
+        public static void StruckAfterIsTheUnits(FakeWorld world)
+        {
+            Fresh();
+            ObjectTypes.Unit(ObjectTypes.FourCC("h0T1"), () => new TimedStruck());
+            var handle = world.NewUnit(ObjectTypes.FourCC("h0T1"), 1);
+            world.MoveUnit(handle, 500.0f, 500.0f);
+            var target = (TimedStruck)Unit.Of(handle)!;
+            var bolt = new Shot();
+            ShotAt(bolt, 300.0f, 500.0f, 32.0f, 600.0f, 0.0f, 0.0f);
+            UntilEnded(world, bolt, 64);
+            Expect.True(bolt.HasEnded, "the bolt stopped on the unit");
+            Expect.Same(target, target.Made!.Parent, "the timer OnStruck made with After is the unit's");
+            Steps(world, 40);
+            Expect.Equal(1, target.Ran, "and it ran");
         }
 
         /// <summary>A kind whose setting is None starts no interaction; a missile with UnitContact None flies through a unit, asking nothing. A kind set to None after Create pauses its checks, and set back resumes them.</summary>

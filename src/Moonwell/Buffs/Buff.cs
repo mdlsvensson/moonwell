@@ -81,7 +81,7 @@ namespace Moonwell
 
             if (Tick > 0.0f)
             {
-                Timer.Every(Tick, () => CallTick(), this);
+                Every(Tick, () => CallTick());
             }
 
             if (Duration > 0.0f)
@@ -169,7 +169,7 @@ namespace Moonwell
             }
 
             Timer? made = null;
-            made = Timer.After(Duration, () => Expire(made), this);
+            made = After(Duration, () => Expire(made));
             expiry = made;
         }
 

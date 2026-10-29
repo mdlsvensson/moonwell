@@ -79,11 +79,11 @@ public class LocalTests
                 var map = new OrderedMap<int, int>();
                 map[1] = slot;
                 unit.Remove();
-                Timer.After(1f, () => { });
+                unit.After(1f, () => { });
             });
             """);
 
-        Assert.Equal(new[] { "MW0001: unit.Remove()", "MW0001: Timer.After(1f, () => { })" }, found);
+        Assert.Equal(new[] { "MW0001: unit.Remove()", "MW0001: unit.After(1f, () => { })" }, found);
     }
 
     [Fact]

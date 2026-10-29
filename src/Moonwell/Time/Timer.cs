@@ -21,7 +21,7 @@ namespace Moonwell
         internal int intervals = 1;
 
         /// <summary>Makes a timer due the seconds after its start, again at every interval of them when it repeats; it is not yet adopted or scheduled.</summary>
-        private Timer(float start, float seconds, bool periodic, Action action)
+        internal Timer(float start, float seconds, bool periodic, Action action)
         {
             this.start = start;
             due = start + seconds;
@@ -48,35 +48,12 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Runs an action once after the seconds, for the owner or else the current owner.</summary>
-        public static Timer After(float seconds, Action action, Scope? scope = null)
-        {
-            Dev.Check(seconds >= 0.0f, "Timer.After: seconds must be 0 or more");
-            return Start(new Timer(Runtime.World.Now(), seconds, false, action), scope);
-        }
-
         /// <summary>
-        /// Runs an action at every interval of the seconds, for the owner or else the current owner. Seconds of 0 or less are
-        /// reported and refused in every build, since such a timer would freeze the game: the timer given back has ended and
-        /// never runs (decision 74).
+        /// Reports seconds of 0 or less given to a scope's Every, under the label, and gives back a timer that has ended without
+        /// being adopted or scheduled. The error is thrown and caught here so that in Lua it records where it was thrown, which
+        /// names the C# line that called Every.
         /// </summary>
-        public static Timer Every(float seconds, Action action, Scope? scope = null)
-        {
-            // Not more than 0, so NaN is refused too.
-            if (!(seconds > 0.0f))
-            {
-                return Refuse(seconds, action);
-            }
-
-            return Start(new Timer(Runtime.World.Now(), seconds, true, action), scope);
-        }
-
-        /// <summary>
-        /// Reports seconds of 0 or less given to Every, and gives back a timer that has ended without being adopted or scheduled.
-        /// The error is thrown and caught here so that in Lua it records where it was thrown, which names the C# line that called
-        /// Every.
-        /// </summary>
-        private static Timer Refuse(float seconds, Action action)
+        internal static Timer Refuse(string label, float seconds, Action action)
         {
             try
             {
@@ -84,7 +61,7 @@ namespace Moonwell
             }
             catch (MoonwellException error)
             {
-                Errors.Report("Timer.Every", error);
+                Errors.Report(label, error);
             }
 
             var timer = new Timer(Runtime.World.Now(), seconds, true, action);
@@ -92,10 +69,10 @@ namespace Moonwell
             return timer;
         }
 
-        /// <summary>Adopts a new timer under its owner, and schedules it unless its owner has already ended.</summary>
-        private static Timer Start(Timer timer, Scope? scope)
+        /// <summary>Adopts a new timer into its scope, and schedules it unless the scope has already ended.</summary>
+        internal static Timer Start(Timer timer, Scope scope)
         {
-            (scope ?? Scope.Current).Adopt(timer);
+            scope.Adopt(timer);
             if (!timer.HasEnded)
             {
                 Runtime.Scheduler.Add(timer);

@@ -793,7 +793,7 @@ namespace Moonwell.Engine
         {
             if (!Running)
             {
-                timer = Timer.Every(Interactions.Step, Run, Runtime.Root);
+                timer = Runtime.Root.Every(Interactions.Step, Run);
             }
         }
 

@@ -41,6 +41,29 @@ namespace Moonwell
             }
         }
 
+        /// <summary>Runs an action once after the seconds, as a timer in this scope: it ends with the scope if the scope ends first.</summary>
+        public Timer After(float seconds, Action action)
+        {
+            Dev.Check(seconds >= 0.0f, Names.NameOf(this) + ".After: seconds must be 0 or more");
+            return Timer.Start(new Timer(Runtime.World.Now(), seconds, false, action), this);
+        }
+
+        /// <summary>
+        /// Runs an action at every interval of the seconds, as a timer in this scope, until the scope ends. Seconds of 0 or less
+        /// are reported and refused in every build, since such a timer would freeze the game: the timer given back has ended and
+        /// never runs (decision 74).
+        /// </summary>
+        public Timer Every(float seconds, Action action)
+        {
+            // Not more than 0, so NaN is refused too.
+            if (!(seconds > 0.0f))
+            {
+                return Timer.Refuse(Names.NameOf(this) + ".Every", seconds, action);
+            }
+
+            return Timer.Start(new Timer(Runtime.World.Now(), seconds, true, action), this);
+        }
+
         /// <summary>Runs an action with this owner as the current owner, and restores the previous one after, even when it throws.</summary>
         public void Run(Action action)
         {

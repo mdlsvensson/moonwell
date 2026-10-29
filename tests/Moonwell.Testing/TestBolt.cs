@@ -21,8 +21,8 @@ namespace Moonwell.Testing
             TestLog.Lines.Add("bolt cast");
             Given = cast;
             Seen = Scope.Current;
-            Timer.Every(0.5f, () => { Ticks++; });
-            Timer.Every(0.5f, () => { ChannelTicks++; }, cast);
+            Every(0.5f, () => { Ticks++; });
+            cast.Every(0.5f, () => { ChannelTicks++; });
         }
     }
 }

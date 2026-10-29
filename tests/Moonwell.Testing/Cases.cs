@@ -24,9 +24,23 @@ namespace Moonwell.Testing
             AddAuditAreas(list);
             AddInput(list);
             AddLifecycle(list);
+            AddScope(list);
             AddAuditDocs(list);
             AddDebug(list);
             return list;
+        }
+
+        /// <summary>Adds the cases for explicit scopes: what code makes belongs to the scope named where it is made.</summary>
+        private static void AddScope(List<Case> list)
+        {
+            list.Add(new Case { Name = "scope.after-belongs-to-its-scope", Run = ScopeCases.AfterBelongsToItsScope });
+            list.Add(new Case { Name = "scope.every-belongs-to-its-scope", Run = ScopeCases.EveryBelongsToItsScope });
+            list.Add(new Case { Name = "scope.death-after-is-the-units", Run = ScopeCases.DeathAfterIsTheUnits });
+            list.Add(new Case { Name = "scope.impact-after-is-the-missiles", Run = ContactCases.ImpactAfterIsTheMissiles });
+            list.Add(new Case { Name = "scope.struck-after-is-the-units", Run = ContactCases.StruckAfterIsTheUnits });
+            list.Add(new Case { Name = "scope.pair-after-is-the-interactions", Run = PairCases.PairAfterIsTheInteractions });
+            list.Add(new Case { Name = "scope.part-after-runs", Run = PairCases.PartAfterRuns });
+            list.Add(new Case { Name = "scope.helper-uses-its-scope", Run = ScopeCases.HelperUsesItsScope });
         }
 
         /// <summary>Adds the cases for the full audit's doc fixes: OrderedMap and OrderedSet in a foreach, and the guide's forms to write instead.</summary>

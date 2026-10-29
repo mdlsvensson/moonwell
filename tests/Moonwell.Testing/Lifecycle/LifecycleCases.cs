@@ -54,7 +54,7 @@ namespace Moonwell.Testing
                 world.LocalSlot = machine;
                 var player = Player.Get(1);
                 player.Gold = 0;
-                Timer.After(1.0f, () =>
+                Game.Instance.After(1.0f, () =>
                 {
                     Local.For(Player.Get(0), () => { throw new InvalidOperationException("only on player 1's machine"); });
                     player.Gold += 10;
@@ -181,7 +181,7 @@ namespace Moonwell.Testing
             var a = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             var b = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             var ran = 0;
-            b.Run(() => { Timer.Every(1.0f, () => { ran++; }); });
+            b.Every(1.0f, () => { ran++; });
             var shared = a.Add(new Marker());
             try
             {
@@ -437,7 +437,7 @@ namespace Moonwell.Testing
             var first = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             var second = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             var ran = 0;
-            var timer = Timer.Every(1.0f, () => { ran++; }, first);
+            var timer = first.Every(1.0f, () => { ran++; });
             try
             {
                 second.Adopt(timer);

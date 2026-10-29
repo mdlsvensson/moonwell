@@ -300,7 +300,7 @@ namespace Moonwell.Testing
             DebugViews.Add(new CircleView());
             var debug = On(world);
             debug.Advance(0.01f);
-            Timer.Every(0.25f, () => { debug.ClockSeconds += 0.002f; });
+            Game.Instance.Every(0.25f, () => { debug.ClockSeconds += 0.002f; });
             debug.Advance(2.0f);
             var printed = world.PrintedTexts.Count;
             debug.Chat(0, "-stats");

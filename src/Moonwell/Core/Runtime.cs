@@ -46,7 +46,7 @@ namespace Moonwell
             DebugPanel.Reset();
             DebugStats.Reset();
 #endif
-            Timer.Every(0.25f, Sweep.Run, Game.Instance);
+            Game.Instance.Every(0.25f, Sweep.Run);
         }
 
         /// <summary>Called when a wake request is due; runs the timers that are due.</summary>

@@ -71,7 +71,7 @@ namespace Moonwell.Testing
             /// <summary>Starts a timer every half second, which the component owns.</summary>
             protected override void OnAdded()
             {
-                Timer.Every(0.5f, () => { Runs++; });
+                Every(0.5f, () => { Runs++; });
             }
         }
 

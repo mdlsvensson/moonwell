@@ -207,7 +207,7 @@ namespace Moonwell.Testing
             aura.Meeting = pair =>
             {
                 meeting = Scope.Current;
-                made = Timer.After(100.0f, () => { });
+                made = pair.After(100.0f, () => { });
             };
             aura.Ticking = pair => ticking = Scope.Current;
             aura.Parting = pair => parting = Scope.Current;
@@ -224,6 +224,36 @@ namespace Moonwell.Testing
             Expect.Same(met, parting, "OnPart runs with the pair as the current owner");
             Expect.True(made!.HasEnded, "the timer ended with the pair");
             Expect.True(Scope.Current == Runtime.Root, "and the root is current after");
+        }
+
+        /// <summary>After in an interaction's OnMeet is the interaction's; the pair's After is the pair's.</summary>
+        public static void PairAfterIsTheInteractions(FakeWorld world)
+        {
+            Fresh();
+            var a = UnitAt(world, 0.0f, 0.0f);
+            UnitAt(world, 100.0f, 0.0f);
+            var aura = new TimedAura();
+            a.Interact(aura);
+            Steps(world, 16);
+            var met = aura.Pairs[0];
+            Expect.Same(aura, aura.Mine!.Parent, "After in OnMeet is the interaction's");
+            Expect.Same(met, aura.Paired!.Parent, "the pair's After is the pair's");
+        }
+
+        /// <summary>After in an interaction's OnPart is the interaction's, so it runs after the pair has parted.</summary>
+        public static void PartAfterRuns(FakeWorld world)
+        {
+            Fresh();
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var b = UnitAt(world, 100.0f, 0.0f);
+            var aura = new TimedAura();
+            a.Interact(aura);
+            Steps(world, 16);
+            world.MoveUnit(b.Handle, 600.0f, 0.0f);
+            Steps(world, 16);
+            Expect.Same(aura, aura.Parted!.Parent, "After in OnPart is the interaction's");
+            Steps(world, 40);
+            Expect.Equal(1, aura.PartRan, "and it ran after the parting");
         }
     }
 }

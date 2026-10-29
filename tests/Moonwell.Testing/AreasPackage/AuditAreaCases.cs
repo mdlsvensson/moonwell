@@ -402,8 +402,8 @@ namespace Moonwell.Testing
             var fired = 0;
             area.WhenLeft = u =>
             {
-                own = Timer.After(1f, () => fired++);
-                Game.Instance.Run(() => kept = Timer.After(1f, () => fired += 10));
+                own = area.After(1f, () => fired++);
+                kept = Game.Instance.After(1f, () => fired += 10);
                 tally = u.Add(new Tally());
             };
             area.End();

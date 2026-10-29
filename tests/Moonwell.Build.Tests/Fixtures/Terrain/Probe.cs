@@ -9,7 +9,7 @@ namespace TerrainFixture
         public override void OnGameStart()
         {
             var footman = Unit.Create<Human.Units.Footman>(Player.One, 0f, 0f);
-            Timer.After(0.1f, () =>
+            After(0.1f, () =>
             {
                 if (Terrain.IsWalkable(0f, 0f) && Terrain.Height(0f, 0f) > -10000f)
                 {

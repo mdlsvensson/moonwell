@@ -12,8 +12,8 @@ namespace Moonwell.Testing
         /// <summary>Starts a respawn timer for 120 seconds, and a timer every second that the unit owns.</summary>
         public override void OnDeath(Unit? killerUnit)
         {
-            Timer.After(120.0f, () => { Respawned++; });
-            Timer.Every(1.0f, () => { Lingered++; }, this);
+            Game.Instance.After(120.0f, () => { Respawned++; });
+            Every(1.0f, () => { Lingered++; });
         }
     }
 }
