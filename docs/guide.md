@@ -1,7 +1,7 @@
 # Making a map with Moonwell
 
-This guide describes Moonwell 0.3.3; the guide for 0.2.5 is at the
-[`v0.2.5` tag](https://github.com/mdlsvensson/moonwell/blob/v0.2.5/docs/guide.md).
+This guide describes Moonwell 0.4.0; the guide for 0.3.3 is at the
+[`v0.3.3` tag](https://github.com/mdlsvensson/moonwell/blob/v0.3.3/docs/guide.md).
 
 ## Start a map
 
