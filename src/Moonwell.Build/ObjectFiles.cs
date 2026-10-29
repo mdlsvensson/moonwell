@@ -152,7 +152,7 @@ namespace Moonwell.Build
                 var inherited = standard.Value(one.StandardRoot, "fube", 0, set);
                 if (inherited != null && inherited.Contains(','))
                 {
-                    throw new BuildException($"{one.ClassName}: fube (the extended tooltip) inherits \"{inherited}\" from {one.StandardRoot}, which holds a comma, and the game shows a map's own buff's extended tooltip only up to its first comma; set TooltipExtended to a text without one");
+                    throw new BuildException($"{one.ClassName}: fube (the extended tooltip) inherits \"{inherited}\" from {one.StandardRoot}, which holds a comma, and the game shows a map's own buff's extended tooltip only up to its first comma; set TooltipExtended to a text without one, where ‚ (U+201A), which the game shows as a comma, may stand for one");
                 }
             }
         }
@@ -187,7 +187,7 @@ namespace Moonwell.Build
                 // (<A000,Dur1>), which holds one, cannot work in it either (game facts, probe of 2026-10-29).
                 if (one.Kind == "buff" && fieldId == "fube" && value is string tooltip && tooltip.Contains(','))
                 {
-                    throw new BuildException($"{one.ClassName}: fube (the extended tooltip) holds a comma, and the game shows a buff's extended tooltip only up to its first comma; a placeholder such as <A000,Dur1> holds one too");
+                    throw new BuildException($"{one.ClassName}: fube (the extended tooltip) holds a comma, and the game shows a buff's extended tooltip only up to its first comma; a placeholder such as <A000,Dur1> holds one too; write ‚ (U+201A) for a comma, which the game shows as one");
                 }
 
                 // A unit's, item's, destructable's or buff's modification has no level and no pointer in the file. Set changes a

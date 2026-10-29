@@ -583,7 +583,7 @@ namespace Moonwell.Build.Tests
                 () => WriteObjects(new[] { buff }, ids, new Dictionary<string, string>(), built.Standard));
 
             Assert.Equal(
-                "Objects.Slowed: fube (the extended tooltip) holds a comma, and the game shows a buff's extended tooltip only up to its first comma; a placeholder such as <A000,Dur1> holds one too",
+                "Objects.Slowed: fube (the extended tooltip) holds a comma, and the game shows a buff's extended tooltip only up to its first comma; a placeholder such as <A000,Dur1> holds one too; write ‚ (U+201A) for a comma, which the game shows as one",
                 error.Message);
         }
 
@@ -601,7 +601,7 @@ namespace Moonwell.Build.Tests
 
             Assert.Contains(',', inherited);
             Assert.Equal(
-                $"Objects.Burning: fube (the extended tooltip) inherits \"{inherited}\" from BHfs, which holds a comma, and the game shows a map's own buff's extended tooltip only up to its first comma; set TooltipExtended to a text without one",
+                $"Objects.Burning: fube (the extended tooltip) inherits \"{inherited}\" from BHfs, which holds a comma, and the game shows a map's own buff's extended tooltip only up to its first comma; set TooltipExtended to a text without one, where ‚ (U+201A), which the game shows as a comma, may stand for one",
                 error.Message);
         }
 
