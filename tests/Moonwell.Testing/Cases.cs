@@ -114,6 +114,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "debug.clock.timer-while-halted", Run = ClockCases.TimerWhileHalted });
             list.Add(new Case { Name = "debug.clock.halt-inside-timer", Run = ClockCases.HaltInsideTimer });
             list.Add(new Case { Name = "debug.clock.catchup", Run = ClockCases.Catchup });
+            list.Add(new Case { Name = "debug.clock.halted-timer-ended-later-is-quiet", Run = ClockCases.HaltedTimerEndedLaterIsQuiet });
+            list.Add(new Case { Name = "debug.clock.stepped-timer-ended-later-is-quiet", Run = ClockCases.SteppedTimerEndedLaterIsQuiet });
+            list.Add(new Case { Name = "debug.clock.halted-timer-ended-as-made-is-reported", Run = ClockCases.HaltedTimerEndedAsMadeIsReported });
             list.Add(new Case { Name = "debug.session.off-at-start", Run = SessionCases.OffAtStart });
             list.Add(new Case { Name = "debug.actors.actor-before-added", Run = ActorCases.ActorBeforeAdded });
             list.Add(new Case { Name = "debug.session.toggle", Run = SessionCases.Toggle });

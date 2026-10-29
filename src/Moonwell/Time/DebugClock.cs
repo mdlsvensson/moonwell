@@ -19,9 +19,13 @@ namespace Moonwell
         /// <summary>How many seconds of Moonwell's time pass in one second of game time.</summary>
         internal float Speed { get; private set; } = 1.0f;
 
+        /// <summary>The game time of the latest read of Moonwell's time, so code that read Moonwell's time knows the game's too.</summary>
+        internal float LastGame { get; private set; }
+
         /// <summary>Moonwell's time at a game time.</summary>
         internal float Now(float gameNow)
         {
+            LastGame = gameNow;
             if (IsHalted)
             {
                 return baseTime;

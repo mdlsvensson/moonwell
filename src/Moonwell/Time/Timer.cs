@@ -30,6 +30,9 @@ namespace Moonwell
         internal Timer(float start, float seconds, bool periodic, Action action)
         {
             this.start = start;
+#if DEBUG
+            madeAt = Runtime.Clock.LastGame;
+#endif
             due = start + seconds;
             Interval = periodic ? seconds : 0.0f;
             IsPeriodic = periodic;
@@ -76,16 +79,24 @@ namespace Moonwell
         }
 
 #if DEBUG
+        /// <summary>The game time the timer was made at, as Moonwell's clock last read it; start is Moonwell's time, which a halt holds still.</summary>
+        internal readonly float madeAt;
+
         /// <summary>
         /// Reports, in a development build, a timer its scope ended in the instant it was made, before it ran: the line that
-        /// made it named a scope already on its way out, so it does nothing, and nothing else says so. A timer ended by its own
-        /// End, or one Moonwell made for its own work, is not reported.
+        /// made it named a scope already on its way out, so it does nothing, and nothing else says so. The instant is the
+        /// same on both clocks, the game's and Moonwell's, so a halt or a step of the debug mode in between is not one. A
+        /// timer ended by its own End, or one Moonwell made for its own work, is not reported.
         /// </summary>
         internal override void Finish()
         {
-            if (!ran && !own && Parent != null && Parent.ending && start == Runtime.World.Now())
+            if (!ran && !own && Parent != null && Parent.ending)
             {
-                Errors.Report(Names.NameOf(Parent) + ".Timer", new MoonwellException("ended with its scope in the instant it was made, before it ran; name a scope that lasts"));
+                var now = Runtime.World.Now();
+                if (start == now && madeAt == Runtime.Clock.LastGame)
+                {
+                    Errors.Report(Names.NameOf(Parent) + ".Timer", new MoonwellException("ended with its scope in the instant it was made, before it ran; name a scope that lasts"));
+                }
             }
         }
 #endif

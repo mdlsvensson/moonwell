@@ -6,6 +6,38 @@ namespace Moonwell.Testing
     /// <summary>Cases for Moonwell's clock in a development build: halting it, stepping it, and running it faster or slower than game time, with the timers it runs.</summary>
     public static class ClockCases
     {
+        /// <summary>A timer made while Moonwell's clock is halted, whose scope ends after the game has gone on 3 s, is not reported as never run: the game's own clock moved, though Moonwell's did not.</summary>
+        public static void HaltedTimerEndedLaterIsQuiet(FakeWorld world)
+        {
+            HaltNow(world);
+            var scope = new TestScope("scope", new List<string>());
+            scope.After(1.0f, () => { });
+            world.Advance(3.0f);
+            scope.End();
+            Expect.Equal(0, ScopeCases.NeverRanReports(world), "the reports: " + string.Join(" | ", world.Logged));
+        }
+
+        /// <summary>A timer made while halted, whose scope ends after a step, is not reported: Moonwell's clock moved, though the game's did not.</summary>
+        public static void SteppedTimerEndedLaterIsQuiet(FakeWorld world)
+        {
+            HaltNow(world);
+            var scope = new TestScope("scope", new List<string>());
+            scope.After(1.0f, () => { });
+            Step(1.0f / 32.0f);
+            scope.End();
+            Expect.Equal(0, ScopeCases.NeverRanReports(world), "the reports: " + string.Join(" | ", world.Logged));
+        }
+
+        /// <summary>A timer made while halted, whose scope ends in that same instant, is still reported.</summary>
+        public static void HaltedTimerEndedAsMadeIsReported(FakeWorld world)
+        {
+            HaltNow(world);
+            var scope = new TestScope("scope", new List<string>());
+            scope.After(1.0f, () => { });
+            scope.End();
+            Expect.Equal(1, ScopeCases.NeverRanReports(world), "the reports: " + string.Join(" | ", world.Logged));
+        }
+
         /// <summary>Halts the clock at the fake's game time.</summary>
         private static void HaltNow(FakeWorld world)
         {
