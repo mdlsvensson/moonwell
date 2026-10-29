@@ -29,7 +29,7 @@ namespace Moonwell.Testing
             Fresh();
             var well = Gizmo.Create(new Well(), 10.0f, 20.0f);
             Expect.Same(Runtime.Root, well.Parent, "owned by the current owner, the root");
-            Expect.Same(Player.NeutralPassive, well.Player, "Neutral Passive by default");
+            Expect.Same(Player.NeutralPassive, well.Owner, "Neutral Passive by default");
             Expect.Equal(1, well.Created, "OnCreated ran once");
             Expect.Near(10.0f, well.X, "X");
             Expect.Near(20.0f, well.Y, "Y");
@@ -41,9 +41,9 @@ namespace Moonwell.Testing
             var owner = new TestScope("owner", log);
             var owned = Gizmo.Create(new Well(), 0.0f, 0.0f, Player.Two, owner);
             Expect.Same(owner, owned.Parent, "owned by the owner given");
-            Expect.Same(Player.Two, owned.Player, "plays for the player given");
-            owned.Player = Player.Three;
-            Expect.Same(Player.Three, owned.Player, "the player can be changed");
+            Expect.Same(Player.Two, owned.Owner, "plays for the player given");
+            owned.Owner = Player.Three;
+            Expect.Same(Player.Three, owned.Owner, "the player can be changed");
             var inside = new Well();
             owner.Run(() => Gizmo.Create(inside, 0.0f, 0.0f));
             Expect.Same(owner, inside.Parent, "owned by the owner that runs the code");
@@ -514,7 +514,7 @@ namespace Moonwell.Testing
         {
             Fresh();
             var well = Gizmo.Create(new ShadowWell(), 0.0f, 0.0f);
-            Expect.Same(Player.NeutralPassive, well.Player, "it plays for Neutral Passive");
+            Expect.Same(Player.NeutralPassive, well.Owner, "it plays for Neutral Passive");
             Expect.True(well.OwnPlayer == null, "its own player is none");
             Expect.Near(0.0f, well.Z, "Z is 0");
             well.Z = 2.0f;

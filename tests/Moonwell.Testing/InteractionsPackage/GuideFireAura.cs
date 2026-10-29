@@ -17,7 +17,7 @@ namespace Moonwell.Testing
         }
 
         /// <summary>The guide's: the holder's enemies.</summary>
-        public override bool Accepts(Unit other) => Holder.Player.IsEnemy(other.Player);
+        public override bool Accepts(Unit other) => Holder.Owner.IsEnemy(other.Owner);
 
         /// <summary>Logs "meet".</summary>
         public override void OnMeet(Pair pair)

@@ -93,7 +93,7 @@ namespace Moonwell
             if (entering && Events.Wants(Hook.OnUnitCreated) && !made.HasEnded)
             {
                 EnterComponents(Game.Instance, made);
-                var player = Player.Existing(made.Player.Slot);
+                var player = Player.Existing(made.Owner.Slot);
                 if (player != null)
                 {
                     EnterComponents(player, made);

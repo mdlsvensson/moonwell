@@ -13,7 +13,7 @@ namespace AreasFixture
 
         public override void OnUnitEntered(Unit enteringUnit)
         {
-            enteringUnit.Player.Print("Welcome.");
+            enteringUnit.Owner.Print("Welcome.");
         }
 
         public override void OnUnitStays(Unit stayingUnit)

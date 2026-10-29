@@ -38,7 +38,7 @@ namespace InteractionsFixture
 
         public override bool Accepts(Unit other)
         {
-            return Holder.Player.IsEnemy(other.Player);
+            return Holder.Owner.IsEnemy(other.Owner);
         }
 
         public override void OnTick(Pair pair)

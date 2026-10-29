@@ -253,7 +253,7 @@ namespace Moonwell.Testing
             var enemy = StruckAt(world, 400.0f, 500.0f, 1, "enemy");
             var bolt = new Shot();
             bolt.Speed = 600.0f;
-            bolt.Hit = other => other is Unit unit && bolt.Source!.Player.IsEnemy(unit.Player);
+            bolt.Hit = other => other is Unit unit && bolt.Source!.Owner.IsEnemy(unit.Owner);
             source.Fire(bolt, 600.0f, 500.0f);
             UntilEnded(world, bolt, 64);
             Expect.True(bolt.HasEnded, "it stopped at the enemy");

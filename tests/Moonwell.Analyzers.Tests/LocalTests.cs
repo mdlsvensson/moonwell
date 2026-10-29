@@ -75,7 +75,7 @@ public class LocalTests
             {
                 var slot = p.Slot;
                 var handle = unit.Handle;
-                var owner = unit.Player;
+                var owner = unit.Owner;
                 var map = new OrderedMap<int, int>();
                 map[1] = slot;
                 unit.Remove();

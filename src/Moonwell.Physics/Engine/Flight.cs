@@ -859,7 +859,7 @@ namespace Moonwell.Engine
             var dz = missile.followsGround ? above - startAbove : Ground.Height(x, y) + above - startZ;
             Aim(missile, x - startX, y - startY, dz, facing);
             missile.source = source;
-            Missile.Create(missile, startX, startY, startZ, source.Player, scope);
+            Missile.Create(missile, startX, startY, startZ, source.Owner, scope);
         }
 
         /// <summary>

@@ -343,11 +343,11 @@ namespace Moonwell
 
             if (actor is Unit unit)
             {
-                line = line + " · " + PlayerName(unit.Player);
+                line = line + " · " + PlayerName(unit.Owner);
             }
             else if (actor is Item item)
             {
-                line = line + " · " + PlayerName(item.Player);
+                line = line + " · " + PlayerName(item.Owner);
             }
 
             var parent = actor.Parent;

@@ -202,11 +202,11 @@ namespace Moonwell.Testing
         {
             var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
             var item = Item.Of(handle)!;
-            Expect.Equal(0, item.Player.Slot, "the player before");
+            Expect.Equal(0, item.Owner.Slot, "the player before");
 
-            item.Player = Player.Get(3);
+            item.Owner = Player.Get(3);
 
-            Expect.Equal(3, item.Player.Slot, "the new player");
+            Expect.Equal(3, item.Owner.Slot, "the new player");
             Expect.Equal(3, world.SlotOf(world.ItemOwnerOf(handle)), "the game's player");
             Expect.Equal("owner 3 False", world.ItemCalls[0], "the call keeps the colour");
         }
@@ -503,12 +503,12 @@ namespace Moonwell.Testing
             world.VanishItem(handle);
             world.Advance(0.3f);
             Expect.True(swept.IsGone, "the sweep found the item gone");
-            Expect.Equal(3, swept.Player.Slot, "the player it had when taken in");
+            Expect.Equal(3, swept.Owner.Slot, "the player it had when taken in");
 
             var ownerless = world.NewItem(ObjectTypes.FourCC("ofoo"));
             world.LoseItemOwner(ownerless);
             var neutral = Item.Of(ownerless)!;
-            Expect.Equal(world.NeutralPassiveSlot(), neutral.Player.Slot, "no owner given: the neutral passive player");
+            Expect.Equal(world.NeutralPassiveSlot(), neutral.Owner.Slot, "no owner given: the neutral passive player");
         }
 
         /// <summary>A removed item gives the last charges, player and place read or set, has no carrier, changes nothing and asks the game nothing.</summary>
@@ -517,12 +517,12 @@ namespace Moonwell.Testing
             var handle = world.NewItem(ObjectTypes.FourCC("ofoo"));
             var swept = Item.Of(handle)!;
             swept.Charges = 4;
-            swept.Player = Player.Get(2);
+            swept.Owner = Player.Get(2);
             swept.MoveTo(10.0f, 20.0f);
             Expect.Equal(4, swept.Charges, "read: charges");
             Expect.Near(10.0f, swept.X, "read: x");
             Expect.Near(20.0f, swept.Y, "read: y");
-            Expect.Equal(2, swept.Player.Slot, "read: player");
+            Expect.Equal(2, swept.Owner.Slot, "read: player");
             var carrier = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
             carrier.Give(swept);
             Expect.True(swept.IsCarried, "carried before the removal");
@@ -533,7 +533,7 @@ namespace Moonwell.Testing
             Expect.True(swept.IsGone, "the sweep found the item gone");
             world.GoneCalls = 0;
             Expect.Equal(4, swept.Charges, "swept: charges");
-            Expect.Equal(2, swept.Player.Slot, "swept: player");
+            Expect.Equal(2, swept.Owner.Slot, "swept: player");
             Expect.Near(10.0f, swept.X, "swept: x");
             Expect.Near(20.0f, swept.Y, "swept: y");
             Expect.True(swept.Carrier == null, "swept: no carrier");
@@ -556,11 +556,11 @@ namespace Moonwell.Testing
             // Values set and never read: the setters keep them, so they are what a gone item gives.
             var unread = Item.Of(world.NewItem(ObjectTypes.FourCC("ofoo")))!;
             unread.Charges = 9;
-            unread.Player = Player.Get(4);
+            unread.Owner = Player.Get(4);
             unread.MoveTo(1.5f, 2.5f);
             unread.Remove();
             Expect.Equal(9, unread.Charges, "unread: charges");
-            Expect.Equal(4, unread.Player.Slot, "unread: player");
+            Expect.Equal(4, unread.Owner.Slot, "unread: player");
             Expect.Near(1.5f, unread.X, "unread: x");
             Expect.Near(2.5f, unread.Y, "unread: y");
         }
@@ -569,7 +569,7 @@ namespace Moonwell.Testing
         private static void ExpectNoCalls(FakeWorld world, Item item, int calls, string what)
         {
             item.Charges = 99;
-            item.Player = Player.Get(5);
+            item.Owner = Player.Get(5);
             item.MoveTo(500.0f, 600.0f);
             Expect.Equal(calls, world.ItemCalls.Count, what + ": calls that changed the item");
             Expect.Equal(0, world.GoneCalls, what + ": calls to the game for the gone item");

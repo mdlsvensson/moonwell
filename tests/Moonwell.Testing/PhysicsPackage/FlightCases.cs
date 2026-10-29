@@ -152,7 +152,7 @@ namespace Moonwell.Testing
             dart.LaunchHeight = 0.0f;
             source.Fire(dart, 800.0f, 0.0f);
             Expect.Same(source, dart.Source, "the source");
-            Expect.Same(source.Player, dart.Player, "the source's player");
+            Expect.Same(source.Owner, dart.Owner, "the source's player");
             Within(0.0f, dart.Z, 0.01f, "it starts on the ground");
             Expect.True(dart.Gravity > 0.0f, "Fire gave it a gravity");
             var peak = -1000.0f;
@@ -383,9 +383,9 @@ namespace Moonwell.Testing
                 Missile.Create(placedOwned, 0.0f, 0.0f, 100.0f, Player.Two, owner);
             });
             Expect.Same(Game.Instance, placed.Parent, "Create with no owner, inside an owner's Run, belongs to the game");
-            Expect.Same(Player.NeutralPassive, placed.Player, "Neutral Passive unless given a player");
+            Expect.Same(Player.NeutralPassive, placed.Owner, "Neutral Passive unless given a player");
             Expect.Same(owner, placedOwned.Parent, "Create with an owner belongs to it");
-            Expect.Same(Player.Two, placedOwned.Player, "the player given");
+            Expect.Same(Player.Two, placedOwned.Owner, "the player given");
             owner.End();
             Expect.True(owned.HasEnded, "it ends with its owner");
             Expect.True(placedOwned.HasEnded, "the placed one too");

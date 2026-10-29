@@ -136,7 +136,7 @@ namespace Moonwell
 
         /// <summary>The player that owns the item; a new item belongs to the neutral passive player. Picking the item up or dropping it does not change the owner, so this is not the carrier's player. Setting it takes effect at once and leaves the item's colour as it is. Once the game has removed the item, the last player read or set (the one it had when Moonwell took it in, if none); the neutral passive player when the game gives none. Setting does nothing then.</summary>
         [LocalSafe]
-        public Player Player
+        public Player Owner
         {
             get
             {

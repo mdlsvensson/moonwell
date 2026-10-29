@@ -77,8 +77,8 @@ namespace Moonwell
 
             var source = hit.Source;
             var target = hit.Target;
-            var targetSlot = target.Player.Slot;
-            var sourceSlot = source == null ? -1 : source.Player.Slot;
+            var targetSlot = target.Owner.Slot;
+            var sourceSlot = source == null ? -1 : source.Owner.Slot;
             if (source != null)
             {
                 RunUnit(source, hit, null, SourceSlots + (int)stage);
@@ -105,7 +105,7 @@ namespace Moonwell
         /// <summary>Runs the burst reactions: the source and its components, the game's components, then the source's player's.</summary>
         internal static void RunBurst(Burst burst)
         {
-            var slot = burst.Source.Player.Slot;
+            var slot = burst.Source.Owner.Slot;
             RunUnit(burst.Source, null, burst, SourceSlots + (int)Stage.Burst);
             RunMap(Game.Instance, null, burst, WatchSlots + (int)Stage.Burst);
             var player = Player.Existing(slot);

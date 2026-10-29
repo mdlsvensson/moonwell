@@ -123,9 +123,9 @@ namespace Moonwell.Testing
             var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"), slot: 1);
             var unit = Unit.Of(handle)!;
             world.VanishUnit(handle);
-            Expect.Equal(1, unit.Player.Slot, "the owner's slot before the sweep");
+            Expect.Equal(1, unit.Owner.Slot, "the owner's slot before the sweep");
             world.Advance(0.3f);
-            Expect.Equal(1, unit.Player.Slot, "the owner's slot after the sweep");
+            Expect.Equal(1, unit.Owner.Slot, "the owner's slot after the sweep");
         }
 
         /// <summary>A unit's player is set in the game, with the unit's colour changed to the new player's; once the unit is gone, setting does nothing.</summary>
@@ -134,16 +134,16 @@ namespace Moonwell.Testing
             var handle = world.NewUnit(ObjectTypes.FourCC("hfoo"), slot: 1);
             var unit = Unit.Of(handle)!;
 
-            unit.Player = Player.Get(3);
+            unit.Owner = Player.Get(3);
 
-            Expect.Equal(3, unit.Player.Slot, "the new player");
+            Expect.Equal(3, unit.Owner.Slot, "the new player");
             Expect.Equal(3, world.SlotOf(world.OwnerOf(handle)), "the game's player");
             Expect.Equal("owner 3 True", world.UnitCalls[world.UnitCalls.Count - 1], "the call changes the colour");
 
             unit.Remove();
             var calls = world.UnitCalls.Count;
-            unit.Player = Player.Get(5);
-            Expect.Equal(3, unit.Player.Slot, "the last player once gone");
+            unit.Owner = Player.Get(5);
+            Expect.Equal(3, unit.Owner.Slot, "the last player once gone");
             Expect.Equal(calls, world.UnitCalls.Count, "no call once gone");
         }
 
@@ -1062,7 +1062,7 @@ namespace Moonwell.Testing
             heroDefault.SetLevel(5);
             var revived = heroDefault.Revive(0.0f, 0.0f);
             itemDefault.MoveTo(10.0f, 20.0f);
-            itemDefault.Player = Player.Get(1);
+            itemDefault.Owner = Player.Get(1);
 
             world.CallsThrow = false;
             Expect.True(!ordered, "an order to the default object");

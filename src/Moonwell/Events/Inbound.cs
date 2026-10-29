@@ -207,8 +207,8 @@ namespace Moonwell
         {
             var hit = damage.Target;
             var from = damage.Source;
-            var hitSlot = hit.Player.Slot;
-            var fromSlot = from == null ? -1 : from.Player.Slot;
+            var hitSlot = hit.Owner.Slot;
+            var fromSlot = from == null ? -1 : from.Owner.Slot;
             if (from != null)
             {
                 DealtDamage(from, damage);
@@ -250,8 +250,8 @@ namespace Moonwell
             // The buffs the death ends are those on the unit now, which see it; one its reactions apply stays.
             var buffs = dead.GetAll<Buff>();
             Unit? slayer = slain == null ? null : Unit.Of(slain);
-            var deadSlot = dead.Player.Slot;
-            var slayerSlot = slayer == null ? -1 : slayer.Player.Slot;
+            var deadSlot = dead.Owner.Slot;
+            var slayerSlot = slayer == null ? -1 : slayer.Owner.Slot;
             Dying(dead, slayer);
             if (slayer != null)
             {
@@ -291,7 +291,7 @@ namespace Moonwell
                 return;
             }
 
-            var casterSlot = by.Player.Slot;
+            var casterSlot = by.Owner.Slot;
             var running = by.ActiveCast;
             if (running != null)
             {

@@ -61,9 +61,9 @@ namespace Moonwell
             set { Place(value.X, value.Y); }
         }
 
-        /// <summary>The player the gizmo plays for: Neutral Passive unless it was given one. The gizmo's Scope stays the owner it lives and ends with.</summary>
+        /// <summary>The player the gizmo plays for: Neutral Passive unless it was given one.</summary>
         [LocalSafe]
-        public Player Player
+        public Player Owner
         {
             get { return player; }
             set { player = value; }
@@ -85,13 +85,13 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Places a gizmo of the map at a place for a player, and returns it. It belongs to the owner, or else the current owner (a missile: the game), and ends with it; the player is Neutral Passive unless given. OnCreated runs with the gizmo as the current owner.</summary>
-        public static T Create<T>(T gizmo, float x, float y, Player? player = null, Scope? scope = null)
+        /// <summary>Places a gizmo of the map at a place for an owning player, and returns it. It belongs to the owner, or else the current owner (a missile: the game), and ends with it; the owning player is Neutral Passive unless given. OnCreated runs with the gizmo as the current owner.</summary>
+        public static T Create<T>(T gizmo, float x, float y, Player? owner = null, Scope? scope = null)
             where T : Gizmo
         {
             Dev.Check(gizmo.entry == null, Names.NameOf(gizmo) + ".Create: the gizmo has been created already");
             Interactions.EnsureInstalled();
-            gizmo.player = player ?? Player.NeutralPassive;
+            gizmo.player = owner ?? Player.NeutralPassive;
             gizmo.entry = Tracking.Begin(gizmo, Tracking.GizmoKind, x, y);
             (scope ?? gizmo.DefaultScope()).Adopt(gizmo);
             if (!gizmo.HasEnded)

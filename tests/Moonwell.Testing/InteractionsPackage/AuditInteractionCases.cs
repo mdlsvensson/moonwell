@@ -166,13 +166,13 @@ namespace Moonwell.Testing
             Steps(world, 32);
             ExpectLog(new string[] { "meet b", "burn b", "burn b" }, "b, an enemy, burns");
             Expect.Equal(2, world.Dealt.Count, "twice");
-            b.Player = a.Player;
+            b.Owner = a.Owner;
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "burn b", "burn b", "part b" }, "charmed: the pair parts at the next tick");
             Steps(world, 32);
             Expect.Equal(2, world.Dealt.Count, "and b is burnt no more");
             Expect.Equal(0, aura.Pairs.Count, "no pair");
-            b.Player = Player.Get(1);
+            b.Owner = Player.Get(1);
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "burn b", "burn b", "part b", "meet b", "burn b" }, "an enemy again, b meets again at the next tick");
             Expect.Equal(3, world.Dealt.Count, "and burns");
@@ -191,7 +191,7 @@ namespace Moonwell.Testing
             Expect.True(!aura.RecheckAccepts, "turned off");
             a.Interact(aura);
             Steps(world, 16);
-            b.Player = a.Player;
+            b.Owner = a.Owner;
             Steps(world, 32);
             ExpectLog(new string[] { "meet b", "burn b", "burn b", "burn b" }, "the pair is kept and burns on");
         }
