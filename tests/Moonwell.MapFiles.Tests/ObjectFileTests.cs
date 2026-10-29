@@ -37,7 +37,7 @@ public sealed class ObjectFileTests(ITestOutputHelper output)
     {
         var bytes = Fixtures.Bytes(file);
 
-        var objectFile = ObjectFile.Read(Fixtures.KindOf(file)!.Value, bytes);
+        var objectFile = ObjectFile.ReadLenient(Fixtures.KindOf(file)!.Value, bytes);
 
         Assert.Equal(bytes, objectFile.ToBytes());
     }
@@ -48,7 +48,7 @@ public sealed class ObjectFileTests(ITestOutputHelper output)
         // World Editor never writes War3Net's obsolete bool and char value types, so the file is built with War3Net.
         var bytes = BoolAndCharUnitFile();
 
-        var read = ObjectFile.Read(Kind.Unit, bytes);
+        var read = ObjectFile.ReadLenient(Kind.Unit, bytes);
 
         var entry = Assert.Single(read.Custom);
         Assert.Equal(new FieldValue.Bool(true), entry.Find("ubol", 0)!.Value);
@@ -58,7 +58,7 @@ public sealed class ObjectFileTests(ITestOutputHelper output)
         // A value set by hand is written the same way War3Net wrote it.
         entry.Set("ubol", 0, 0, new FieldValue.Bool(false));
         entry.Set("uchr", 0, 0, new FieldValue.Char('y'));
-        var again = ObjectFile.Read(Kind.Unit, read.ToBytes()).Custom[0];
+        var again = ObjectFile.ReadLenient(Kind.Unit, read.ToBytes()).Custom[0];
         Assert.Equal(new FieldValue.Bool(false), again.Find("ubol", 0)!.Value);
         Assert.Equal(new FieldValue.Char('y'), again.Find("uchr", 0)!.Value);
 
@@ -67,6 +67,30 @@ public sealed class ObjectFileTests(ITestOutputHelper output)
         Assert.Contains("ubol", problem.Message);
         Assert.Contains("value type 4", problem.Message);
         Assert.Null(problem.Parsed);
+    }
+
+    [Fact]
+    public void A_char_value_that_is_a_lone_surrogate_is_refused_and_leaves_nothing_behind()
+    {
+        var units = ObjectFile.Empty(Kind.Unit);
+        var entry = units.AddCustom("hfoo", "h000");
+        var before = units.ToBytes();
+
+        // A new modification: the refusal leaves no modification.
+        var refused = Assert.Throws<ArgumentException>(() => entry.Set("uchr", 0, 0, new FieldValue.Char('\ud800')));
+        Assert.Equal("Value", refused.ParamName);
+        Assert.Null(entry.Find("uchr", 0));
+        Assert.Equal(before, units.ToBytes());
+
+        // An existing modification keeps its value and type.
+        entry.Set("uchr", 0, 0, new FieldValue.Text("x"));
+        var mod = entry.Find("uchr", 0)!;
+        Assert.Throws<ArgumentException>(() => mod.Value = new FieldValue.Char('\udfff'));
+        Assert.Equal(new FieldValue.Text("x"), mod.Value);
+
+        // A character outside the surrogates is still accepted.
+        mod.Value = new FieldValue.Char('å');
+        Assert.Equal(new FieldValue.Char('å'), mod.Value);
     }
 
     [Fact]
@@ -126,7 +150,7 @@ public sealed class ObjectFileTests(ITestOutputHelper output)
             Assert.Null(problem.Parsed);
 
             // The lenient read fails the same way: War3Net cannot read the file.
-            var lenient = Assert.Throws<ObjectFileException>(() => ObjectFile.Read(kind, cut));
+            var lenient = Assert.Throws<ObjectFileException>(() => ObjectFile.ReadLenient(kind, cut));
             Assert.Contains("War3Net cannot read war3map." + Kinds.Extension(kind), lenient.Message);
         }
     }

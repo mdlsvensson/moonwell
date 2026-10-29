@@ -5,7 +5,7 @@
     as War3Net holds them. Moonwell's build and Moonwell Editor share it, so both read and write the same bytes.
   -->
   <PropertyGroup>
-    <Description>A Warcraft III map's object files: the seven object kinds with their file names, four-character ids as numbers and back, and reading and writing the files.</Description>
+    <Description>A Warcraft III map's object files: the seven object kinds with their file names, four-character ids as numbers and back, the rules for new object ids, and reading and writing the files.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!-- NU5104: the War3Net fork is published only as prereleases (6.1.2-moonwell.N), so a stable Moonwell.MapFiles depends on one. -->
     <NoWarn>$(NoWarn);CS1591;NU5104</NoWarn>

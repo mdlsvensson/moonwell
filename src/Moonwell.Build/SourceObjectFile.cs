@@ -39,7 +39,7 @@ namespace Moonwell.Build
             var name = Path.GetFileName(path);
             try
             {
-                return new SourceObjectFile(ObjectFile.Read(kind, System.IO.File.ReadAllBytes(path), name), true);
+                return new SourceObjectFile(ObjectFile.ReadLenient(kind, System.IO.File.ReadAllBytes(path), name), true);
             }
             catch (ObjectFileException failure)
             {

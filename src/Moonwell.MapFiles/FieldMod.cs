@@ -21,7 +21,10 @@ public sealed class FieldMod
     /// <summary>War3Net's modification this wraps.</summary>
     internal ObjectDataModification Record { get; }
 
-    /// <summary>The field's four-character id, such as "uhpm".</summary>
+    /// <summary>
+    /// The field's four-character id, such as "uhpm". Always four characters, as War3Net's <c>ToRawcode</c> gives them, a
+    /// NUL byte included (unlike <c>Rawcodes.TextOf</c>, which trims trailing NULs).
+    /// </summary>
     public string Field
     {
         get => Record.Id.ToRawcode();
@@ -124,6 +127,11 @@ public sealed class FieldMod
                     Record.Value = flag.Value;
                     break;
                 case FieldValue.Char letter:
+                    if (char.IsSurrogate(letter.Value))
+                    {
+                        throw new ArgumentException("A char value cannot be a lone surrogate.", nameof(Value));
+                    }
+
                     Record.Type = ObjectDataType.Char;
                     Record.Value = letter.Value;
                     break;
@@ -143,7 +151,8 @@ public sealed class FieldMod
         or ObjectDataType.String;
 
     /// <summary>
-    /// A text is stored NUL-terminated as UTF-8, so it can hold neither a NUL nor a broken surrogate pair.
+    /// A text is stored NUL-terminated as UTF-8, so it can hold neither a NUL nor a broken surrogate pair (a char value
+    /// is refused a lone surrogate in <see cref="Value"/> the same way).
     /// </summary>
     private static void CheckText(string text)
     {
@@ -197,14 +206,14 @@ public abstract record FieldValue
     public sealed record Text(string Value) : FieldValue;
 
     /// <summary>
-    /// A yes/no value (type 4, one byte), which War3Net marks obsolete; no World Editor save has one. <see cref="ObjectFile.Read(Kind, byte[], string?)"/>
+    /// A yes/no value (type 4, one byte), which War3Net marks obsolete; no World Editor save has one. <see cref="ObjectFile.ReadLenient(Kind, byte[], string?)"/>
     /// keeps it, <see cref="ObjectFile.ReadExact(Kind, byte[], string?)"/> refuses it.
     /// </summary>
     /// <param name="Value">The flag.</param>
     public sealed record Bool(bool Value) : FieldValue;
 
     /// <summary>
-    /// A single character (type 5), which War3Net marks obsolete and reads and writes as UTF-8. <see cref="ObjectFile.Read(Kind, byte[], string?)"/>
+    /// A single character (type 5), which War3Net marks obsolete and reads and writes as UTF-8. <see cref="ObjectFile.ReadLenient(Kind, byte[], string?)"/>
     /// keeps it, <see cref="ObjectFile.ReadExact(Kind, byte[], string?)"/> refuses it.
     /// </summary>
     /// <param name="Value">The character.</param>

@@ -17,7 +17,7 @@ public static class ObjectIds
     /// for an ability, <c>B</c> for a buff and <c>R</c> for an upgrade.
     /// </summary>
     /// <param name="kind">The kind of the new object.</param>
-    /// <param name="baseId">The id of the object it is based on; only a unit's first character matters.</param>
+    /// <param name="baseId">The id of the object it is based on; only a unit's first character matters; a unit whose base id is empty gets <c>h</c>.</param>
     /// <returns>The letter.</returns>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="kind"/> is not one of the seven kinds.</exception>
     public static char Letter(Kind kind, string baseId) => kind switch

@@ -55,7 +55,8 @@ public sealed class ObjectEntry
 
     /// <summary>
     /// The standard object's id: for a custom object the one it is based on, for a change to a standard object that
-    /// object itself.
+    /// object itself. Always four characters, as War3Net's <c>ToRawcode</c> gives them, a NUL byte included (unlike
+    /// <c>Rawcodes.TextOf</c>, which trims trailing NULs).
     /// </summary>
     public string BaseId
     {
@@ -63,7 +64,10 @@ public sealed class ObjectEntry
         set => OldId = Rawcodes.From(value, nameof(BaseId));
     }
 
-    /// <summary>The custom object's id; "" for a change to a standard object.</summary>
+    /// <summary>
+    /// The custom object's id; "" for a change to a standard object. Otherwise four characters, as War3Net's
+    /// <c>ToRawcode</c> gives them, a NUL byte included (unlike <c>Rawcodes.TextOf</c>, which trims trailing NULs).
+    /// </summary>
     public string Id
     {
         get => NewId == 0 ? "" : NewId.ToRawcode();

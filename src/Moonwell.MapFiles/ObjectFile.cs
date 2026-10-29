@@ -49,12 +49,15 @@ public sealed class ObjectFile
     public IReadOnlyList<ObjectEntry> Custom => custom;
 
     /// <summary>
-    /// Reads an object file with War3Net and nothing more (the lenient read): whatever War3Net reads is kept, even a
-    /// bool or char value (<see cref="FieldValue.Bool"/>, <see cref="FieldValue.Char"/>) and bytes it would not write
-    /// back. Throws an <see cref="ObjectFileException"/> ("War3Net cannot read ...") when War3Net cannot read the file.
+    /// Reads an object file with War3Net's read only (the lenient read): no refusal of value types War3Net reads but
+    /// the editor does not support (a bool or char value, <see cref="FieldValue.Bool"/>, <see cref="FieldValue.Char"/>),
+    /// and no round-trip check. Writing the file back may not give the same bytes: a Char value 0x80-0xFF reads as
+    /// U+FFFD and writes back longer, a Bool 2 writes back as 1 (what Moonwell's build did before too).
+    /// <see cref="ReadExact(Kind, byte[], string?)"/> is the read that guarantees it. Throws an
+    /// <see cref="ObjectFileException"/> ("War3Net cannot read ...") when War3Net cannot read the file.
     /// <paramref name="name"/> is the file's name in messages (by default <c>war3map.</c> and the kind's extension).
     /// </summary>
-    public static ObjectFile Read(Kind kind, byte[] bytes, string? name = null)
+    public static ObjectFile ReadLenient(Kind kind, byte[] bytes, string? name = null)
     {
         ArgumentNullException.ThrowIfNull(bytes);
         var extension = Kinds.Extension(kind);
@@ -84,7 +87,7 @@ public sealed class ObjectFile
     }
 
     /// <summary>
-    /// Reads an object file with War3Net (<see cref="Read(Kind, byte[], string?)"/>), then refuses a file the editor
+    /// Reads an object file with War3Net (<see cref="ReadLenient(Kind, byte[], string?)"/>), then refuses a file the editor
     /// cannot save exactly: one with a bool or char value, and one War3Net does not write back to the same bytes. Throws
     /// an <see cref="ObjectFileException"/> naming the problem; for a file War3Net cannot write back exactly the
     /// exception's <see cref="ObjectFileException.Parsed"/> holds what War3Net read, to show but never to save.
@@ -94,12 +97,12 @@ public sealed class ObjectFile
 
     /// <summary>
     /// <see cref="ReadExact(Kind, byte[], string?)"/> with the guard's write-back given. War3Net (from 6.1.2-moonwell.4)
-    /// writes every known file back exactly, so tests pass a <paramref name="writeBack"/> that differs to stand for a
-    /// file it cannot.
+    /// writes every known file back exactly, so a test passes a <paramref name="writeBack"/> that differs to stand for a
+    /// file War3Net cannot write back exactly.
     /// </summary>
-    internal static ObjectFile ReadExact(Kind kind, byte[] bytes, string? name, Func<ObjectFile, byte[]> writeBack)
+    public static ObjectFile ReadExact(Kind kind, byte[] bytes, string? name, Func<ObjectFile, byte[]> writeBack)
     {
-        var file = Read(kind, bytes, name);
+        var file = ReadLenient(kind, bytes, name);
         name ??= "war3map." + Kinds.Extension(kind);
 
         foreach (var entry in file.original.Concat(file.custom))
