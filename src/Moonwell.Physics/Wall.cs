@@ -95,10 +95,10 @@ namespace Moonwell
         }
 
         /// <summary>
-        /// Makes a straight upright wall from (x1, y1) to (x2, y2), as tall as the height above the ground (0, the default,
-        /// for endless), with the bounciness a bounce off it keeps of a missile's own (1 by default). It is in the scope given, and
-        /// ends with it. The ends must differ, and the height and the bounciness must be
-        /// 0 or more.
+        /// Makes a straight upright wall from (x1, y1) to (x2, y2), as tall as the height above the ground (0, the
+        /// default, for endless), with the bounciness a bounce off it keeps of a missile's own (1 by default). It is in
+        /// the scope given, and ends with it. The ends must differ, and the height and the bounciness must be 0 or
+        /// more.
         /// </summary>
         public static Wall Create(float x1, float y1, float x2, float y2, Scope scope, float height = 0f, float bounciness = 1f)
         {

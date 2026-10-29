@@ -29,7 +29,7 @@ namespace Moonwell.Engine
 
         // In Lua a pair is its own table and the cast checks nothing, so the call is left out.
 
-        /// <summary>A pair kept as an Scope, as the pair it is.</summary>
+        /// <summary>A pair kept as a Scope, as the pair it is.</summary>
         /// @CSharpLua.Template = "{0}"
         public static Interaction<H, O>.Pair As<H, O>(Scope pair)
             where H : Actor

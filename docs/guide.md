@@ -230,7 +230,7 @@ public sealed class KillCounter : UnitComponent
 
 **Scopes.** What code makes belongs to the scope named where it is made, and ends when that scope ends: the game, a
 player, a unit, item or destructable, a component, a buff, an ability, a cast, an area, an interaction or its pair, or a
-gizmo. Timers are made on their scope: inside a class, `After(2f, Puff)` and `Every(1f, Tick)` are the class's own;
+gizmo. Timers are made on their scope: inside a class, `After(2f, Puff)` and `Every(1f, Pulse)` are the class's own;
 elsewhere the line names it, as `cast.Every(0.5f, Pulse)` or `Game.Instance.After(30f, Respawn)`. `Create`, `Fire`,
 `Wall.Create` and `Interact` take the scope as an argument. Nothing has a default, so a static helper is given one.
 

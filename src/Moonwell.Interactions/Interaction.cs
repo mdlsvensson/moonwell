@@ -15,7 +15,7 @@ namespace Moonwell
         // CSharp.lua gives a subclass's field a name of its own only when it sees the base's field of that name,
         // and it does not see a private one, so in Lua the two would be one field.
 
-        /// <summary>The pairs, in the order they met; each is an Interaction&lt;THolder, TOther&gt;.Pair, kept as an Scope (see Pairing).</summary>
+        /// <summary>The pairs, in the order they met; each is an Interaction&lt;THolder, TOther&gt;.Pair, kept as a Scope (see Pairing).</summary>
         internal readonly List<Scope> pairs = new List<Scope>();
 
         /// <summary>The pair of each other, by the other's entry id; a lookup only.</summary>

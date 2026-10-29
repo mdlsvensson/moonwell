@@ -35,7 +35,7 @@ namespace Moonwell
         [LocalSafe]
         public int Level => Runtime.World.AbilityLevel(Unit.Handle, Id);
 
-        /// <summary>Runs when the unit begins a cast of the ability. What it makes belongs to this ability object, which lasts as long as the caster is in the game, so a delayed effect started here runs after the spell has ended; work that should stop with a channel names the cast as its scope: Timer.Every(0.5f, Pulse, cast).</summary>
+        /// <summary>Runs when the unit begins a cast of the ability. This ability object is a scope that lasts as long as the caster is in the game, so a delayed effect made here with After runs after the spell has ended; work that should stop with a channel is made on the cast: cast.Every(0.5f, Pulse).</summary>
         public virtual void OnCast(Cast cast)
         {
         }

@@ -2474,7 +2474,7 @@ namespace Moonwell.Engine
         /// <summary>For two missiles: the one made after.</summary>
         public Missile? late;
 
-        /// <summary>For two missiles: the earlier one's pair with the later, while it has one; an Interaction&lt;Missile, Missile&gt;.Pair kept as an Scope (see Pairing).</summary>
+        /// <summary>For two missiles: the earlier one's pair with the later, while it has one; an Interaction&lt;Missile, Missile&gt;.Pair kept as a Scope (see Pairing).</summary>
         public Scope? earlyPair;
 
         /// <summary>For two missiles: the later one's pair with the earlier, while it has one.</summary>

@@ -3,9 +3,10 @@ using Moonwell.Engine;
 namespace Moonwell
 {
     /// <summary>
-    /// Firing missiles from a unit: <c>caster.Fire(new Firebolt(), target)</c>. The missile starts at the unit, its
-    /// LaunchOffset ahead and its LaunchHeight up, with the unit as its Source and the unit's player as its own, and flies
-    /// at its Speed. It is in the scope given, and ends with it. With no Arc it flies on past the mark until something stops it; with an Arc it lands on the mark.
+    /// Firing missiles from a unit: <c>caster.Fire(new Firebolt(), target, scope)</c>. The missile starts at the unit,
+    /// its LaunchOffset ahead and its LaunchHeight up, with the unit as its Source and the unit's player as its own,
+    /// and flies at its Speed. It is in the scope given, and ends with it. With no Arc it flies on past the mark until
+    /// something stops it; with an Arc it lands on the mark.
     /// </summary>
     public static class FireExtensions
     {

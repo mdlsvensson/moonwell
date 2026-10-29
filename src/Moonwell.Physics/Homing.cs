@@ -4,8 +4,9 @@ namespace Moonwell
 {
     /// <summary>
     /// Turns a missile toward a target as it flies: <c>Components.Add(new Homing { TurnRate = 180f })</c>, and
-    /// <c>unit.Fire(missile, target)</c> gives it its target. Every 0.1 second it turns the missile's velocity toward the
-    /// target's middle by at most TurnRate a second, keeping its speed. While the target is inside the circle the missile
+    /// <c>unit.Fire(missile, target, scope)</c> gives it its target. Every 0.1 second it turns the missile's velocity
+    /// toward the target's middle by at most TurnRate a second, keeping its speed. While the target is inside the
+    /// circle the missile
     /// cannot turn tight enough to reach, it flies straight on to gain room instead of circling it (ALICE's way). With an
     /// Arc it re-aims the arc's rest each time instead, keeping its speed along the ground and its Gravity, at where the
     /// target will be when it comes down (its velocity from its places at the last two turns), so it lands on a target
