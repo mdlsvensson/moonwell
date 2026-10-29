@@ -156,6 +156,13 @@ namespace Moonwell.Build
 
                 var (type, value) = StoredValues.Of(one.ClassName, field, one.Changed[key]!, name => resolver.IdOf(one.ClassName, fieldId, name));
 
+                // The game shows a buff's extended tooltip only up to its first comma, quoted or not, so a placeholder
+                // (<A000,Dur1>), which holds one, cannot work in it either (game facts, probe of 2026-10-29).
+                if (one.Kind == "buff" && fieldId == "fube" && value is string tooltip && tooltip.Contains(','))
+                {
+                    throw new BuildException($"{one.ClassName}: fube (the extended tooltip) holds a comma, and the game shows a buff's extended tooltip only up to its first comma; a placeholder such as <A000,Dur1> holds one too");
+                }
+
                 // A unit's, item's, destructable's or buff's modification has no level and no pointer in the file. Set changes a
                 // modification of the same field and level instead of adding another; the declared keys (a field and a level) never collide.
                 try

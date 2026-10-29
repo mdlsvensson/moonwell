@@ -566,6 +566,46 @@ namespace Moonwell.Build.Tests
         }
 
         [Fact]
+        public void a_buff_tooltip_with_a_comma_fails_naming_class_and_field()
+        {
+            var buff = new DeclaredObject(
+                "Objects.Slowed",
+                "buff",
+                "Bslo",
+                false,
+                null,
+                "A001",
+                new SortedDictionary<string, object?> { ["fube"] = "Slowed for <A000,Dur1> seconds." },
+                Array.Empty<string>());
+            var ids = new Dictionary<string, string> { ["Objects.Slowed"] = "B000", ["Objects.Slowed#carrier"] = "A001" };
+
+            var error = Assert.Throws<BuildException>(
+                () => WriteObjects(new[] { buff }, ids, new Dictionary<string, string>(), built.Standard));
+
+            Assert.Equal(
+                "Objects.Slowed: fube (the extended tooltip) holds a comma, and the game shows a buff's extended tooltip only up to its first comma; a placeholder such as <A000,Dur1> holds one too",
+                error.Message);
+        }
+
+        [Fact]
+        public void a_buff_name_with_a_comma_is_written()
+        {
+            var buff = new DeclaredObject(
+                "Objects.Slowed",
+                "buff",
+                "Bslo",
+                false,
+                null,
+                "A001",
+                new SortedDictionary<string, object?> { ["fnam"] = "Slowed, badly" },
+                Array.Empty<string>());
+            var ids = new Dictionary<string, string> { ["Objects.Slowed"] = "B000", ["Objects.Slowed#carrier"] = "A001" };
+
+            // Only the extended tooltip was seen cut at a comma.
+            Assert.Null(Record.Exception(() => WriteObjects(new[] { buff }, ids, new Dictionary<string, string>(), built.Standard)));
+        }
+
+        [Fact]
         public void a_text_with_half_a_surrogate_pair_fails_naming_class_and_field()
         {
             // Built at run time: an attribute argument cannot carry a lone surrogate.
