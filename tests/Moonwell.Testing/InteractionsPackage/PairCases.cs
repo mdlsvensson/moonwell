@@ -252,6 +252,43 @@ namespace Moonwell.Testing
             Expect.Equal(1, firstParts, "and the first's pair did not part again");
         }
 
+        /// <summary>A timer made with the pair's After in OnPart, in the pair as it ends, is reported in a development build.</summary>
+        public static void PairAfterInPartIsReported(FakeWorld world)
+        {
+            Fresh();
+            var a = UnitAt(world, 0.0f, 0.0f);
+            var b = UnitAt(world, 100.0f, 0.0f);
+            var aura = new PartingTimerAura();
+            a.Interact(aura, Game.Instance);
+            Steps(world, 16);
+            world.MoveUnit(b.Handle, 600.0f, 0.0f);
+            Steps(world, 16);
+            Expect.True(aura.Made!.HasEnded, "the timer OnPart made ended with the pair");
+            ScopeCases.ExpectNeverRanCount(world, 1);
+        }
+
+        /// <summary>An interaction whose holder ends first ends then, each pair parting once, and its scope ending after does nothing more.</summary>
+        public static void InteractEndsWithHolderThenScope(FakeWorld world)
+        {
+            Fresh();
+            var u = UnitAt(world, 0.0f, 0.0f);
+            UnitAt(world, 100.0f, 0.0f);
+            var scope = new TestScope("scope", new List<string>());
+            var aura = new FireAura();
+            var parts = 0;
+            aura.Parting = pair => { parts++; };
+            u.Interact(aura, scope);
+            Steps(world, 16);
+            Expect.Equal(1, aura.Pairs.Count, "it met the other unit");
+            u.Remove();
+            Steps(world, 16);
+            Expect.True(aura.HasEnded, "it ended with its holder");
+            Expect.Equal(1, parts, "its pair parted once");
+            scope.End();
+            Expect.Equal(1, parts, "the scope ending parted nothing more");
+            Expect.Equal(0, scope.ChildCount, "and holds nothing");
+        }
+
         /// <summary>After in an interaction's OnPart is the interaction's, so it runs after the pair has parted.</summary>
         public static void PartAfterRuns(FakeWorld world)
         {

@@ -15,6 +15,17 @@ namespace Moonwell.Testing
             return fake;
         }
 
+        /// <summary>An area added and ended in one instant ends its own first sweep without the never-ran report: no line of the map named its scope.</summary>
+        public static void EndedAsAddedIsQuiet(FakeWorld world)
+        {
+            Fresh();
+            var area = new LogArea(Square(), 1f);
+            Game.Instance.Add(area);
+            area.End();
+            Expect.True(area.HasEnded, "the area has ended");
+            Expect.Equal(0, ScopeCases.NeverRanReports(world), "the reports: " + string.Join(" | ", world.Logged));
+        }
+
         /// <summary>A rect from (0, 0) to (256, 256).</summary>
         private static AreaShape Square()
         {

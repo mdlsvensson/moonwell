@@ -51,6 +51,22 @@ namespace Moonwell
             return Timer.Start(new Timer(Runtime.World.Now(), seconds, true, action), this);
         }
 
+        /// <summary>Runs an action once after the seconds, as a timer of Moonwell's own work in this scope, which the never-ran report skips.</summary>
+        internal Timer OwnAfter(float seconds, Action action)
+        {
+            var timer = new Timer(Runtime.World.Now(), seconds, false, action);
+            timer.own = true;
+            return Timer.Start(timer, this);
+        }
+
+        /// <summary>Runs an action at every interval of the seconds, more than 0, as a timer of Moonwell's own work in this scope, which the never-ran report skips.</summary>
+        internal Timer OwnEvery(float seconds, Action action)
+        {
+            var timer = new Timer(Runtime.World.Now(), seconds, true, action);
+            timer.own = true;
+            return Timer.Start(timer, this);
+        }
+
         /// <summary>Takes a child under this scope; a child adopted by an ended scope ends at once. A child that already has a parent, or has ended, is left as it is, and the error is reported, in every build: linked twice, it would break the scopes' lists (decision 74).</summary>
         internal void Adopt(Scoped child)
         {

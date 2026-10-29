@@ -17,6 +17,9 @@ namespace Moonwell
         /// <summary>Whether the scheduler has called the action at least once.</summary>
         internal bool ran;
 
+        /// <summary>Whether Moonwell made it for its own work (a buff's tick and expiry, an area's first sweep), which the never-ran report skips: no line of the map named its scope.</summary>
+        internal bool own;
+
         /// <summary>
         /// How many intervals after its start a repeating timer is next due; 1 until it first runs. Its due time is worked out
         /// from the start and this count, not added up run by run, so the rounding of a float late in a game does not add up.
@@ -76,11 +79,11 @@ namespace Moonwell
         /// <summary>
         /// Reports, in a development build, a timer its scope ended in the instant it was made, before it ran: the line that
         /// made it named a scope already on its way out, so it does nothing, and nothing else says so. A timer ended by its own
-        /// End is not reported.
+        /// End, or one Moonwell made for its own work, is not reported.
         /// </summary>
         internal override void Finish()
         {
-            if (!ran && Parent != null && Parent.ending && start == Runtime.World.Now())
+            if (!ran && !own && Parent != null && Parent.ending && start == Runtime.World.Now())
             {
                 Errors.Report(Names.NameOf(Parent) + ".Timer", new MoonwellException("ended with its scope in the instant it was made, before it ran; name a scope that lasts"));
             }

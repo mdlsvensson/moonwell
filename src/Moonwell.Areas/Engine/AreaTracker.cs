@@ -135,7 +135,7 @@ namespace Moonwell.Engine
             AddParts(made, shape);
             World.Listen(made, area.HearEnter, area.HearLeave);
             areas.Add(area);
-            area.After(0f, area.Sweep);
+            area.OwnAfter(0f, area.Sweep);
         }
 
         /// <summary>Stops an area: it is no longer stepped, and its region and triggers are destroyed.</summary>

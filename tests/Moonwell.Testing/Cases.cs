@@ -53,6 +53,11 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "scope.timer-ended-later", Run = ScopeCases.TimerEndedLater });
             list.Add(new Case { Name = "scope.timer-that-ran", Run = ScopeCases.TimerThatRan });
             list.Add(new Case { Name = "scope.refused-every-once", Run = ScopeCases.RefusedEveryOnce });
+            list.Add(new Case { Name = "scope.buff-ended-as-applied-is-quiet", Run = BuffCases.EndedAsAppliedIsQuiet });
+            list.Add(new Case { Name = "scope.area-ended-as-added-is-quiet", Run = AreaCases.EndedAsAddedIsQuiet });
+            list.Add(new Case { Name = "scope.expire-timer-is-reported", Run = ScopeCases.ExpireTimerIsReported });
+            list.Add(new Case { Name = "scope.pair-after-in-part-is-reported", Run = PairCases.PairAfterInPartIsReported });
+            list.Add(new Case { Name = "scope.interact-ends-with-holder-then-scope", Run = PairCases.InteractEndsWithHolderThenScope });
         }
 
         /// <summary>Adds the cases for the full audit's doc fixes: OrderedMap and OrderedSet in a foreach, and the guide's forms to write instead.</summary>

@@ -87,6 +87,27 @@ namespace Moonwell.Testing
 #endif
         }
 
+        /// <summary>Checks that a development build reported a number of timers that never ran, and a release build none.</summary>
+        public static void ExpectNeverRanCount(FakeWorld world, int count)
+        {
+#if DEBUG
+            Expect.Equal(count, NeverRanReports(world), "the reports of a timer that never ran: " + string.Join(" | ", world.Logged));
+#else
+            Expect.Equal(0, NeverRanReports(world), "a release build reports none");
+#endif
+        }
+
+        /// <summary>A timer a buff's OnExpire makes in the buff, which ends right after, is reported in a development build.</summary>
+        public static void ExpireTimerIsReported(FakeWorld world)
+        {
+            var unit = Unit.Of(world.NewUnit(ObjectTypes.FourCC("hfoo")))!;
+            var buff = unit.Apply(new ExpiringTimerBuff());
+            world.Advance(1.05f);
+            Expect.True(buff.HasEnded, "the buff expired");
+            Expect.True(buff.Made!.HasEnded, "the timer OnExpire made ended with it");
+            ExpectNeverRanReported(world, "Moonwell: ExpiringTimerBuff.Timer " + NeverRan);
+        }
+
         /// <summary>A timer whose scope ends in the instant it was made is reported in a development build.</summary>
         public static void TimerEndedAsMadeIsReported(FakeWorld world)
         {

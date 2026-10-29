@@ -81,7 +81,7 @@ namespace Moonwell
 
             if (Tick > 0.0f)
             {
-                Every(Tick, () => CallTick());
+                OwnEvery(Tick, () => CallTick());
             }
 
             if (Duration > 0.0f)
@@ -169,7 +169,7 @@ namespace Moonwell
             }
 
             Timer? made = null;
-            made = After(Duration, () => Expire(made));
+            made = OwnAfter(Duration, () => Expire(made));
             expiry = made;
         }
 
