@@ -4,7 +4,7 @@ using Moonwell.Engine;
 
 namespace Moonwell
 {
-    /// <summary>A map's own object with a place, for the things the game has no object for: a well, a trap, a missile. It belongs to the owner that made it and ends with it, or by End or Remove. It can tick on its own, in the package's cycle.</summary>
+    /// <summary>A map's own object with a place, for the things the game has no object for: a well, a trap, a missile. It is in the scope Create names and ends with it, or by End or Remove. It can tick on its own, in the package's cycle.</summary>
     public abstract class Gizmo : Actor
     {
         // The fields are internal, not private, as a map's subclass may name a field of its own the same:
@@ -26,7 +26,7 @@ namespace Moonwell
         /// <summary>The seconds between ticks; 0 for none.</summary>
         internal float tick;
 
-        /// <summary>The components the class starts with, added in order when the gizmo is created: after its owner is set and before OnCreated runs. A class lists them in its constructor. Assigning a new list drops what a parent class listed.</summary>
+        /// <summary>The components the class starts with, added in order when the gizmo is created: after its scope is set and before OnCreated runs. A class lists them in its constructor. Assigning a new list drops what a parent class listed.</summary>
         protected List<GizmoComponent> Components { get; set; } = new List<GizmoComponent>();
 
         /// <summary>The gizmo's left-to-right place. Setting it moves the gizmo's entry to the cell of the new place at once.</summary>
@@ -136,7 +136,7 @@ namespace Moonwell
             End();
         }
 
-        /// <summary>Runs in Create once the gizmo has its entry and its owner, before its components are added and OnCreated runs; nothing for a plain gizmo. A package's kind of gizmo starts its own part here, as a missile joins the physics pass.</summary>
+        /// <summary>Runs in Create once the gizmo has its entry and its scope, before its components are added and OnCreated runs; nothing for a plain gizmo. A package's kind of gizmo starts its own part here, as a missile joins the physics pass.</summary>
         internal virtual void Placed()
         {
         }

@@ -2,7 +2,7 @@ using System;
 
 namespace Moonwell
 {
-    /// <summary>A part of an actor: it is owned by the actor, and ends when it is removed or when the actor ends.</summary>
+    /// <summary>A part of an actor: it is in the actor's scope, and ends when it is removed or when the actor ends.</summary>
     public abstract class Component : Scope
     {
         /// <summary>The actor the component is on; null until it is added.</summary>

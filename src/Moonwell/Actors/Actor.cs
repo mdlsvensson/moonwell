@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Moonwell
 {
-    /// <summary>An owner that holds components, in the order they were added, and ends them when it ends.</summary>
+    /// <summary>A scope that holds components, in the order they were added, and ends them when it ends.</summary>
     public abstract class Actor : Scope
     {
         // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Scope).

@@ -315,7 +315,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the item leaves the game, before its components end; HasEnded is still false here. It runs once for each OnCreated: one made for an owner that had already ended, which ends at once, runs neither.</summary>
+        /// <summary>Runs when the item leaves the game, before its components end; HasEnded is still false here. It runs once for each OnCreated: one made in a scope that had already ended, which ends at once, runs neither.</summary>
         protected virtual void OnLeave()
         {
         }
@@ -338,7 +338,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the item leaves the game. One that never came in, as one made for an owner that had ended, runs neither, as it ran no OnCreated.</summary>
+        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the item leaves the game. One that never came in, as one made in a scope that had ended, runs neither, as it ran no OnCreated.</summary>
         protected sealed override void OnEnd()
         {
             if (!entered)

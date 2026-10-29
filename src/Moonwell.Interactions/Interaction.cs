@@ -6,8 +6,8 @@ namespace Moonwell
 {
     /// <summary>
     /// What one thing, the holder, does with the things of a class near it. A map derives from Interaction&lt;THolder, TOther&gt;;
-    /// this base carries what the cycle and Interact need without the types. An interaction belongs to the owner that started
-    /// it and ends with it, with its holder, or by End; its pairs part first, newest first.
+    /// this base carries what the cycle and Interact need without the types. An interaction is in the scope Interact names, and
+    /// ends with it, with its holder, or by End; its pairs part first, newest first.
     /// </summary>
     public abstract class Interaction : Scope
     {
@@ -136,7 +136,7 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Whether a pair or another owned object has begun to end. An object that has ended began to end first, so ending covers HasEnded.</summary>
+        /// <summary>Whether a pair or another scoped object has begun to end. An object that has ended began to end first, so ending covers HasEnded.</summary>
         internal static bool Gone(Scoped owned)
         {
             return owned.ending;

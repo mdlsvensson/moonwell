@@ -863,7 +863,7 @@ namespace Moonwell
             return (T)Create(ObjectTypes.IdOf<T>(), owner, x, y, scope, facing);
         }
 
-        /// <summary>The ability of the unit with an id: one object per id, made by the registered maker or as a plain Ability, and owned by the unit.</summary>
+        /// <summary>The ability of the unit with an id: one object per id, made by the registered maker or as a plain Ability, in the unit's scope.</summary>
         public Ability AbilityOf(int abilityId)
         {
             if (abilities.TryGetValue(abilityId, out var known))
@@ -959,7 +959,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the unit leaves the game, before its components end; HasEnded is still false here. It runs once for each OnCreated: one made for an owner that had already ended, which ends at once, runs neither.</summary>
+        /// <summary>Runs when the unit leaves the game, before its components end; HasEnded is still false here. It runs once for each OnCreated: one made in a scope that had already ended, which ends at once, runs neither.</summary>
         protected virtual void OnLeave()
         {
         }
@@ -1009,7 +1009,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the unit leaves the game. One that never came in, as one made for an owner that had ended, runs neither, as it ran no OnCreated.</summary>
+        /// <summary>Tells the interactions package, if there is one; runs OnLeave; the components then end, and the unit leaves the game. One that never came in, as one made in a scope that had ended, runs neither, as it ran no OnCreated.</summary>
         protected sealed override void OnEnd()
         {
             if (!entered)

@@ -7,9 +7,9 @@ namespace Moonwell
     /// A map's own object that flies: a bolt, a shell, a boulder. Every missile moves the same way, once a step: its speed
     /// changes by its Acceleration, gravity pulls it down, and it moves by its velocity. Its settings are declared in the
     /// constructor and are live after. A unit fires one with <c>unit.Fire(missile, target)</c>; <c>Missile.Create</c> places
-    /// one for code that sets its velocity itself. It belongs to the game unless it is given an owner, and ends when it
+    /// one for code that sets its velocity itself. It is in the scope Fire or Create names, and ends when it
     /// stops on the ground or on a thing it meets (its GroundContact, UnitContact and the rest), when its Duration or
-    /// MaxDistance runs out, when it leaves the world, by End, or with its owner.
+    /// MaxDistance runs out, when it leaves the world, by End, or with its scope.
     /// </summary>
     public abstract class Missile : Gizmo
     {

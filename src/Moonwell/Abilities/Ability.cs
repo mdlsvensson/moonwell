@@ -1,6 +1,6 @@
 namespace Moonwell
 {
-    /// <summary>An ability of a unit: one object per unit and ability id, which owns the casts of the ability and what its OnCast makes.</summary>
+    /// <summary>An ability of a unit: one object per unit and ability id, a scope that holds the casts of the ability.</summary>
     public class Ability : Scope
     {
         /// <summary>The table behind AbilityHooks, made on first use so that the class has no static initializer (see Unit.UnitHooks).</summary>
