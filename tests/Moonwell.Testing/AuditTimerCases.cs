@@ -207,7 +207,7 @@ namespace Moonwell.Testing
         /// </summary>
         public static void AfterZeroRunaway(FakeWorld world)
         {
-            var owner = new TestOwner("owner", new List<string>());
+            var owner = new TestScope("owner", new List<string>());
             var runs = 0;
             Action? link = null;
             link = () =>
@@ -227,7 +227,7 @@ namespace Moonwell.Testing
             var second = runs;
             owner.End();
             world.Advance(1.0f);
-            var reported = LoggedWith(world, "TestOwner.Timer failed: more than 10000 timer runs in one instant");
+            var reported = LoggedWith(world, "TestScope.Timer failed: more than 10000 timer runs in one instant");
             Expect.Equal("10000 10000 20000 20000 1", first + " " + waited + " " + second + " " + runs + " " + reported, "runs at 1.1 s, at 1.13 s, at 1.132 s and after its owner ended, and the lines reported");
         }
 

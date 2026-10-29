@@ -39,7 +39,7 @@ namespace Moonwell.Engine
         public List<Interaction>? Held;
 
         /// <summary>The pairs whose other is the thing that have not parted, in the order they met; null until it is the other of one.</summary>
-        public List<Owner>? Partners;
+        public List<Scope>? Partners;
 
         /// <summary>Makes the entry of a thing, in no cell, with no place read.</summary>
         public Entry(int id, Actor thing, int kind)

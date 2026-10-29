@@ -11,10 +11,10 @@ namespace Moonwell.Engine
     internal static class Pairing
     {
         /// <summary>The pairs a check walks. One list is shared, as Find's candidates are: a walk adds the pairs at the end and takes them off again when it is done, so a check never walks a list that a reaction changes. An interaction's check reads it here rather than through Walk.</summary>
-        internal static readonly List<Owner> walk = new List<Owner>();
+        internal static readonly List<Scope> walk = new List<Scope>();
 
         /// <summary>The shared list of pairs being walked.</summary>
-        public static List<Owner> Walk
+        public static List<Scope> Walk
         {
             get { return walk; }
         }
@@ -29,9 +29,9 @@ namespace Moonwell.Engine
 
         // In Lua a pair is its own table and the cast checks nothing, so the call is left out.
 
-        /// <summary>A pair kept as an Owner, as the pair it is.</summary>
+        /// <summary>A pair kept as an Scope, as the pair it is.</summary>
         /// @CSharpLua.Template = "{0}"
-        public static Interaction<H, O>.Pair As<H, O>(Owner pair)
+        public static Interaction<H, O>.Pair As<H, O>(Scope pair)
             where H : Actor
             where O : Actor
         {

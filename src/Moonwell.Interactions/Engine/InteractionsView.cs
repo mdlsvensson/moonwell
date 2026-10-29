@@ -42,7 +42,7 @@ namespace Moonwell.Engine
         private readonly List<Entry> found = new List<Entry>();
 
         /// <summary>The pairs being shown, nearest first.</summary>
-        private readonly List<Owner> pairs = new List<Owner>();
+        private readonly List<Scope> pairs = new List<Scope>();
 
         /// <summary>The interaction of each pair in pairs.</summary>
         private readonly List<Interaction> pairsOf = new List<Interaction>();
@@ -210,7 +210,7 @@ namespace Moonwell.Engine
                 for (var i = 0; i < partners.Count; i++)
                 {
                     var pair = partners[i];
-                    var of = pair.Owner as Interaction;
+                    var of = pair.Parent as Interaction;
                     if (of == null)
                     {
                         continue;
@@ -289,7 +289,7 @@ namespace Moonwell.Engine
             {
                 for (var i = 0; i < partners.Count; i++)
                 {
-                    var of = partners[i].Owner as Interaction;
+                    var of = partners[i].Parent as Interaction;
                     if (of != null)
                     {
                         AddPair(of, partners[i], MostPairLines);
@@ -504,7 +504,7 @@ namespace Moonwell.Engine
         /// to a number: a pair no nearer than the farthest of a full list is left out, and one nearer pushes the farthest out.
         /// No pair is kept past the number, so a frame is never a sort of every pair.
         /// </summary>
-        private void AddPair(Interaction interaction, Owner pair, int most)
+        private void AddPair(Interaction interaction, Scope pair, int most)
         {
             interaction.ReadPair(pair, facts);
             var distance = facts.Distance;

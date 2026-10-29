@@ -7,7 +7,7 @@ namespace Moonwell.Testing
     public static class OwnershipCases
     {
         /// <summary>An owned object that adopts a new child into its owner while it ends.</summary>
-        private sealed class AdoptingOwned : Owned
+        private sealed class AdoptingOwned : Scoped
         {
             private readonly string name;
             private readonly List<string> log;
@@ -23,17 +23,17 @@ namespace Moonwell.Testing
             protected override void OnEnd()
             {
                 log.Add("end " + name);
-                Owner!.Adopt(new TestOwned("late", log));
+                Parent!.Adopt(new TestScoped("late", log));
             }
         }
 
         /// <summary>An owner that adopts a child from its Finish, which runs after its children have ended.</summary>
-        private sealed class FinishAdopter : Owner
+        private sealed class FinishAdopter : Scope
         {
-            private readonly Owned child;
+            private readonly Scoped child;
 
             /// <summary>Makes an owner that adopts the child when it finishes.</summary>
-            public FinishAdopter(Owned child)
+            public FinishAdopter(Scoped child)
             {
                 this.child = child;
             }
@@ -59,10 +59,10 @@ namespace Moonwell.Testing
         public static void EndsNewestFirst(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
-            owner.Adopt(new TestOwned("a", log));
-            owner.Adopt(new TestOwned("b", log));
-            owner.Adopt(new TestOwned("c", log));
+            var owner = new TestScope("owner", log);
+            owner.Adopt(new TestScoped("a", log));
+            owner.Adopt(new TestScoped("b", log));
+            owner.Adopt(new TestScoped("c", log));
             owner.End();
             ExpectLog(log, new string[] { "end owner", "end c", "end b", "end a" }, "log after the owner ends");
         }
@@ -71,20 +71,20 @@ namespace Moonwell.Testing
         public static void EndsGrandchildren(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
-            var middle = new TestOwner("middle", log);
+            var owner = new TestScope("owner", log);
+            var middle = new TestScope("middle", log);
             owner.Adopt(middle);
-            middle.Adopt(new TestOwned("leaf", log));
+            middle.Adopt(new TestScoped("leaf", log));
             owner.End();
             ExpectLog(log, new string[] { "end owner", "end middle", "end leaf" }, "log after the owner ends");
-            Expect.Equal(0, owner.OwnedCount, "owned count of the owner after it ends");
+            Expect.Equal(0, owner.ChildCount, "owned count of the owner after it ends");
         }
 
         /// <summary>Ending an object twice ends it once.</summary>
         public static void EndOnce(FakeWorld world)
         {
             var log = new List<string>();
-            var a = new TestOwned("a", log);
+            var a = new TestScoped("a", log);
             a.End();
             a.End();
             ExpectLog(log, new string[] { "end a" }, "log after ending a twice");
@@ -142,28 +142,28 @@ namespace Moonwell.Testing
         public static void AdoptIntoEnded(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             owner.End();
-            var child = new TestOwned("child", log);
+            var child = new TestScoped("child", log);
             owner.Adopt(child);
             ExpectLog(log, new string[] { "end owner", "end child" }, "log after adopting into an ended owner");
             Expect.True(child.HasEnded, "the child has ended");
-            Expect.Same(owner, child.Owner, "the child's owner after it ends");
-            Expect.Equal(0, owner.OwnedCount, "owned count of the ended owner");
+            Expect.Same(owner, child.Parent, "the child's owner after it ends");
+            Expect.Equal(0, owner.ChildCount, "owned count of the ended owner");
         }
 
         /// <summary>A child that ends by itself leaves its owner, and the owner's later end does not end it again.</summary>
         public static void ChildEndsAlone(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
-            var a = new TestOwned("a", log);
-            var b = new TestOwned("b", log);
+            var owner = new TestScope("owner", log);
+            var a = new TestScoped("a", log);
+            var b = new TestScoped("b", log);
             owner.Adopt(a);
             owner.Adopt(b);
-            Expect.Equal(2, owner.OwnedCount, "owned count before a ends");
+            Expect.Equal(2, owner.ChildCount, "owned count before a ends");
             a.End();
-            Expect.Equal(1, owner.OwnedCount, "owned count after a ends");
+            Expect.Equal(1, owner.ChildCount, "owned count after a ends");
             owner.End();
             ExpectLog(log, new string[] { "end a", "end owner", "end b" }, "log after a ends alone and then the owner ends");
         }
@@ -172,8 +172,8 @@ namespace Moonwell.Testing
         public static void AdoptWhileEnding(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
-            owner.Adopt(new TestOwned("a", log));
+            var owner = new TestScope("owner", log);
+            owner.Adopt(new TestScoped("a", log));
             owner.Adopt(new AdoptingOwned("c", log));
             owner.End();
             ExpectLog(log, new string[] { "end owner", "end c", "end late", "end a" }, "log after a child adopts while ending");
@@ -183,39 +183,39 @@ namespace Moonwell.Testing
         public static void ErrorDoesNotStop(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
-            owner.Adopt(new TestOwned("a", log));
-            owner.Adopt(new ThrowingOwned());
-            owner.Adopt(new TestOwned("b", log));
+            var owner = new TestScope("owner", log);
+            owner.Adopt(new TestScoped("a", log));
+            owner.Adopt(new ThrowingScoped());
+            owner.Adopt(new TestScoped("b", log));
             owner.End();
             ExpectLog(log, new string[] { "end owner", "end b", "end a" }, "log after a child's end throws");
             Expect.Equal(1, world.Logged.Count, "logged lines after the throwing end");
-            Expect.Equal("Moonwell: ThrowingOwned.OnEnd failed: boom", world.Logged[0], "the logged line");
+            Expect.Equal("Moonwell: ThrowingScoped.OnEnd failed: boom", world.Logged[0], "the logged line");
         }
 
         /// <summary>Run makes its owner the current owner while it runs, and restores the root after, even when it throws.</summary>
         public static void RunSetsCurrent(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
-            Owner? seen = null;
-            owner.Run(() => { seen = Owner.Current; });
-            Expect.Same(owner, seen, "Owner.Current inside Run");
-            Expect.Same(Runtime.Root, Owner.Current, "Owner.Current after Run");
+            var owner = new TestScope("owner", log);
+            Scope? seen = null;
+            owner.Run(() => { seen = Scope.Current; });
+            Expect.Same(owner, seen, "Scope.Current inside Run");
+            Expect.Same(Runtime.Root, Scope.Current, "Scope.Current after Run");
             Expect.Throws<InvalidOperationException>(() => owner.Run(() => { throw new InvalidOperationException("boom"); }), "Run whose action throws");
-            Expect.Same(Runtime.Root, Owner.Current, "Owner.Current after Run threw");
+            Expect.Same(Runtime.Root, Scope.Current, "Scope.Current after Run threw");
         }
 
         /// <summary>A child adopted from an owner's Finish, after its children have ended, ends at once.</summary>
         public static void AdoptInFinish(FakeWorld world)
         {
             var log = new List<string>();
-            var child = new TestOwned("child", log);
+            var child = new TestScoped("child", log);
             var owner = new FinishAdopter(child);
             owner.End();
             ExpectLog(log, new string[] { "end child" }, "log after adopting from Finish");
             Expect.True(child.HasEnded, "the child has ended");
-            Expect.Equal(0, owner.OwnedCount, "owned count of the owner after it ends");
+            Expect.Equal(0, owner.ChildCount, "owned count of the owner after it ends");
         }
     }
 }

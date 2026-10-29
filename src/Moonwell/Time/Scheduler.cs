@@ -99,7 +99,7 @@ namespace Moonwell
                 if (runs == RunawayRuns)
                 {
                     runaway = true;
-                    Errors.Report(Names.NameOf(timer.Owner!) + ".Timer", new MoonwellException("more than 10000 timer runs in one instant; the rest wait 1/32 s"));
+                    Errors.Report(Names.NameOf(timer.Parent!) + ".Timer", new MoonwellException("more than 10000 timer runs in one instant; the rest wait 1/32 s"));
                     break;
                 }
 
@@ -172,9 +172,9 @@ namespace Moonwell
         /// <summary>Calls a timer's action with its owner as the current owner, and reports an error it throws.</summary>
         private static void Run(Timer timer)
         {
-            var reactor = timer.Owner!;
-            var previous = Owner.current;
-            Owner.current = reactor;
+            var reactor = timer.Parent!;
+            var previous = Scope.current;
+            Scope.current = reactor;
             try
             {
                 timer.action();
@@ -184,7 +184,7 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(reactor) + ".Timer", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
         }
 
         /// <summary>

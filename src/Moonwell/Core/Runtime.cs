@@ -11,7 +11,7 @@ namespace Moonwell
         internal static IWorld World = null!;
 
         /// <summary>The owner of everything no other owner holds; set by Reset.</summary>
-        internal static Owner Root = null!;
+        internal static Scope Root = null!;
 
         /// <summary>The scheduler that runs the timers; set by Reset.</summary>
         internal static Scheduler Scheduler = null!;
@@ -39,7 +39,7 @@ namespace Moonwell
             KnownItems.Reset();
             KnownDestructables.Reset();
             ObjectTypes.Reset();
-            Owner.current = null;
+            Scope.current = null;
 #if DEBUG
             DebugSession.Reset();
             DebugViews.Reset();
@@ -98,8 +98,8 @@ namespace Moonwell
         internal static void Begin(Action setup)
         {
             ListenForCarriers();
-            var previous = Owner.current;
-            Owner.current = Game.Instance;
+            var previous = Scope.current;
+            Scope.current = Game.Instance;
             try
             {
                 setup();
@@ -109,7 +109,7 @@ namespace Moonwell
                 Errors.Report("Moonwell.Setup", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
 
             foreach (var handle in World.UnitsInWorld())
             {

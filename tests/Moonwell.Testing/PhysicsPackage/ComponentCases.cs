@@ -392,7 +392,7 @@ namespace Moonwell.Testing
         {
             var fake = Fresh();
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var dart = new Dart();
             dart.VX = 300.0f;
             Missile.Create(dart, 0.0f, 0.0f, 100.0f, null, owner);

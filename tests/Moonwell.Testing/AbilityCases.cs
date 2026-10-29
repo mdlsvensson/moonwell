@@ -33,7 +33,7 @@ namespace Moonwell.Testing
             Expect.True(bolt is TestBolt, "the ability is a TestBolt");
             Expect.Same(caster, bolt.Unit, "the unit of the ability");
             Expect.Equal(ObjectTypes.FourCC("A000"), bolt.Id, "the id of the ability");
-            Expect.Same(caster, bolt.Owner, "the owner of the ability");
+            Expect.Same(caster, bolt.Parent, "the owner of the ability");
             Expect.Same(bolt, caster.AbilityOf(ObjectTypes.FourCC("A000")), "the ability asked for again");
             Expect.Equal("Ability", Names.NameOf(caster.AbilityOf(ObjectTypes.FourCC("AHhb"))), "an unregistered ability");
         }
@@ -46,7 +46,7 @@ namespace Moonwell.Testing
             Expect.Same(caster.AbilityOf(ObjectTypes.FourCC("A000")), caster.AbilityOf<TestBolt>(), "the ability of the class");
         }
 
-        /// <summary>A cast runs the ability's OnCast, then the caster's type and components, then the map's, then the caster's player's; Owner.Current in OnCast is the ability.</summary>
+        /// <summary>A cast runs the ability's OnCast, then the caster's type and components, then the map's, then the caster's player's; Scope.Current in OnCast is the ability.</summary>
         public static void Order(FakeWorld world)
         {
             Arena();
@@ -56,7 +56,7 @@ namespace Moonwell.Testing
             Inbound.SpellEffect(striker.Handle, ObjectTypes.FourCC("A000"), null, 0f, 0f);
             ExpectLog(new string[] { "bolt cast", "striker cast", "striker comp cast", "game cast", "p0 cast" }, "the log");
             Expect.True(bolt.Given != null, "the cast was given to OnCast");
-            Expect.Same(bolt, bolt.Seen, "Owner.Current inside OnCast");
+            Expect.Same(bolt, bolt.Seen, "Scope.Current inside OnCast");
         }
 
         /// <summary>The cast has the level read when it begins, the target's object, and the given place.</summary>

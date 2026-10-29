@@ -1018,8 +1018,8 @@ namespace Moonwell.Engine
         /// <summary>Asks the missile's CanHit about a thing, with the missile as the current owner; an error it throws is reported and refuses.</summary>
         private static bool Asks(Missile missile, Actor other)
         {
-            var previous = Owner.current;
-            Owner.current = missile;
+            var previous = Scope.current;
+            Scope.current = missile;
             bool answer;
             try
             {
@@ -1031,15 +1031,15 @@ namespace Moonwell.Engine
                 answer = false;
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
             return answer;
         }
 
         /// <summary>Runs OnStruck on a struck unit's class, then its components and buffs in the order they were added, with the missile's owner as the current owner; only where the class writes it, not on what has ended, and none once the missile has ended. Each is guarded.</summary>
         private static void Struck(Missile missile, Unit unit, Impact impact)
         {
-            var previous = Owner.current;
-            Owner.current = missile.Owner ?? Game.Instance;
+            var previous = Scope.current;
+            Scope.current = missile.Parent ?? Game.Instance;
             if (!unit.HasEnded && (MaskOf(unit) & StruckBit) != 0)
             {
                 Call(unit, impact);
@@ -1056,7 +1056,7 @@ namespace Moonwell.Engine
             }
 
             unit.EndDispatch();
-            Owner.current = previous;
+            Scope.current = previous;
         }
 
         /// <summary>Calls OnStruck on an object that writes it, reporting an error it throws.</summary>
@@ -1155,7 +1155,7 @@ namespace Moonwell.Engine
         /// with other missiles, or made and put in both missiles' lists; the pair is noted on it as the earlier's or the
         /// later's.
         /// </summary>
-        internal static Touch MetMissile(Missile holder, Missile other, Owner pair)
+        internal static Touch MetMissile(Missile holder, Missile other, Scope pair)
         {
             var early = holder.made < other.made ? holder : other;
             var late = holder.made < other.made ? other : holder;
@@ -2480,11 +2480,11 @@ namespace Moonwell.Engine
         /// <summary>For two missiles: the one made after.</summary>
         public Missile? late;
 
-        /// <summary>For two missiles: the earlier one's pair with the later, while it has one; an Interaction&lt;Missile, Missile&gt;.Pair kept as an Owner (see Pairing).</summary>
-        public Owner? earlyPair;
+        /// <summary>For two missiles: the earlier one's pair with the later, while it has one; an Interaction&lt;Missile, Missile&gt;.Pair kept as an Scope (see Pairing).</summary>
+        public Scope? earlyPair;
 
         /// <summary>For two missiles: the later one's pair with the earlier, while it has one.</summary>
-        public Owner? latePair;
+        public Scope? latePair;
     }
 
     /// <summary>A missile's checks against units: the package starts it on a missile whose UnitContact is not None.</summary>

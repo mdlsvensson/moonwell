@@ -154,7 +154,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "interactions.grid.settings-checked", Run = InteractionsGridCases.SettingsChecked });
             list.Add(new Case { Name = "interactions.gizmo.create", Run = GizmoCases.Create });
             list.Add(new Case { Name = "interactions.gizmo.reaction-owner", Run = GizmoCases.ReactionOwner });
-            list.Add(new Case { Name = "interactions.gizmo.default-owner", Run = GizmoCases.DefaultOwner });
+            list.Add(new Case { Name = "interactions.gizmo.default-owner", Run = GizmoCases.DefaultScope });
             list.Add(new Case { Name = "interactions.gizmo.tick", Run = GizmoCases.Tick });
             list.Add(new Case { Name = "interactions.gizmo.tick-rounding", Run = GizmoCases.TickRounding });
             list.Add(new Case { Name = "interactions.gizmo.no-tick", Run = GizmoCases.NoTick });
@@ -869,7 +869,7 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "items.sweep", Run = ItemCases.SweepDetectsRemoval });
             list.Add(new Case { Name = "items.owned-create", Run = ItemCases.OwnedByOwner });
             list.Add(new Case { Name = "items.create-of-class", Run = ItemCases.CreateOfClass });
-            list.Add(new Case { Name = "shadowed-fields.owner", Run = ShadowFieldCases.Owner });
+            list.Add(new Case { Name = "shadowed-fields.owner", Run = ShadowFieldCases.Scope });
             list.Add(new Case { Name = "shadowed-fields.hero", Run = ShadowFieldCases.Hero });
             list.Add(new Case { Name = "shadowed-fields.item", Run = ShadowFieldCases.Item });
             list.Add(new Case { Name = "damage.deal-from-code", Run = DamageCases.DealFromCode });

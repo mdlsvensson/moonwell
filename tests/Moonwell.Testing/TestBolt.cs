@@ -7,7 +7,7 @@ namespace Moonwell.Testing
         public Cast? Given;
 
         /// <summary>The owner that was current when the last OnCast ran.</summary>
-        public Owner? Seen;
+        public Scope? Seen;
 
         /// <summary>How many times the timer started by the last cast with no owner given has run.</summary>
         public int Ticks;
@@ -20,7 +20,7 @@ namespace Moonwell.Testing
         {
             TestLog.Lines.Add("bolt cast");
             Given = cast;
-            Seen = Owner.Current;
+            Seen = Scope.Current;
             Timer.Every(0.5f, () => { Ticks++; });
             Timer.Every(0.5f, () => { ChannelTicks++; }, cast);
         }

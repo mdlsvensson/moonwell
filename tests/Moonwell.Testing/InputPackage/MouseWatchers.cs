@@ -13,7 +13,7 @@ namespace Moonwell.Testing
         private readonly string label;
 
         /// <summary>The current owner seen in the last reaction.</summary>
-        public Owner? OwnerSeen;
+        public Scope? OwnerSeen;
 
         /// <summary>The name of a button, spelt out so that .NET and Lua write the same line.</summary>
         public static string Name(MouseButton button)
@@ -31,21 +31,21 @@ namespace Moonwell.Testing
         /// <summary>Logs the move.</summary>
         public void OnMouseMoved(Mouse mouse)
         {
-            OwnerSeen = Owner.Current;
+            OwnerSeen = Scope.Current;
             log.Add(label + " moved");
         }
 
         /// <summary>Logs the press.</summary>
         public void OnMousePressed(Mouse mouse, MouseButton button)
         {
-            OwnerSeen = Owner.Current;
+            OwnerSeen = Scope.Current;
             log.Add(label + " pressed " + LogMouseGame.Name(button));
         }
 
         /// <summary>Logs the release.</summary>
         public void OnMouseReleased(Mouse mouse, MouseButton button)
         {
-            OwnerSeen = Owner.Current;
+            OwnerSeen = Scope.Current;
             log.Add(label + " released " + LogMouseGame.Name(button));
         }
     }
@@ -60,7 +60,7 @@ namespace Moonwell.Testing
         private readonly string label;
 
         /// <summary>The current owner seen in the last reaction.</summary>
-        public Owner? OwnerSeen;
+        public Scope? OwnerSeen;
 
         /// <summary>Makes a component that logs under a label.</summary>
         public LogMousePlayer(List<string> log, string label)
@@ -72,21 +72,21 @@ namespace Moonwell.Testing
         /// <summary>Logs the move.</summary>
         public void OnMouseMoved(Mouse mouse)
         {
-            OwnerSeen = Owner.Current;
+            OwnerSeen = Scope.Current;
             log.Add(label + " moved");
         }
 
         /// <summary>Logs the press.</summary>
         public void OnMousePressed(Mouse mouse, MouseButton button)
         {
-            OwnerSeen = Owner.Current;
+            OwnerSeen = Scope.Current;
             log.Add(label + " pressed " + LogMouseGame.Name(button));
         }
 
         /// <summary>Logs the release.</summary>
         public void OnMouseReleased(Mouse mouse, MouseButton button)
         {
-            OwnerSeen = Owner.Current;
+            OwnerSeen = Scope.Current;
             log.Add(label + " released " + LogMouseGame.Name(button));
         }
     }

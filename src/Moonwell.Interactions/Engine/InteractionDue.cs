@@ -82,12 +82,12 @@ namespace Moonwell.Engine
                 return;
             }
 
-            var previous = Owner.current;
+            var previous = Scope.current;
             var failure = interaction.RunCheck();
             Arm();
             if (failure != null)
             {
-                Owner.current = previous;
+                Scope.current = previous;
                 Errors.Report(Names.NameOf(interaction) + ".Check", failure);
             }
         }

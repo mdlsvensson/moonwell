@@ -257,7 +257,7 @@ namespace Moonwell.Testing
             Steps(world, 16);
             ExpectLog(new string[] { "meet b", "tick b", "part b" }, "asked again, it threw again: no meeting");
             Expect.Equal(3, aura.Asked, "asked once at each check");
-            Expect.Same(Runtime.Root, Owner.Current, "the root is the current owner after the step");
+            Expect.Same(Runtime.Root, Scope.Current, "the root is the current owner after the step");
         }
 
         /// <summary>OnPart runs once per OnMeet when Accepts, asked again at a tick, ends a pair itself, ends its other, or ends the interaction: each pair parts once, and the check stops when the interaction ends.</summary>

@@ -84,9 +84,9 @@ namespace Moonwell.Testing
         public static void Bounce(FakeWorld world)
         {
             Fresh();
-            var maker = Owner.Current;
+            var maker = Scope.Current;
             var wall = Wall.Create(600.0f, 200.0f, 600.0f, 800.0f);
-            Expect.Same(maker, wall.Owner, "it belongs to its maker");
+            Expect.Same(maker, wall.Parent, "it belongs to its maker");
             Within(600.0f, wall.X1, 0.0f, "its ends: x1");
             Within(800.0f, wall.Y2, 0.0f, "y2");
             Within(0.0f, wall.Height, 0.0f, "endless");
@@ -118,9 +118,9 @@ namespace Moonwell.Testing
             Expect.True(ghost.Asked.Count == 1 && ghost.Asked[0] == wall, "asked once, though inside it for steps");
 
             var log = new List<string>();
-            var keeper = new TestOwner("keeper", log);
+            var keeper = new TestScope("keeper", log);
             var soft = Wall.Create(600.0f, 1200.0f, 600.0f, 1800.0f, 0.0f, 0.5f, keeper);
-            Expect.Same(keeper, soft.Owner, "a wall given an owner belongs to it");
+            Expect.Same(keeper, soft.Parent, "a wall given an owner belongs to it");
             Within(0.5f, soft.Bounciness, 0.0f, "its Bounciness");
             var dull = ShotAt(Contact.Bounce, 400.0f, 1500.0f, 100.0f, 600.0f, 0.0f);
             UntilImpacts(world, dull, 1, 64);

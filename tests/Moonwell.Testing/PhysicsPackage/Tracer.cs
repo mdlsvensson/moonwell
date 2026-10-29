@@ -9,10 +9,10 @@ namespace Moonwell.Testing
         private readonly List<string> log;
 
         /// <summary>The owner that was current when OnImpact last ran.</summary>
-        public Owner? ImpactedWith;
+        public Scope? ImpactedWith;
 
         /// <summary>The owner that was current when OnRest last ran.</summary>
-        public Owner? RestedWith;
+        public Scope? RestedWith;
 
         /// <summary>Makes a tracer that writes to a log.</summary>
         public Tracer(List<string> log)
@@ -23,14 +23,14 @@ namespace Moonwell.Testing
         /// <summary>Writes its name and keeps the current owner.</summary>
         public override void OnImpact(Impact impact)
         {
-            ImpactedWith = Owner.Current;
+            ImpactedWith = Scope.Current;
             log.Add("tracer.impact");
         }
 
         /// <summary>Writes its name and keeps the current owner.</summary>
         public override void OnRest()
         {
-            RestedWith = Owner.Current;
+            RestedWith = Scope.Current;
             log.Add("tracer.rest");
         }
     }

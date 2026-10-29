@@ -19,7 +19,7 @@ namespace Moonwell.Testing
         public float Slowest = 1000000000.0f;
 
         /// <summary>The owner that was current when OnImpact last ran.</summary>
-        public Owner? ImpactedWith;
+        public Scope? ImpactedWith;
 
         /// <summary>Whether it had ended when OnImpact last ran.</summary>
         public bool EndedInImpact;
@@ -28,7 +28,7 @@ namespace Moonwell.Testing
         public int Rested;
 
         /// <summary>The owner that was current when OnRest last ran.</summary>
-        public Owner? RestedWith;
+        public Scope? RestedWith;
 
         /// <summary>Where the reactions write their names, in the order they ran; null for nowhere.</summary>
         public List<string>? Log;
@@ -54,7 +54,7 @@ namespace Moonwell.Testing
             {
                 Slowest = impact.Speed;
             }
-            ImpactedWith = Owner.Current;
+            ImpactedWith = Scope.Current;
             EndedInImpact = HasEnded;
             if (Log != null)
             {
@@ -71,7 +71,7 @@ namespace Moonwell.Testing
         public override void OnRest()
         {
             Rested++;
-            RestedWith = Owner.Current;
+            RestedWith = Scope.Current;
             if (Log != null)
             {
                 Log.Add("ball.rest");

@@ -17,7 +17,7 @@ namespace Moonwell.Testing
         public int Asked;
 
         /// <summary>The current owner when Accepts last ran.</summary>
-        public Owner? AskedAs;
+        public Scope? AskedAs;
 
         /// <summary>The cycle's step at each OnTick, in turn.</summary>
         public List<int> TickSteps = new List<int>();
@@ -45,7 +45,7 @@ namespace Moonwell.Testing
         public override bool Accepts(Unit other)
         {
             Asked++;
-            AskedAs = Owner.Current;
+            AskedAs = Scope.Current;
             return Accepting == null || Accepting(other);
         }
 

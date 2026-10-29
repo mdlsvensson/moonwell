@@ -2,28 +2,28 @@ using System;
 
 namespace Moonwell
 {
-    /// <summary>An owned object that holds other owned objects, and ends them newest first when it ends.</summary>
-    public abstract class Owner : Owned
+    /// <summary>Something that holds what is made in it, and ends it, newest first, when it ends.</summary>
+    public abstract class Scope : Scoped
     {
         /// <summary>The owner that running code makes new objects for; null outside Run.</summary>
-        internal static Owner? current;
+        internal static Scope? current;
 
         // The instance fields are internal, not private, as a map's subclass may name a field of its own the same:
         // CSharp.lua gives a subclass's field a name of its own only when it sees the base's field of that name,
         // and it does not see a private one, so in Lua the two would be one field (PrivateFieldTests).
 
         /// <summary>The newest child, the first one to end.</summary>
-        internal Owned? newest;
+        internal Scoped? newest;
 
         /// <summary>Whether the children have ended; a child adopted from then on ends at once.</summary>
         internal bool childrenEnded;
 
-        /// <summary>How many children are linked to this owner.</summary>
+        /// <summary>How many children are linked to this scope.</summary>
         internal int count;
 
         /// <summary>The owner running code makes new objects for: the one set by Run, else the root.</summary>
         [LocalSafe]
-        public static Owner Current
+        public static Scope Current
         {
             get
             {
@@ -31,9 +31,9 @@ namespace Moonwell
             }
         }
 
-        /// <summary>How many children this owner holds that have not ended.</summary>
+        /// <summary>How many children this scope holds that have not ended.</summary>
         [LocalSafe]
-        public int OwnedCount
+        public int ChildCount
         {
             get
             {
@@ -56,16 +56,16 @@ namespace Moonwell
             }
         }
 
-        /// <summary>Takes a child under this owner; a child adopted by an ended owner ends at once. A child that already has an owner, or has ended, is left as it is, and the error is reported, in every build: linked twice, it would break the owners' lists (decision 74).</summary>
-        internal void Adopt(Owned child)
+        /// <summary>Takes a child under this scope; a child adopted by an ended scope ends at once. A child that already has a parent, or has ended, is left as it is, and the error is reported, in every build: linked twice, it would break the scopes' lists (decision 74).</summary>
+        internal void Adopt(Scoped child)
         {
-            if (child.Owner != null || child.HasEnded)
+            if (child.Parent != null || child.HasEnded)
             {
-                Errors.Refuse(Names.NameOf(this) + ".Adopt", Names.NameOf(child) + " already has an owner or has ended");
+                Errors.Refuse(Names.NameOf(this) + ".Adopt", Names.NameOf(child) + " already has a parent or has ended");
                 return;
             }
 
-            child.Owner = this;
+            child.Parent = this;
             if (HasEnded || childrenEnded)
             {
                 child.End();
@@ -83,8 +83,8 @@ namespace Moonwell
             count++;
         }
 
-        /// <summary>Takes a child out of the list of children, so it does not end with this owner.</summary>
-        internal void Unlink(Owned child)
+        /// <summary>Takes a child out of the list of children, so it does not end with this scope.</summary>
+        internal void Unlink(Scoped child)
         {
             if (!child.linked)
             {

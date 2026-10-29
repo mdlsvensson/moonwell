@@ -674,9 +674,9 @@ namespace Moonwell.Testing
         public static void OwnedByOwner(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0f, 0f, 0f, owner);
-            Expect.Same(owner, made.Owner, "the owner of the unit");
+            Expect.Same(owner, made.Parent, "the owner of the unit");
             owner.End();
             Expect.Equal(1, world.RemovedUnits.Count, "the units the game was asked to remove");
             Expect.Same(made.Handle, world.RemovedUnits[0], "the handle removed");
@@ -686,11 +686,11 @@ namespace Moonwell.Testing
         public static void NotOwnedByCurrent(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             Unit? made = null;
             owner.Run(() => { made = Unit.Create(ObjectTypes.FourCC("hfoo"), Player.Get(0), 0f, 0f, 0f); });
             var kept = made!;
-            Expect.True(kept.Owner == null, "the unit has no owner");
+            Expect.True(kept.Parent == null, "the unit has no owner");
             owner.End();
             Expect.True(!kept.HasEnded, "the unit outlives the owner");
         }

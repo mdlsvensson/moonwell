@@ -201,29 +201,29 @@ namespace Moonwell.Testing
             var b = UnitAt(world, 100.0f, 0.0f);
             var aura = new FireAura();
             Timer? made = null;
-            Owner? meeting = null;
-            Owner? ticking = null;
-            Owner? parting = null;
+            Scope? meeting = null;
+            Scope? ticking = null;
+            Scope? parting = null;
             aura.Meeting = pair =>
             {
-                meeting = Owner.Current;
+                meeting = Scope.Current;
                 made = Timer.After(100.0f, () => { });
             };
-            aura.Ticking = pair => ticking = Owner.Current;
-            aura.Parting = pair => parting = Owner.Current;
+            aura.Ticking = pair => ticking = Scope.Current;
+            aura.Parting = pair => parting = Scope.Current;
             a.Interact(aura);
             Steps(world, 16);
             var met = aura.Pairs[0];
-            Expect.Same(aura, met.Owner, "the pair is its interaction's");
+            Expect.Same(aura, met.Parent, "the pair is its interaction's");
             Expect.Same(met, meeting, "OnMeet runs with the pair as the current owner");
             Expect.Same(met, ticking, "and OnTick");
-            Expect.Same(met, made!.Owner, "the timer is the pair's");
+            Expect.Same(met, made!.Parent, "the timer is the pair's");
             Expect.True(!made!.HasEnded, "and runs");
             world.MoveUnit(b.Handle, 600.0f, 0.0f);
             Steps(world, 16);
             Expect.Same(met, parting, "OnPart runs with the pair as the current owner");
             Expect.True(made!.HasEnded, "the timer ended with the pair");
-            Expect.True(Owner.Current == Runtime.Root, "and the root is current after");
+            Expect.True(Scope.Current == Runtime.Root, "and the root is current after");
         }
     }
 }

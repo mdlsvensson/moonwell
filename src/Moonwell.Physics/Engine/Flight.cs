@@ -698,8 +698,8 @@ namespace Moonwell.Engine
         /// <summary>Runs OnImpact on a missile, then on its components in the order they were added, each with the missile's owner as the current owner and each reporting an error it throws; none runs once the missile has ended.</summary>
         internal static void Impacted(Missile missile, Impact impact)
         {
-            var previous = Owner.current;
-            Owner.current = missile.Owner ?? Game.Instance;
+            var previous = Scope.current;
+            Scope.current = missile.Parent ?? Game.Instance;
             try
             {
                 missile.OnImpact(impact);
@@ -729,7 +729,7 @@ namespace Moonwell.Engine
             }
 
             missile.EndDispatch();
-            Owner.current = previous;
+            Scope.current = previous;
         }
 
         /// <summary>Lays a missile still on the ground, with no velocity, and runs OnRest on it, then on its components in the order they were added, each with the missile as the current owner and each reporting an error it throws; none runs once the missile has ended.</summary>
@@ -745,8 +745,8 @@ namespace Moonwell.Engine
             missile.restZ = missile.z;
             missile.groundGone = false;
             Contacts.Pause(missile);
-            var previous = Owner.current;
-            Owner.current = missile;
+            var previous = Scope.current;
+            Scope.current = missile;
             try
             {
                 missile.OnRest();
@@ -776,7 +776,7 @@ namespace Moonwell.Engine
             }
 
             missile.EndDispatch();
-            Owner.current = previous;
+            Scope.current = previous;
         }
 
         /// <summary>Plays a missile's ImpactModel once (an effect made and destroyed at once, which plays its death) and its ImpactSound at a point; nothing for an empty one.</summary>
@@ -817,8 +817,8 @@ namespace Moonwell.Engine
         /// <summary>Runs OnExpire with the missile as the current owner, reporting an error it throws, and ends the missile.</summary>
         private static void Expire(Missile missile)
         {
-            var previous = Owner.current;
-            Owner.current = missile;
+            var previous = Scope.current;
+            Scope.current = missile;
             try
             {
                 missile.OnExpire();
@@ -828,7 +828,7 @@ namespace Moonwell.Engine
                 Errors.Report(Names.NameOf(missile) + ".OnExpire", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
             missile.End();
         }
 
@@ -839,7 +839,7 @@ namespace Moonwell.Engine
         /// <paramref name="level"/>, it is at the launch's own height above the ground, or with an Arc its radius above the
         /// ground, so its bottom lands on the ground there. The source and its player are the missile's.
         /// </summary>
-        public static void Launch(Unit source, Missile missile, float x, float y, float above, bool level, Owner? owner)
+        public static void Launch(Unit source, Missile missile, float x, float y, float above, bool level, Scope? scope)
         {
             Physics.EnsureInstalled();
             var facing = source.Facing;
@@ -859,7 +859,7 @@ namespace Moonwell.Engine
             var dz = missile.followsGround ? above - startAbove : Ground.Height(x, y) + above - startZ;
             Aim(missile, x - startX, y - startY, dz, facing);
             missile.source = source;
-            Missile.Create(missile, startX, startY, startZ, source.Player, owner);
+            Missile.Create(missile, startX, startY, startZ, source.Player, scope);
         }
 
         /// <summary>

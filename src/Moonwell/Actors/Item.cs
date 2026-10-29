@@ -65,7 +65,7 @@ namespace Moonwell
         {
         }
 
-        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Owner).
+        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Scope).
 
         /// <summary>The charges last read or set.</summary>
         internal int lastCharges;
@@ -272,8 +272,8 @@ namespace Moonwell
             return KnownItems.TakeIn(handle, null);
         }
 
-        /// <summary>Creates an item of a type at a place; owner, when given, owns it. Throws a MoonwellException naming the id when the game makes no item of the type.</summary>
-        public static Item Create(int typeId, float x, float y, Owner? owner = null)
+        /// <summary>Creates an item of a type at a place; a scope, when given, holds it. Throws a MoonwellException naming the id when the game makes no item of the type.</summary>
+        public static Item Create(int typeId, float x, float y, Scope? scope = null)
         {
             var handle = Runtime.World.SpawnItem(typeId, x, y);
             if (handle == null)
@@ -281,20 +281,20 @@ namespace Moonwell
                 throw new MoonwellException("Item.Create: the game made no item of type " + Names.IdText(typeId));
             }
 
-            var made = KnownItems.TakeIn(handle, owner)!;
-            if (owner != null && made.Owner == null)
+            var made = KnownItems.TakeIn(handle, scope)!;
+            if (scope != null && made.Parent == null)
             {
-                owner.Adopt(made);
+                scope.Adopt(made);
             }
 
             return made;
         }
 
-        /// <summary>Creates an item of a registered class at a place; owner, when given, owns it.</summary>
-        public static T Create<T>(float x, float y, Owner? owner = null)
+        /// <summary>Creates an item of a registered class at a place; scope, when given, owns it.</summary>
+        public static T Create<T>(float x, float y, Scope? scope = null)
             where T : Item
         {
-            return (T)Create(ObjectTypes.IdOf<T>(), x, y, owner);
+            return (T)Create(ObjectTypes.IdOf<T>(), x, y, scope);
         }
 
         /// <summary>Adds a component to the item, and returns it.</summary>
@@ -347,8 +347,8 @@ namespace Moonwell
             }
 
             Hooks.CallEnding(this);
-            var previous = Owner.current;
-            Owner.current = this;
+            var previous = Scope.current;
+            Scope.current = this;
             try
             {
                 OnLeave();
@@ -358,7 +358,7 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".OnLeave", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
         }
 
         /// <summary>Removes the item from the game unless the game has already, and forgets it.</summary>

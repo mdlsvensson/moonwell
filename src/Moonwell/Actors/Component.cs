@@ -3,7 +3,7 @@ using System;
 namespace Moonwell
 {
     /// <summary>A part of an actor: it is owned by the actor, and ends when it is removed or when the actor ends.</summary>
-    public abstract class Component : Owner
+    public abstract class Component : Scope
     {
         /// <summary>The actor the component is on; null until it is added.</summary>
         internal Actor? actor;
@@ -52,8 +52,8 @@ namespace Moonwell
                 return;
             }
 
-            var previous = Owner.current;
-            Owner.current = this;
+            var previous = Scope.current;
+            Scope.current = this;
             try
             {
                 OnRemoved();
@@ -63,7 +63,7 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".OnRemoved", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
             actor!.Detach(this);
         }
     }

@@ -16,7 +16,7 @@ namespace Moonwell.Testing
         public List<Unit?> Sources = new List<Unit?>();
 
         /// <summary>The owner current when OnStruck last ran.</summary>
-        public Owner? StruckWith;
+        public Scope? StruckWith;
 
         /// <summary>Run at the end of OnStruck; null for nothing.</summary>
         public Action<Impact>? Striking;
@@ -34,7 +34,7 @@ namespace Moonwell.Testing
         public void OnStruck(Impact impact)
         {
             TestLog.Lines.Add(Label + " struck");
-            StruckWith = Owner.Current;
+            StruckWith = Scope.Current;
             if (Striking != null)
             {
                 Striking(impact);

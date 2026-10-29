@@ -24,7 +24,7 @@ namespace Moonwell
         }
 
         /// <summary>Takes a game destructable in: makes its object, adds its starting components, and runs OnCreated.</summary>
-        internal static Destructable? TakeIn(destructable handle, Owner? owner)
+        internal static Destructable? TakeIn(destructable handle, Scope? scope)
         {
             var existing = Find(handle);
             if (existing != null)
@@ -55,7 +55,7 @@ namespace Moonwell
             made.Y = Runtime.World.DestructableY(handle);
             known[handle] = made;
             Live.Add(made);
-            owner?.Adopt(made);
+            scope?.Adopt(made);
             made.Mask = Hooks.MaskOf(made, Destructable.DestructableHooks);
             Events.Need(made.Mask);
             made.WatchIfWanted(made.Mask);
@@ -69,8 +69,8 @@ namespace Moonwell
             if (!made.HasEnded)
             {
                 made.entered = true;
-                var previous = Owner.current;
-                Owner.current = made;
+                var previous = Scope.current;
+                Scope.current = made;
                 try
                 {
                     made.CallEnter();
@@ -80,7 +80,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(made) + ".OnCreated", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             if (!made.HasEnded)

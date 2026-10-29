@@ -362,19 +362,19 @@ namespace Moonwell.Testing
             var volley = source.Apply(new Volley());
             Expect.Same(volley, volley.Seen, "the buff was the current owner when it fired");
             var dart = volley.Fired!;
-            Expect.Same(Game.Instance, dart.Owner, "fired with no owner, it belongs to the game");
+            Expect.Same(Game.Instance, dart.Parent, "fired with no owner, it belongs to the game");
             volley.End();
             Expect.True(!dart.HasEnded, "the buff ending does not end it");
             Steps(world, 2);
             Expect.True(dart.X > 0.0f, "it flies on");
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var other = UnitAt(world, 0.0f, 200.0f, 0.0f);
             var given = new Volley();
             given.Given = owner;
             other.Apply(given);
             var owned = given.Fired!;
-            Expect.Same(owner, owned.Owner, "fired with an owner, it belongs to it");
+            Expect.Same(owner, owned.Parent, "fired with an owner, it belongs to it");
             var placed = new Dart();
             var placedOwned = new Dart();
             owner.Run(() =>
@@ -382,9 +382,9 @@ namespace Moonwell.Testing
                 Missile.Create(placed, 0.0f, 0.0f, 100.0f);
                 Missile.Create(placedOwned, 0.0f, 0.0f, 100.0f, Player.Two, owner);
             });
-            Expect.Same(Game.Instance, placed.Owner, "Create with no owner, inside an owner's Run, belongs to the game");
+            Expect.Same(Game.Instance, placed.Parent, "Create with no owner, inside an owner's Run, belongs to the game");
             Expect.Same(Player.NeutralPassive, placed.Player, "Neutral Passive unless given a player");
-            Expect.Same(owner, placedOwned.Owner, "Create with an owner belongs to it");
+            Expect.Same(owner, placedOwned.Parent, "Create with an owner belongs to it");
             Expect.Same(Player.Two, placedOwned.Player, "the player given");
             owner.End();
             Expect.True(owned.HasEnded, "it ends with its owner");
@@ -558,12 +558,12 @@ namespace Moonwell.Testing
         {
             var fake = Fresh();
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var dart = new Dart();
             dart.Model = "dart.mdl";
             dart.Speed = 320.0f;
             owner.Run(() => Gizmo.Create(dart, 0.0f, 0.0f));
-            Expect.Same(Game.Instance, dart.Owner, "it belongs to the game, not the current owner");
+            Expect.Same(Game.Instance, dart.Parent, "it belongs to the game, not the current owner");
             Within(60.0f, dart.Z, 0.001f, "its LaunchHeight above the ground");
             Expect.True(dart.Effect != null, "it has its effect");
             Within(60.0f, fake.Places[dart.Effect!][2], 0.001f, "drawn at its height");
@@ -574,7 +574,7 @@ namespace Moonwell.Testing
             low.Speed = 320.0f;
             low.LaunchHeight = 20.0f;
             Missile.Create(low, 5.0f, 5.0f);
-            Expect.Same(Game.Instance, low.Owner, "with no height: the game's");
+            Expect.Same(Game.Instance, low.Parent, "with no height: the game's");
             Within(20.0f, low.Z, 0.001f, "with no height: its LaunchHeight above the ground");
             Steps(world, 1);
             Within(15.0f, low.X, 0.001f, "with no height: it moves");

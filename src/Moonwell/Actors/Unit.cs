@@ -33,7 +33,7 @@ namespace Moonwell
         /// <summary>The components the class starts with, added in order when the unit enters. Assigning a new list drops what a parent class listed.</summary>
         protected List<UnitComponent> Components { get; set; } = new List<UnitComponent>();
 
-        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Owner).
+        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Scope).
 
         /// <summary>The ability objects of the unit, one per ability id, in the order they were first asked for.</summary>
         internal readonly OrderedMap<int, Ability> abilities = new OrderedMap<int, Ability>();
@@ -838,8 +838,8 @@ namespace Moonwell
         /// <summary>The facing of a unit made without one, in degrees: the game's bj_UNIT_FACING.</summary>
         public const float DefaultFacing = 270.0f;
 
-        /// <summary>Creates a unit of a type for a player at a place and facing (270 degrees without one); owner, when given, owns it. Throws a MoonwellException naming the id when the game makes no unit of the type.</summary>
-        public static Unit Create(int typeId, Player player, float x, float y, float facing = DefaultFacing, Owner? owner = null)
+        /// <summary>Creates a unit of a type for a player at a place and facing (270 degrees without one); a scope, when given, holds it. Throws a MoonwellException naming the id when the game makes no unit of the type.</summary>
+        public static Unit Create(int typeId, Player player, float x, float y, float facing = DefaultFacing, Scope? scope = null)
         {
             var handle = Runtime.World.SpawnUnit(player.Handle, typeId, x, y, facing);
             if (handle == null)
@@ -847,20 +847,20 @@ namespace Moonwell
                 throw new MoonwellException("Unit.Create: the game made no unit of type " + Names.IdText(typeId));
             }
 
-            var made = KnownUnits.TakeIn(handle, owner, true)!;
-            if (owner != null && made.Owner == null)
+            var made = KnownUnits.TakeIn(handle, scope, true)!;
+            if (scope != null && made.Parent == null)
             {
-                owner.Adopt(made);
+                scope.Adopt(made);
             }
 
             return made;
         }
 
-        /// <summary>Creates a unit of a registered class for a player at a place and facing (270 degrees without one); owner, when given, owns it.</summary>
-        public static T Create<T>(Player player, float x, float y, float facing = DefaultFacing, Owner? owner = null)
+        /// <summary>Creates a unit of a registered class for a player at a place and facing (270 degrees without one); scope, when given, owns it.</summary>
+        public static T Create<T>(Player player, float x, float y, float facing = DefaultFacing, Scope? scope = null)
             where T : Unit
         {
-            return (T)Create(ObjectTypes.IdOf<T>(), player, x, y, facing, owner);
+            return (T)Create(ObjectTypes.IdOf<T>(), player, x, y, facing, scope);
         }
 
         /// <summary>The ability of the unit with an id: one object per id, made by the registered maker or as a plain Ability, and owned by the unit.</summary>
@@ -992,7 +992,7 @@ namespace Moonwell
         {
         }
 
-        /// <summary>Runs when the unit dies, before the unit's components see it; the killer is null when no unit killed it. Death is not an end, and the corpse can go at any time (it decays, explodes or is raised), so what this makes belongs to the game: a respawn timer started here runs whatever happens to the corpse. An effect that should end with the corpse names the unit as its owner: Timer.Every(1f, Smoke, this).</summary>
+        /// <summary>Runs when the unit dies, before the unit's components see it; the killer is null when no unit killed it. Death is not an end, and the corpse can go at any time (it decays, explodes or is raised), so what this makes belongs to the game: a respawn timer started here runs whatever happens to the corpse. An effect that should end with the corpse names the unit as its scope: Timer.Every(1f, Smoke, this).</summary>
         /// <param name="killerUnit">The unit whose damage killed it; null when no unit did: Kill() or Life set to 0 from code, timed life running out, or its own damage (seen 10-21).</param>
         public virtual void OnDeath(Unit? killerUnit)
         {
@@ -1018,8 +1018,8 @@ namespace Moonwell
             }
 
             Hooks.CallEnding(this);
-            var previous = Owner.current;
-            Owner.current = this;
+            var previous = Scope.current;
+            Scope.current = this;
             try
             {
                 OnLeave();
@@ -1029,7 +1029,7 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".OnLeave", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
         }
 
         /// <summary>Removes the unit from the game unless the game has already, and forgets it.</summary>

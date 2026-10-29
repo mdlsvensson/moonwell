@@ -3,7 +3,7 @@ using System;
 namespace Moonwell
 {
     /// <summary>An action that runs once after a delay, or again at every interval, until it ends.</summary>
-    public sealed class Timer : Owned
+    public sealed class Timer : Scoped
     {
         /// <summary>The action each run calls.</summary>
         internal readonly Action action;
@@ -49,10 +49,10 @@ namespace Moonwell
         }
 
         /// <summary>Runs an action once after the seconds, for the owner or else the current owner.</summary>
-        public static Timer After(float seconds, Action action, Owner? owner = null)
+        public static Timer After(float seconds, Action action, Scope? scope = null)
         {
             Dev.Check(seconds >= 0.0f, "Timer.After: seconds must be 0 or more");
-            return Start(new Timer(Runtime.World.Now(), seconds, false, action), owner);
+            return Start(new Timer(Runtime.World.Now(), seconds, false, action), scope);
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Moonwell
         /// reported and refused in every build, since such a timer would freeze the game: the timer given back has ended and
         /// never runs (decision 74).
         /// </summary>
-        public static Timer Every(float seconds, Action action, Owner? owner = null)
+        public static Timer Every(float seconds, Action action, Scope? scope = null)
         {
             // Not more than 0, so NaN is refused too.
             if (!(seconds > 0.0f))
@@ -68,7 +68,7 @@ namespace Moonwell
                 return Refuse(seconds, action);
             }
 
-            return Start(new Timer(Runtime.World.Now(), seconds, true, action), owner);
+            return Start(new Timer(Runtime.World.Now(), seconds, true, action), scope);
         }
 
         /// <summary>
@@ -93,9 +93,9 @@ namespace Moonwell
         }
 
         /// <summary>Adopts a new timer under its owner, and schedules it unless its owner has already ended.</summary>
-        private static Timer Start(Timer timer, Owner? owner)
+        private static Timer Start(Timer timer, Scope? scope)
         {
-            (owner ?? Owner.Current).Adopt(timer);
+            (scope ?? Scope.Current).Adopt(timer);
             if (!timer.HasEnded)
             {
                 Runtime.Scheduler.Add(timer);

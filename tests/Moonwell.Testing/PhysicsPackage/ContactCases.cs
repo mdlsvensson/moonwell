@@ -837,7 +837,7 @@ namespace Moonwell.Testing
         {
             Fresh();
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var target = StruckAt(world, 500.0f, 500.0f, 1, "target");
             var fired = 0;
             var bolt = new Shot();

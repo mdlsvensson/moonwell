@@ -81,9 +81,9 @@ namespace Moonwell.Testing
         public static void OwnedByOwner(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var made = Item.Create(ObjectTypes.FourCC("ofoo"), 0f, 0f, owner);
-            Expect.Same(owner, made.Owner, "the owner of the item");
+            Expect.Same(owner, made.Parent, "the owner of the item");
             owner.End();
             Expect.Equal(1, world.RemovedItems.Count, "the items the game was asked to remove");
             Expect.Same(made.Handle, world.RemovedItems[0], "the handle removed");

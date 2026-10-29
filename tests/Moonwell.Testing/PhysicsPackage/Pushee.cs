@@ -24,7 +24,7 @@ namespace Moonwell.Testing
         public System.Action<Slam>? Slamming;
 
         /// <summary>The owner current at the last reaction.</summary>
-        public Owner? RanWith;
+        public Scope? RanWith;
 
         /// <summary>Makes a unit with its component.</summary>
         public Pushee()
@@ -37,7 +37,7 @@ namespace Moonwell.Testing
         {
             TestLog.Lines.Add("unit pushed");
             Pushers.Add(pusher);
-            RanWith = Owner.Current;
+            RanWith = Scope.Current;
         }
 
         /// <summary>Logs the slam and what it read.</summary>
@@ -47,7 +47,7 @@ namespace Moonwell.Testing
             Slams.Add(slam);
             SlamSpeeds.Add(slam.Speed);
             SlamPushers.Add(slam.Pusher);
-            RanWith = Owner.Current;
+            RanWith = Scope.Current;
             if (Slamming != null)
             {
                 Slamming(slam);
@@ -59,7 +59,7 @@ namespace Moonwell.Testing
         {
             TestLog.Lines.Add("unit grounded");
             Landings.Add(speed);
-            RanWith = Owner.Current;
+            RanWith = Scope.Current;
         }
     }
 }

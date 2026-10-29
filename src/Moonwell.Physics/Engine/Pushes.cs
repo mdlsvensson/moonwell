@@ -735,8 +735,8 @@ namespace Moonwell.Engine
         {
             var unit = push.unit;
             reacted = true;
-            var previous = Owner.current;
-            Owner.current = unit;
+            var previous = Scope.current;
+            Scope.current = unit;
             if (!unit.HasEnded && (MaskOf(unit) & bit) != 0)
             {
                 Call(unit, bit, pusher, slam, speed);
@@ -758,7 +758,7 @@ namespace Moonwell.Engine
             }
 
             unit.EndDispatch();
-            Owner.current = previous;
+            Scope.current = previous;
         }
 
         /// <summary>Calls a reaction on an object that writes it, reporting an error it throws.</summary>

@@ -28,7 +28,7 @@ namespace Moonwell.Testing
         {
             Fresh();
             var well = Gizmo.Create(new Well(), 10.0f, 20.0f);
-            Expect.Same(Runtime.Root, well.Owner, "owned by the current owner, the root");
+            Expect.Same(Runtime.Root, well.Parent, "owned by the current owner, the root");
             Expect.Same(Player.NeutralPassive, well.Player, "Neutral Passive by default");
             Expect.Equal(1, well.Created, "OnCreated ran once");
             Expect.Near(10.0f, well.X, "X");
@@ -38,30 +38,30 @@ namespace Moonwell.Testing
             Expect.Near(10.0f, position.X, "Position.X");
             Expect.Near(20.0f, position.Y, "Position.Y");
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var owned = Gizmo.Create(new Well(), 0.0f, 0.0f, Player.Two, owner);
-            Expect.Same(owner, owned.Owner, "owned by the owner given");
+            Expect.Same(owner, owned.Parent, "owned by the owner given");
             Expect.Same(Player.Two, owned.Player, "plays for the player given");
             owned.Player = Player.Three;
             Expect.Same(Player.Three, owned.Player, "the player can be changed");
             var inside = new Well();
             owner.Run(() => Gizmo.Create(inside, 0.0f, 0.0f));
-            Expect.Same(owner, inside.Owner, "owned by the owner that runs the code");
+            Expect.Same(owner, inside.Parent, "owned by the owner that runs the code");
             Expect.Equal(1, owned.Created, "OnCreated ran once for each");
             Expect.Equal(1, inside.Created, "and for the one made inside Run");
         }
 
-        /// <summary>A plain gizmo given no owner is adopted by the current owner: the one running code, else the root.</summary>
-        public static void DefaultOwner(FakeWorld world)
+        /// <summary>A plain gizmo given no owner is adopted by the current scope: the one running code, else the root.</summary>
+        public static void DefaultScope(FakeWorld world)
         {
             Fresh();
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var inside = new Well();
             owner.Run(() => Gizmo.Create(inside, 0.0f, 0.0f));
-            Expect.Same(owner, inside.Owner, "inside Run: the owner running the code");
+            Expect.Same(owner, inside.Parent, "inside Run: the owner running the code");
             var outside = Gizmo.Create(new Well(), 0.0f, 0.0f);
-            Expect.Same(Runtime.Root, outside.Owner, "outside Run: the root");
+            Expect.Same(Runtime.Root, outside.Parent, "outside Run: the root");
             owner.End();
             Expect.True(inside.HasEnded, "it ends with that owner");
             Expect.True(!outside.HasEnded, "the root's is left");
@@ -71,16 +71,16 @@ namespace Moonwell.Testing
         public static void ReactionOwner(FakeWorld world)
         {
             Fresh();
-            Owner? created = null;
-            Owner? left = null;
+            Scope? created = null;
+            Scope? left = null;
             var well = new Well();
-            well.Creating = () => { created = Owner.Current; };
-            well.Leaving = () => { left = Owner.Current; };
+            well.Creating = () => { created = Scope.Current; };
+            well.Leaving = () => { left = Scope.Current; };
             Gizmo.Create(well, 0.0f, 0.0f);
-            Expect.Same(well, created, "Owner.Current inside OnCreated");
+            Expect.Same(well, created, "Scope.Current inside OnCreated");
             well.Remove();
-            Expect.Same(well, left, "Owner.Current inside OnLeave");
-            Expect.True(Owner.Current == Runtime.Root, "and the root after");
+            Expect.Same(well, left, "Scope.Current inside OnLeave");
+            Expect.True(Scope.Current == Runtime.Root, "and the root after");
         }
 
         /// <summary>A tick of 0.1 second with a step of 1/32 second runs OnTick at steps 4, 8 and 12 as the game moves on.</summary>
@@ -168,7 +168,7 @@ namespace Moonwell.Testing
         {
             Fresh();
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var well = Gizmo.Create(new Well(0.1f), 10.0f, 10.0f, null, owner);
             var entry = well.entry!;
             Expect.Equal(36, entry.Cell, "in the grid");
@@ -362,13 +362,13 @@ namespace Moonwell.Testing
         public static void TickOwner(FakeWorld world)
         {
             Fresh();
-            Owner? seen = null;
+            Scope? seen = null;
             var well = new Well(0.01f);
-            well.Ticking = () => { seen = Owner.Current; };
+            well.Ticking = () => { seen = Scope.Current; };
             Gizmo.Create(well, 0.0f, 0.0f);
             Steps(world, 1);
-            Expect.Same(well, seen, "Owner.Current inside OnTick");
-            Expect.True(Owner.Current == Runtime.Root, "and the root after");
+            Expect.Same(well, seen, "Scope.Current inside OnTick");
+            Expect.True(Scope.Current == Runtime.Root, "and the root after");
         }
 
         /// <summary>A throwing OnCreated or OnLeave is reported, and the gizmo still comes in and leaves.</summary>
@@ -399,7 +399,7 @@ namespace Moonwell.Testing
             Expect.True(first != null, "Get finds a part");
             Expect.Same(fitted, first!.Gizmo, "the part's Gizmo is the gizmo it is on");
             Expect.Same(fitted, first.Actor, "and its Actor");
-            Expect.Same(fitted, first.Owner, "the gizmo owns it");
+            Expect.Same(fitted, first.Parent, "the gizmo owns it");
             Expect.Equal(0, first.Bits, "a gizmo component has no game event");
             Expect.Equal(3, fitted.GetAll<Part>().Count, "GetAll lists all three");
             log.Clear();
@@ -412,7 +412,7 @@ namespace Moonwell.Testing
             Expect.Equal("c removed,b removed", string.Join(",", log), "the gizmo ending ends the rest, newest first");
             Expect.Equal(0, fitted.ComponentCount, "none are left");
             var other = new List<string>();
-            var ended = new TestOwner("owner", other);
+            var ended = new TestScope("owner", other);
             ended.End();
             var late = Gizmo.Create(new Fitted(log), 0.0f, 0.0f, null, ended);
             Expect.True(late.HasEnded, "a gizmo made for an owner that has ended ends at once");

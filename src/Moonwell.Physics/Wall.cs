@@ -100,7 +100,7 @@ namespace Moonwell
         /// given, else to the current owner, and ends with it. The ends must differ, and the height and the bounciness must be
         /// 0 or more.
         /// </summary>
-        public static Wall Create(float x1, float y1, float x2, float y2, float height = 0f, float bounciness = 1f, Owner? owner = null)
+        public static Wall Create(float x1, float y1, float x2, float y2, float height = 0f, float bounciness = 1f, Scope? scope = null)
         {
             Dev.Check(x1 != x2 || y1 != y2, "Wall.Create: the two ends must differ");
             CheckHeight(height);
@@ -113,7 +113,7 @@ namespace Moonwell
             wall.y2 = y2;
             wall.height = height;
             wall.bounciness = bounciness;
-            Gizmo.Create(wall, (x1 + x2) * 0.5f, (y1 + y2) * 0.5f, null, owner);
+            Gizmo.Create(wall, (x1 + x2) * 0.5f, (y1 + y2) * 0.5f, null, scope);
             return wall;
         }
 

@@ -52,13 +52,13 @@ namespace Moonwell.Testing
             public int Adds;
 
             /// <summary>The current owner seen inside OnAdded.</summary>
-            public Owner? Seen;
+            public Scope? Seen;
 
             /// <summary>Counts the add and keeps the current owner.</summary>
             protected override void OnAdded()
             {
                 Adds++;
-                Seen = Owner.Current;
+                Seen = Scope.Current;
             }
         }
 
@@ -209,13 +209,13 @@ namespace Moonwell.Testing
             Expect.True(!actor.Remove<A>(), "no A is left to remove");
         }
 
-        /// <summary>Inside OnAdded, Owner.Current is the component.</summary>
+        /// <summary>Inside OnAdded, Scope.Current is the component.</summary>
         public static void CurrentInOnAdded(FakeWorld world)
         {
             var actor = new TestActor();
             var probe = actor.Add(new Probe());
             Expect.Equal(1, probe.Adds, "OnAdded ran once");
-            Expect.Same(probe, probe.Seen, "Owner.Current inside OnAdded");
+            Expect.Same(probe, probe.Seen, "Scope.Current inside OnAdded");
         }
 
         /// <summary>When the actor ends, its components end newest first, and each logs its removal.</summary>

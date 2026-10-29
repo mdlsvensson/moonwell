@@ -85,8 +85,8 @@ namespace Moonwell
 
             if (!dead.HasEnded && (dead.Mask & Hook.OnDeath) != 0)
             {
-                var previous = Owner.current;
-                Owner.current = dead;
+                var previous = Scope.current;
+                Scope.current = dead;
                 try
                 {
                     dead.OnDeath();
@@ -96,7 +96,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(dead) + ".OnDeath", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             var count = dead.BeginDispatch();
@@ -108,8 +108,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnDeath();
@@ -119,7 +119,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnDeath", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             dead.EndDispatch();
@@ -333,8 +333,8 @@ namespace Moonwell
         {
             if (!item.HasEnded && (item.Mask & Hook.OnPickedUp) != 0)
             {
-                var previous = Owner.current;
-                Owner.current = item;
+                var previous = Scope.current;
+                Scope.current = item;
                 try
                 {
                     item.OnPickedUp(by);
@@ -344,7 +344,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(item) + ".OnPickedUp", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             var count = item.BeginDispatch();
@@ -356,8 +356,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnPickedUp(by);
@@ -367,7 +367,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnPickedUp", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             item.EndDispatch();
@@ -378,8 +378,8 @@ namespace Moonwell
         {
             if (!unit.HasEnded && (unit.Mask & Hook.OnItemPickedUp) != 0)
             {
-                var previous = Owner.current;
-                Owner.current = unit;
+                var previous = Scope.current;
+                Scope.current = unit;
                 try
                 {
                     unit.OnItemPickedUp(item);
@@ -389,7 +389,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(unit) + ".OnItemPickedUp", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             var count = unit.BeginDispatch();
@@ -401,8 +401,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnItemPickedUp(item);
@@ -412,7 +412,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnItemPickedUp", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             unit.EndDispatch();
@@ -423,8 +423,8 @@ namespace Moonwell
         {
             if (!item.HasEnded && (item.Mask & Hook.OnDropped) != 0)
             {
-                var previous = Owner.current;
-                Owner.current = item;
+                var previous = Scope.current;
+                Scope.current = item;
                 try
                 {
                     item.OnDropped(by);
@@ -434,7 +434,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(item) + ".OnDropped", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             var count = item.BeginDispatch();
@@ -446,8 +446,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnDropped(by);
@@ -457,7 +457,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnDropped", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             item.EndDispatch();
@@ -468,8 +468,8 @@ namespace Moonwell
         {
             if (!unit.HasEnded && (unit.Mask & Hook.OnItemDropped) != 0)
             {
-                var previous = Owner.current;
-                Owner.current = unit;
+                var previous = Scope.current;
+                Scope.current = unit;
                 try
                 {
                     unit.OnItemDropped(item);
@@ -479,7 +479,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(unit) + ".OnItemDropped", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             var count = unit.BeginDispatch();
@@ -491,8 +491,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnItemDropped(item);
@@ -502,7 +502,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnItemDropped", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             unit.EndDispatch();
@@ -513,8 +513,8 @@ namespace Moonwell
         {
             if (!from.HasEnded && (from.Mask & Hook.OnDealtDamage) != 0)
             {
-                var previous = Owner.current;
-                Owner.current = from;
+                var previous = Scope.current;
+                Scope.current = from;
                 try
                 {
                     from.OnDealtDamage(damage);
@@ -524,7 +524,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(from) + ".OnDealtDamage", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             var count = from.BeginDispatch();
@@ -536,8 +536,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnDealtDamage(damage);
@@ -547,7 +547,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnDealtDamage", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             from.EndDispatch();
@@ -558,8 +558,8 @@ namespace Moonwell
         {
             if (!hit.HasEnded && (hit.Mask & Hook.OnDamaged) != 0)
             {
-                var previous = Owner.current;
-                Owner.current = hit;
+                var previous = Scope.current;
+                Scope.current = hit;
                 try
                 {
                     hit.OnDamaged(damage);
@@ -569,7 +569,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(hit) + ".OnDamaged", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             var count = hit.BeginDispatch();
@@ -581,8 +581,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnDamaged(damage);
@@ -592,7 +592,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnDamaged", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             hit.EndDispatch();
@@ -603,8 +603,8 @@ namespace Moonwell
         {
             if (!dead.HasEnded && (dead.Mask & Hook.OnDeath) != 0)
             {
-                var previous = Owner.current;
-                Owner.current = Game.Instance;
+                var previous = Scope.current;
+                Scope.current = Game.Instance;
                 try
                 {
                     dead.OnDeath(killer);
@@ -614,7 +614,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(dead) + ".OnDeath", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             var count = dead.BeginDispatch();
@@ -626,8 +626,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnDeath(killer);
@@ -637,7 +637,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnDeath", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             dead.EndDispatch();
@@ -648,8 +648,8 @@ namespace Moonwell
         {
             if (!slayer.HasEnded && (slayer.Mask & Hook.OnKill) != 0)
             {
-                var previous = Owner.current;
-                Owner.current = slayer;
+                var previous = Scope.current;
+                Scope.current = slayer;
                 try
                 {
                     slayer.OnKill(victim);
@@ -659,7 +659,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(slayer) + ".OnKill", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             var count = slayer.BeginDispatch();
@@ -671,8 +671,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnKill(victim);
@@ -682,7 +682,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnKill", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             slayer.EndDispatch();
@@ -700,8 +700,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnUnitDamaged(damage);
@@ -711,7 +711,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnUnitDamaged", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             actor.EndDispatch();
@@ -729,8 +729,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnUnitDied(dying, killer);
@@ -740,7 +740,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnUnitDied", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             actor.EndDispatch();
@@ -751,8 +751,8 @@ namespace Moonwell
         {
             if (!ability.HasEnded && (ability.Mask & Hook.OnCast) != 0)
             {
-                var previous = Owner.current;
-                Owner.current = ability;
+                var previous = Scope.current;
+                Scope.current = ability;
                 try
                 {
                     ability.OnCast(cast);
@@ -762,7 +762,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(ability) + ".OnCast", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
         }
 
@@ -771,8 +771,8 @@ namespace Moonwell
         {
             if (!caster.HasEnded && (caster.Mask & Hook.OnCast) != 0)
             {
-                var previous = Owner.current;
-                Owner.current = caster;
+                var previous = Scope.current;
+                Scope.current = caster;
                 try
                 {
                     caster.OnCast(cast);
@@ -782,7 +782,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(caster) + ".OnCast", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             var count = caster.BeginDispatch();
@@ -794,8 +794,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnCast(cast);
@@ -805,7 +805,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnCast", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             caster.EndDispatch();
@@ -836,8 +836,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnLeave(leaving);
@@ -847,7 +847,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnLeave", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             actor.EndDispatch();
@@ -865,8 +865,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnUnitCast(cast);
@@ -876,7 +876,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnUnitCast", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             actor.EndDispatch();
@@ -894,8 +894,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnGameStart();
@@ -905,7 +905,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnGameStart", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             actor.EndDispatch();

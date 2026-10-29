@@ -596,8 +596,8 @@ namespace Moonwell
         /// <summary>Asks Accepts with the area as the current owner; a failing Accepts is reported and refuses the unit.</summary>
         private bool CallAccepts(Unit unit)
         {
-            var previous = Owner.current;
-            Owner.current = this;
+            var previous = Scope.current;
+            Scope.current = this;
             var answer = false;
             try
             {
@@ -608,15 +608,15 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".Accepts", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
             return answer;
         }
 
         /// <summary>Runs OnUnitEntered with the area as the current owner; a failing one is reported.</summary>
         private void CallEntered(Unit unit)
         {
-            var previous = Owner.current;
-            Owner.current = this;
+            var previous = Scope.current;
+            Scope.current = this;
             try
             {
                 OnUnitEntered(unit);
@@ -626,14 +626,14 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".OnUnitEntered", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
         }
 
         /// <summary>Runs OnUnitStays with the area as the current owner; a failing one is reported.</summary>
         private void CallStays(Unit unit)
         {
-            var previous = Owner.current;
-            Owner.current = this;
+            var previous = Scope.current;
+            Scope.current = this;
             try
             {
                 OnUnitStays(unit);
@@ -643,14 +643,14 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".OnUnitStays", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
         }
 
         /// <summary>Runs OnUnitLeft with the area as the current owner; a failing one is reported.</summary>
         private void CallLeft(Unit unit)
         {
-            var previous = Owner.current;
-            Owner.current = this;
+            var previous = Scope.current;
+            Scope.current = this;
             try
             {
                 OnUnitLeft(unit);
@@ -660,7 +660,7 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".OnUnitLeft", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
         }
     }
 }

@@ -2,24 +2,24 @@ using System;
 
 namespace Moonwell
 {
-    /// <summary>Something an owner holds, and ends when the owner ends or when it ends by itself.</summary>
-    public abstract class Owned
+    /// <summary>Something a scope holds, and ends when the scope ends or when it ends by itself.</summary>
+    public abstract class Scoped
     {
-        /// <summary>The owner that adopted this object; kept after the object ends.</summary>
+        /// <summary>The scope this object was made in, which ends it when it ends; kept after the object ends.</summary>
         [LocalSafe]
-        public Owner? Owner { get; internal set; }
+        public Scope? Parent { get; internal set; }
 
         /// <summary>Whether this object has ended: false inside its OnEnd, OnRemoved and OnLeave, true once its End or removal returns.</summary>
         [LocalSafe]
         public bool HasEnded { get; private set; }
 
-        /// <summary>The older sibling in the owner's list of children; null for the oldest.</summary>
-        internal Owned? before;
+        /// <summary>The older sibling in its parent's list of children; null for the oldest.</summary>
+        internal Scoped? before;
 
-        /// <summary>The newer sibling in the owner's list of children; null for the newest.</summary>
-        internal Owned? after;
+        /// <summary>The newer sibling in its parent's list of children; null for the newest.</summary>
+        internal Scoped? after;
 
-        /// <summary>Whether this object is in its owner's list of children.</summary>
+        /// <summary>Whether this object is in its parent's list of children.</summary>
         internal bool linked;
 
         /// <summary>Whether this object is ending; a second End while it runs does nothing.</summary>
@@ -43,16 +43,16 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".OnEnd", error);
             }
 
-            if (this is Owner owner)
+            if (this is Scope scope)
             {
-                while (owner.newest != null)
+                while (scope.newest != null)
                 {
-                    var child = owner.newest;
-                    owner.Unlink(child);
+                    var child = scope.newest;
+                    scope.Unlink(child);
                     child.End();
                 }
 
-                owner.childrenEnded = true;
+                scope.childrenEnded = true;
             }
 
             try
@@ -65,9 +65,9 @@ namespace Moonwell
             }
 
             HasEnded = true;
-            if (linked && Owner != null)
+            if (linked && Parent != null)
             {
-                Owner.Unlink(this);
+                Parent.Unlink(this);
             }
         }
 

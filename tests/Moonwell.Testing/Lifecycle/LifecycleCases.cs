@@ -131,7 +131,7 @@ namespace Moonwell.Testing
             holder.Interact(aura);
             Steps(world, 8);
             Expect.True(kept.Has<Chilled>() && removed.Has<Chilled>(), "both others are chilled while near");
-            Expect.Same(kept, kept.Get<Chilled>()!.Owner, "the owner of the buff the pair applied");
+            Expect.Same(kept, kept.Get<Chilled>()!.Parent, "the owner of the buff the pair applied");
 
             world.MoveUnit(kept.Handle, 900.0f, 900.0f);
             world.MoveUnit(removed.Handle, -900.0f, -900.0f);
@@ -196,7 +196,7 @@ namespace Moonwell.Testing
             Expect.True(shared.Actor == a && !b.Has<Marker>(), "the component stays on the first unit only");
             a.Remove();
             world.Advance(2.5f);
-            Expect.Equal("2 False 1", ran + " " + b.HasEnded + " " + b.OwnedCount, "runs of the second unit's timer after the first was removed, whether it ended, and what it owns");
+            Expect.Equal("2 False 1", ran + " " + b.HasEnded + " " + b.ChildCount, "runs of the second unit's timer after the first was removed, whether it ended, and what it owns");
         }
 
         /// <summary>A Separate buff that applies itself again in OnExpire is refused, in every build: it is reported, the buff starts nothing again and ends at its expiry, and its unit ends (in a release build it used to be linked twice, and its unit's end never returned) (decision 74).</summary>
@@ -210,7 +210,7 @@ namespace Moonwell.Testing
             Expect.Equal(1, buff.Applied, "the buff's applies");
             target.Remove();
             Expect.True(target.HasEnded, "the unit has ended");
-            Expect.Equal(0, target.OwnedCount, "what the ended unit still owns");
+            Expect.Equal(0, target.ChildCount, "what the ended unit still owns");
         }
 
         /// <summary>Removing a component from another actor than the one it is on is refused, in every build: it is reported, and the component stays on its actor (decision 74).</summary>
@@ -363,8 +363,8 @@ namespace Moonwell.Testing
             ObjectTypes.Item(ObjectTypes.FourCC("I0EO"), () => new CountedItem());
             var owner = Game.Instance.Add(new CreatedWatch());
             owner.End();
-            var unit = Unit.Create<CountedHero>(Player.Get(0), 0.0f, 0.0f, owner: owner);
-            var item = Item.Create<CountedItem>(0.0f, 0.0f, owner: owner);
+            var unit = Unit.Create<CountedHero>(Player.Get(0), 0.0f, 0.0f, scope: owner);
+            var item = Item.Create<CountedItem>(0.0f, 0.0f, scope: owner);
             Expect.True(unit.HasEnded && item.HasEnded, "the unit and the item have ended");
             Expect.True(world.RemovedUnits.Contains(unit.Handle) && world.RemovedItems.Contains(item.Handle), "the unit and the item are removed from the game");
             Expect.Equal("0 0 0 0", CountedHero.Created + " " + CountedHero.Left + " " + CountedItem.Created + " " + CountedItem.Left, "the unit's OnCreated and OnLeave runs, and the item's");
@@ -447,10 +447,10 @@ namespace Moonwell.Testing
                 Expect.True(false, "the adopt threw: " + error.Message);
             }
 
-            Expect.Equal(1, Logged(world, "Unit.Adopt failed: Timer already has an owner or has ended"), "the reports of the adopt: " + string.Join(" | ", world.Logged));
+            Expect.Equal(1, Logged(world, "Unit.Adopt failed: Timer already has a parent or has ended"), "the reports of the adopt: " + string.Join(" | ", world.Logged));
             second.Remove();
             world.Advance(2.5f);
-            Expect.Equal("2 1 0", ran + " " + first.OwnedCount + " " + second.OwnedCount, "the timer's runs after the second owner was removed, and what each owns");
+            Expect.Equal("2 1 0", ran + " " + first.ChildCount + " " + second.ChildCount, "the timer's runs after the second owner was removed, and what each owns");
         }
     }
 }

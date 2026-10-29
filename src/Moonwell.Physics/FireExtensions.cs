@@ -11,7 +11,7 @@ namespace Moonwell
     public static class FireExtensions
     {
         /// <summary>Fires a missile at a unit where it is now: at its middle, half its height above the ground and its fly height, and returns the missile. Each Homing its class lists with no target is given the unit, before OnCreated runs.</summary>
-        public static T Fire<T>(this Unit source, T missile, Unit target, Owner? owner = null)
+        public static T Fire<T>(this Unit source, T missile, Unit target, Scope? scope = null)
             where T : Missile
         {
             var starting = missile.StartingComponents();
@@ -25,23 +25,23 @@ namespace Moonwell
             }
 
             var above = target.FlyHeight + Shapes.UnitHeight(target) * 0.5f;
-            Flight.Launch(source, missile, target.X, target.Y, above, false, owner);
+            Flight.Launch(source, missile, target.X, target.Y, above, false, scope);
             return missile;
         }
 
         /// <summary>Fires a missile at a point, and returns it: with no Arc at the height above the ground there that it left at, so on flat ground it flies level; with an Arc it lands on the ground there, its middle aimed its radius above the ground so its bottom meets the ground at the point.</summary>
-        public static T Fire<T>(this Unit source, T missile, float x, float y, Owner? owner = null)
+        public static T Fire<T>(this Unit source, T missile, float x, float y, Scope? scope = null)
             where T : Missile
         {
-            Flight.Launch(source, missile, x, y, 0.0f, true, owner);
+            Flight.Launch(source, missile, x, y, 0.0f, true, scope);
             return missile;
         }
 
         /// <summary>Fires a missile at a point and height, and returns it; with an Arc it lands there.</summary>
-        public static T Fire<T>(this Unit source, T missile, float x, float y, float z, Owner? owner = null)
+        public static T Fire<T>(this Unit source, T missile, float x, float y, float z, Scope? scope = null)
             where T : Missile
         {
-            Flight.Launch(source, missile, x, y, z - Ground.Height(x, y), false, owner);
+            Flight.Launch(source, missile, x, y, z - Ground.Height(x, y), false, scope);
             return missile;
         }
     }

@@ -61,7 +61,7 @@ namespace Moonwell
             set { Place(value.X, value.Y); }
         }
 
-        /// <summary>The player the gizmo plays for: Neutral Passive unless it was given one. The gizmo's Owner stays the owner it lives and ends with.</summary>
+        /// <summary>The player the gizmo plays for: Neutral Passive unless it was given one. The gizmo's Scope stays the owner it lives and ends with.</summary>
         [LocalSafe]
         public Player Player
         {
@@ -86,14 +86,14 @@ namespace Moonwell
         }
 
         /// <summary>Places a gizmo of the map at a place for a player, and returns it. It belongs to the owner, or else the current owner (a missile: the game), and ends with it; the player is Neutral Passive unless given. OnCreated runs with the gizmo as the current owner.</summary>
-        public static T Create<T>(T gizmo, float x, float y, Player? player = null, Owner? owner = null)
+        public static T Create<T>(T gizmo, float x, float y, Player? player = null, Scope? scope = null)
             where T : Gizmo
         {
             Dev.Check(gizmo.entry == null, Names.NameOf(gizmo) + ".Create: the gizmo has been created already");
             Interactions.EnsureInstalled();
             gizmo.player = player ?? Player.NeutralPassive;
             gizmo.entry = Tracking.Begin(gizmo, Tracking.GizmoKind, x, y);
-            (owner ?? gizmo.DefaultOwner()).Adopt(gizmo);
+            (scope ?? gizmo.DefaultScope()).Adopt(gizmo);
             if (!gizmo.HasEnded)
             {
                 gizmo.Placed();
@@ -118,11 +118,11 @@ namespace Moonwell
         }
 
         /// <summary>Starts an interaction held by the gizmo, and returns it. It belongs to the owner, or else the current owner, and ends with it, with the gizmo, or by End. Fails in a development build when the gizmo has not been created, when it is not of the interaction's holder class, when its Range is not more than 0, or when it was started before.</summary>
-        public T Interact<T>(T interaction, Owner? owner = null)
+        public T Interact<T>(T interaction, Scope? scope = null)
             where T : Interaction
         {
             Dev.Check(entry != null, Names.NameOf(this) + ".Interact: the gizmo has not been created");
-            interaction.Begin(this, Tracking.GizmoKind, owner);
+            interaction.Begin(this, Tracking.GizmoKind, scope);
             return interaction;
         }
 
@@ -137,9 +137,9 @@ namespace Moonwell
         }
 
         /// <summary>The owner Create adopts the gizmo into when it is given none: the current owner. A package's kind of gizmo may choose another, as a missile belongs to the game.</summary>
-        internal virtual Owner DefaultOwner()
+        internal virtual Scope DefaultScope()
         {
-            return Owner.Current;
+            return Scope.Current;
         }
 
         /// <summary>Runs in Create once the gizmo has its entry and its owner, before its components are added and OnCreated runs; nothing for a plain gizmo. A package's kind of gizmo starts its own part here, as a missile joins the physics pass.</summary>
@@ -180,8 +180,8 @@ namespace Moonwell
                 due.Cancel();
             }
 
-            var previous = Owner.current;
-            Owner.current = this;
+            var previous = Scope.current;
+            Scope.current = this;
             try
             {
                 OnLeave();
@@ -191,7 +191,7 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".OnLeave", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
             if (entry != null)
             {
                 Tracking.Release(entry);
@@ -201,22 +201,22 @@ namespace Moonwell
         /// <summary>Runs OnTick with the gizmo as the current owner, and reports an error it throws. The cycle calls it, since a map overrides the hook.</summary>
         internal void CallTick()
         {
-            var previous = Owner.current;
-            Owner.current = this;
+            var previous = Scope.current;
+            Scope.current = this;
             var failure = Guard.Tick(this);
             if (failure != null)
             {
                 Errors.Report(Names.NameOf(this) + ".OnTick", failure);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
         }
 
         /// <summary>Runs OnCreated with the gizmo as the current owner, and reports an error it throws.</summary>
         private void CallCreated()
         {
-            var previous = Owner.current;
-            Owner.current = this;
+            var previous = Scope.current;
+            Scope.current = this;
             try
             {
                 OnCreated();
@@ -226,7 +226,7 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(this) + ".OnCreated", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
         }
 
         /// <summary>Sets the gizmo's place, and its cell with it.</summary>

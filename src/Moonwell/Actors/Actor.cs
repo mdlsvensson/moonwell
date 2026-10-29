@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace Moonwell
 {
     /// <summary>An owner that holds components, in the order they were added, and ends them when it ends.</summary>
-    public abstract class Actor : Owner
+    public abstract class Actor : Scope
     {
-        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Owner).
+        // The instance fields are internal, not private, as a map's subclass may name a field of its own the same (see Scope).
 
         /// <summary>The components in add order; a removed one is null until the list is compacted.</summary>
         internal List<Component?> components = new List<Component?>();
@@ -142,8 +142,8 @@ namespace Moonwell
             component.Mask = Hooks.MaskOf(component, component.Table);
             Events.Need(component.Mask);
             component.added = true;
-            var previous = Owner.current;
-            Owner.current = component;
+            var previous = Scope.current;
+            Scope.current = component;
             try
             {
                 component.CallAdded();
@@ -153,7 +153,7 @@ namespace Moonwell
                 Errors.Report(Names.NameOf(component) + ".OnAdded", error);
             }
 
-            Owner.current = previous;
+            Scope.current = previous;
             return component;
         }
 

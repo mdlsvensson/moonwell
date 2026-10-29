@@ -114,31 +114,31 @@ namespace Moonwell.Testing
         public static void OwnerAdopts(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             Timer? made = null;
             owner.Run(() => { made = Timer.After(2f, () => { }); });
             var timer = made!;
-            Expect.Same(owner, timer.Owner, "the timer's owner");
+            Expect.Same(owner, timer.Parent, "the timer's owner");
             owner.End();
             Expect.True(timer.HasEnded, "the timer has ended with its owner");
         }
 
-        /// <summary>Inside the callback, Owner.Current is the timer's owner.</summary>
+        /// <summary>Inside the callback, Scope.Current is the timer's owner.</summary>
         public static void CurrentInCallback(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
-            Owner? seen = null;
-            owner.Run(() => { Timer.After(1f, () => { seen = Owner.Current; }); });
+            var owner = new TestScope("owner", log);
+            Scope? seen = null;
+            owner.Run(() => { Timer.After(1f, () => { seen = Scope.Current; }); });
             world.Advance(1f);
-            Expect.Same(owner, seen, "Owner.Current inside the callback");
+            Expect.Same(owner, seen, "Scope.Current inside the callback");
         }
 
         /// <summary>A timer that throws is reported, and a timer due at the same time still runs.</summary>
         public static void ErrorIsolated(FakeWorld world)
         {
             var log = new List<string>();
-            var owner = new TestOwner("owner", log);
+            var owner = new TestScope("owner", log);
             var second = 0;
             owner.Run(() =>
             {
@@ -150,7 +150,7 @@ namespace Moonwell.Testing
             var reported = false;
             foreach (var line in world.Logged)
             {
-                if (line.Contains("TestOwner.Timer failed"))
+                if (line.Contains("TestScope.Timer failed"))
                 {
                     reported = true;
                 }

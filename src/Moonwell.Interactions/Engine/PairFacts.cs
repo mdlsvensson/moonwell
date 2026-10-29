@@ -1,7 +1,7 @@
 #if DEBUG
 namespace Moonwell.Engine
 {
-    /// <summary>What the debug mode reads of a pair. A pair is kept as an Owner, and only its typed interaction can read it (see Pairing), so Interaction.ReadPair fills one of these, which the view reuses.</summary>
+    /// <summary>What the debug mode reads of a pair. A pair is kept as an Scope, and only its typed interaction can read it (see Pairing), so Interaction.ReadPair fills one of these, which the view reuses.</summary>
     internal sealed class PairFacts
     {
         /// <summary>The holder of the pair's interaction.</summary>

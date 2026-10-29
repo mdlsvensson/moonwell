@@ -30,7 +30,7 @@ namespace Moonwell
         }
 
         /// <summary>Takes a game unit in: makes its object, adds its starting components, and runs OnCreated, and the map's OnUnitCreated when the unit is coming into the game (entering: it enters, Unit.Create made it, or it is there at the start), not for a unit taken in long after it came in. An illusion is taken in as a plain unit, not as its type's class, with no starting components and no OnCreated (decision 77).</summary>
-        internal static Unit? TakeIn(unit handle, Owner? owner, bool entering)
+        internal static Unit? TakeIn(unit handle, Scope? scope, bool entering)
         {
             var existing = Find(handle);
             if (existing != null)
@@ -59,7 +59,7 @@ namespace Moonwell
             made.owner = Runtime.World.OwnerOf(handle);
             known[handle] = made;
             Live.Add(made);
-            owner?.Adopt(made);
+            scope?.Adopt(made);
             made.Mask = Hooks.MaskOf(made, Unit.UnitHooks);
             Events.Need(made.Mask);
             for (var i = 0; i < made.StartComponents.Count; i++)
@@ -76,8 +76,8 @@ namespace Moonwell
 
             if (!made.HasEnded && !illusion)
             {
-                var previous = Owner.current;
-                Owner.current = made;
+                var previous = Scope.current;
+                Scope.current = made;
                 try
                 {
                     made.CallEnter();
@@ -87,7 +87,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(made) + ".OnCreated", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             if (entering && Events.Wants(Hook.OnUnitCreated) && !made.HasEnded)
@@ -193,8 +193,8 @@ namespace Moonwell
                     continue;
                 }
 
-                var previous = Owner.current;
-                Owner.current = component;
+                var previous = Scope.current;
+                Scope.current = component;
                 try
                 {
                     component.OnUnitCreated(unit);
@@ -204,7 +204,7 @@ namespace Moonwell
                     Errors.Report(Names.NameOf(component) + ".OnUnitCreated", error);
                 }
 
-                Owner.current = previous;
+                Scope.current = previous;
             }
 
             actor.EndDispatch();

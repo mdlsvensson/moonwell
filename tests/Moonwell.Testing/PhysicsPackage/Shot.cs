@@ -22,7 +22,7 @@ namespace Moonwell.Testing
         public List<Actor> Asked = new List<Actor>();
 
         /// <summary>The owner that was current when OnImpact last ran.</summary>
-        public Owner? ImpactedWith;
+        public Scope? ImpactedWith;
 
         /// <summary>The answer CanHit gives instead of the default; null for the default.</summary>
         public Func<Actor, bool>? Hit;
@@ -83,7 +83,7 @@ namespace Moonwell.Testing
             Reads.Add(normal.Z);
             Reads.Add(impact.Speed);
             Damages.Add(impact.Damage);
-            ImpactedWith = Owner.Current;
+            ImpactedWith = Scope.Current;
             if (Impacting != null)
             {
                 Impacting(impact);
