@@ -16,4 +16,4 @@
   </p>
 </div>
 
-Using moonwell, a map is a C# project (`MyMap.csproj`) and a Warcraft III map saved as a folder (`map/`). You declare the map's settings, its units, heroes, items, abilities, buffs, destructables, doodads, and upgrades, all in code, and use the World Editor for terrain and placing things like regions, cameras, units, items, and trees. `moonwell build` writes declared object data into a staged copy of the map, compiles your C# into Lua, and packs the `.w3x` archive.
+Moonwell is a C# modding framework for Warcraft III: Reforged that's in active development. It is still far from production ready, expect breaking changes. Use with caution. If you don't know what you're doing without AI, use something else for now, there are lots of traps still need resolving.
