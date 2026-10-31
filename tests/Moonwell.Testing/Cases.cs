@@ -1063,6 +1063,9 @@ namespace Moonwell.Testing
             list.Add(new Case { Name = "compiler.switch-statement-patterns", Run = CompilerCases.SwitchStatementPatterns });
             list.Add(new Case { Name = "compiler.negated-negative-constant", Run = CompilerCases.NegatedNegativeConstant });
             list.Add(new Case { Name = "compiler.compound-conditional", Run = CompilerCases.CompoundConditional });
+            list.Add(new Case { Name = "flags.core-enum", Run = FlagCases.CoreEnum });
+            list.Add(new Case { Name = "flags.ignored-enum", Run = FlagCases.IgnoredEnum });
+            list.Add(new Case { Name = "flags.top-bits", Run = FlagCases.TopBits });
         }
 
         /// <summary>Runs every case on a fresh world, and returns a PASS or FAIL line for each, then DONE.</summary>
